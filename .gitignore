@@ -6,7 +6,6 @@ bin/
 packages/
 paket-files/
 node_modules/
-src/Client/public/js/
 release.cmd
 release.sh
 .idea/
