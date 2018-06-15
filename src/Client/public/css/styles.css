@@ -18,6 +18,17 @@ html, body {
     touch-action: auto;
 }
 
+.center-h {
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+.center-v {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 #elmish-app {
     width: 100%;
     height: 100%;
@@ -28,6 +39,7 @@ html, body {
     display: flex;
     flex-direction: row;
     align-items: center;
+    overflow-y: auto;
     touch-action: auto;
 }
 .root:focus {
@@ -37,15 +49,14 @@ html, body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow-y: hidden;
+    overflow: hidden;
+    padding: 5px;
 }
 .playground {
-    margin: 15px;
     position: relative;
     flex-shrink: 0;
 }
 .controls {
-    margin: 10px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -55,15 +66,12 @@ html, body {
     margin: 10px;
 }
 .info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     flex-shrink: 0;
     color: #ff3860;
     font-family: fantasy;
 }
 .score {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: bold;
 }
 .game-over {

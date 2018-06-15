@@ -35,6 +35,7 @@ type Model = {
     TouchStartPos: (float * float) option
     IsPaused: bool
     IsRestarting: bool
+    HideDetail: bool
 }
 
 type Msg =
@@ -43,9 +44,10 @@ type Msg =
     | Tick
     | TouchStart of float * float | TouchEnd
     | Pause | Continue
+    | HideDetail
 
 let init () =
-    let rows, columns = 30, 20
+    let rows, columns = 28, 18
     { 
         Score = 0
         Boundry = rows - 1, columns - 1
@@ -60,6 +62,7 @@ let init () =
         TouchStartPos = None
         IsPaused = false
         IsRestarting = false
+        HideDetail = true
     }, Cmd.none
 
 let update msg model =
@@ -106,6 +109,7 @@ let update msg model =
     | TouchEnd -> { model with TouchStartPos = None }, Cmd.none
     | Pause -> { model with IsPaused = true }, Cmd.none
     | Continue -> { model with IsPaused = false }, Cmd.none
+    | HideDetail -> { model with HideDetail = not model.HideDetail }, Cmd.none
 
 let view (model : Model) (dispatch : Msg -> unit) =
     let generateColorString color =
@@ -125,9 +129,8 @@ let view (model : Model) (dispatch : Msg -> unit) =
     div [ Class "root"; Id "root"
           TabIndex 0.
           OnClick (fun e ->
-            if e.target = e.currentTarget then
-                (e.target :?> Browser.HTMLElement).focus()
-                Rotate |> Msg.Action |> dispatch)
+            (e.target :?> Browser.HTMLElement).focus()
+            Rotate |> Msg.Action |> dispatch)
           OnTouchStart (fun e -> (e.changedTouches.[0.].clientX, e.changedTouches.[0.].clientY) |> TouchStart |> dispatch)
           OnTouchEnd (fun e ->
             match model.TouchStartPos with
@@ -156,10 +159,9 @@ let view (model : Model) (dispatch : Msg -> unit) =
             if not model.IsRestarting then
                 yield div [ Class "container" ]
                     [
-                        div [ Class "playground";
-                              Style [
-                                Width (pixleLength ((snd model.Boundry + 1) * squareSize))
-                                Height (pixleLength ((fst model.Boundry + 1) * squareSize)) ] ]
+                        yield div [ Class "playground";
+                              Style [ Width (pixleLength ((snd model.Boundry + 1) * squareSize))
+                                      Height (pixleLength ((fst model.Boundry + 1) * squareSize)) ] ]
                             [
                                 for row in 0..(fst model.Boundry) do
                                     for col in 0..(snd model.Boundry) ->
@@ -178,32 +180,41 @@ let view (model : Model) (dispatch : Msg -> unit) =
                                     for block in model.PrectionBlock.Value.Squares ->
                                         createSquare (fst block.Location) (snd block.Location) block.Color
                             ]
-                        div [ Class "controls" ]
+                        yield div [ Class "controls" ]
                             [
                                 Button.button [
                                     Button.Color IsDanger; Button.Size IsSmall
-                                    Button.OnClick (fun _ -> BeginRestart |> dispatch) ]
+                                    Button.OnClick (fun e -> e.stopPropagation(); HideDetail |> dispatch) ]
+                                    [ Icon.faIcon [ Icon.Size IsLarge ] [ Fa.icon Fa.I.Expand ]
+                                      span [] [str (if model.HideDetail then "更多" else "隐藏")] ]
+                                Button.button [
+                                    Button.Color IsDanger; Button.Size IsSmall
+                                    Button.OnClick (fun e -> e.stopPropagation(); BeginRestart |> dispatch) ]
                                     [ Icon.faIcon [ Icon.Size IsLarge ] [ Fa.icon Fa.I.Refresh ]
                                       span [] [str "重新开始"] ]
                                 Button.button [
                                     Button.Color IsDanger; Button.Size IsSmall
-                                    Button.OnClick (fun _ -> Pause |> dispatch) ]
+                                    Button.OnClick (fun e -> e.stopPropagation(); Pause |> dispatch) ]
                                     [ Icon.faIcon [ Icon.Size IsLarge ] [ Fa.icon Fa.I.Pause ]
                                       span [] [str "暂停"] ]
                                 Button.button [
                                     Button.Color IsDanger; Button.Size IsSmall
-                                    Button.OnClick (fun _ -> Continue |> dispatch) ]
+                                    Button.OnClick (fun e -> e.stopPropagation(); Continue |> dispatch) ]
                                     [ Icon.faIcon [ Icon.Size IsLarge ] [ Fa.icon Fa.I.Forward ]
                                       span [] [str "继续"] ]
                             ]
-                        div [ Class "info" ]
+                        yield div [ Class "center-h info score"] 
                             [
-                                yield div [ Class "score" ] [str (sprintf "分数：%d" (model.Score))]
-                                yield div [] [str (sprintf "时间：%s 秒" (string (model.TimeCost / 10)))]
-                                if model.IsOver then yield div [] [str "游戏结束"]
-                                yield div [] [str "支持手势和键盘(*上键为旋转)"]
-                                yield div [] [str "@slaveoftime 🖖"]
+                                div [] [str (sprintf "分数：%d" (model.Score))]
+                                div [] [str (sprintf " 🙏 %s 秒" (string (model.TimeCost / 10)))]
                             ]
+                        if not model.HideDetail then 
+                            yield div [ Class "center-v info" ]
+                                [
+                                    if model.IsOver then yield div [] [str "游戏结束"]
+                                    yield div [] [str "支持手势和键盘(*上键为旋转)"]
+                                    yield div [] [str "@slaveoftime 🖖"]
+                                ]
                     ]
             if model.IsRestarting then
                 yield div [ Class "container" ]
@@ -213,12 +224,12 @@ let view (model : Model) (dispatch : Msg -> unit) =
                             [
                                 Button.button [
                                     Button.Color IsDanger; Button.Size IsSmall
-                                    Button.OnClick (fun _ -> Restart |> dispatch) ]
+                                    Button.OnClick (fun e -> e.stopPropagation(); Restart |> dispatch) ]
                                     [ Icon.faIcon [ Icon.Size IsLarge ] [ Fa.icon Fa.I.Refresh ]
                                       span [] [str "是"] ]
                                 Button.button [
                                     Button.Color IsDanger; Button.Size IsSmall
-                                    Button.OnClick (fun _ -> CancelRestart |> dispatch) ]
+                                    Button.OnClick (fun e -> e.stopPropagation(); CancelRestart |> dispatch) ]
                                     [ Icon.faIcon [ Icon.Size IsLarge ] [ Fa.icon Fa.I.Pause ]
                                       span [] [str "否"] ]
                             ]
