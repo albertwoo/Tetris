@@ -1,0 +1,34 @@
+storage: none
+
+group Server
+    storage: none
+    source https://api.nuget.org/v3/index.json
+
+    nuget FSharp.Core
+    nuget Giraffe ~> 1
+    nuget Microsoft.AspNetCore
+    nuget Microsoft.AspNetCore.StaticFiles
+    nuget Fable.Remoting.Giraffe ~> 2.6
+    nuget Microsoft.ApplicationInsights.AspNetCore ~> 2.2
+    nuget WindowsAzure.Storage
+
+group Client
+    storage: none
+    source https://api.nuget.org/v3/index.json
+
+    nuget Fable.Core
+    nuget Fable.Elmish.Debugger
+    nuget Fable.Elmish.React
+    nuget Fable.Elmish.HMR
+    nuget Fable.Remoting.Client ~> 2.4
+    nuget Fulma
+
+    clitool dotnet-fable
+
+group Build
+    source https://api.nuget.org/v3/index.json
+    generate_load_scripts: true
+
+    nuget FAKE
+    nuget Microsoft.Azure.Management.ResourceManager.Fluent 1.4.1
+    github CompositionalIT/fshelpers src/FsHelpers/ArmHelper/ArmHelper.fs

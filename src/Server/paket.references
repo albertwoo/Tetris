@@ -1,0 +1,8 @@
+group Server
+    FSharp.Core
+    Giraffe
+    Microsoft.AspNetCore
+    Microsoft.AspNetCore.StaticFiles
+    Microsoft.ApplicationInsights.AspNetCore
+    WindowsAzure.Storage
+    Fable.Remoting.Giraffe
