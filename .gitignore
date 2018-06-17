@@ -11,3 +11,4 @@ release.sh
 .idea/
 *.DotSettings.user
 deploy/
+*.user
