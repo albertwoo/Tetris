@@ -43,7 +43,7 @@ html, body {
     touch-action: auto;
 }
 .root:focus {
-    background-color: #fdefd2;
+    background-color: #efe9dc;
 }
 .container {
     display: flex;

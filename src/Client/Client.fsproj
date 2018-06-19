@@ -5,8 +5,9 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="..\Shared\Shared.fs" />
-        <Compile Include="TetrisDomain.fs"/>
-        <Compile Include="Client.fs" />
+        <Compile Include="TetrisDomain.fs" />
+        <Compile Include="Tetris.fs" />
+        <Compile Include="App.fs" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>
