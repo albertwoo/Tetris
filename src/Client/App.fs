@@ -47,8 +47,11 @@ let update msg model: Model * Cmd<Msg> =
     | CancelRestart -> { model with IsRestarting = false }, Cmd.none
     | Restart -> init ()
     | TetrisMsg msg' ->
-        let tetrisModel, cmd = Tetris.update msg' model.Tetris
-        { model with Tetris = tetrisModel }, cmd
+        if model.Tetris.IsOver || model.IsPaused || model.IsRestarting then
+            model, Cmd.none
+        else
+            let tetrisModel, cmd = Tetris.update msg' model.Tetris
+            { model with Tetris = tetrisModel }, cmd
     | Tick ->
         if model.Tetris.IsOver || model.IsPaused || model.IsRestarting then
             model, Cmd.none
@@ -88,8 +91,8 @@ let update msg model: Model * Cmd<Msg> =
             let dx, dy = x - x0, y - y0
             let threshhold = 80.
             let isQuickTouch = (DateTime.Now -  model.TouchTime.Value).Ticks < TimeSpan.FromMilliseconds(200.).Ticks
-            if model.Tetris.IsOver then model', Cmd.ofMsg Restart
-            elif isQuickTouch && Math.Abs dx < 10. && Math.Abs dy < 10. then
+            // if model.Tetris.IsOver then model', Cmd.ofMsg Restart
+            if isQuickTouch && Math.Abs dx < 10. && Math.Abs dy < 10. then
                 model', Cmd.ofMsg (Rotate |> Tetris.Action |> TetrisMsg)
             elif isQuickTouch && Math.Abs dx > Math.Abs dy && Math.Abs dx > threshhold then
                 if dx > 0. then model', Cmd.ofMsg (Tetris.ReachRight |> TetrisMsg)
@@ -103,6 +106,17 @@ let update msg model: Model * Cmd<Msg> =
     | HideDetail -> { model with HideDetail = not model.HideDetail }, Cmd.none
    
 let view (model : Model) (dispatch : Msg -> unit) =
+    let iconButton onClick icon text =
+        Button.button
+            [
+                Button.Color IsDanger; Button.Size IsSmall
+                Button.OnClick onClick
+            ]
+            [
+                Icon.faIcon [ Icon.Size IsLarge ] [ Fa.icon icon ]
+                span [] [str text]
+            ]
+        
     div [ Class "root"; Id "root"
           TabIndex 0.
           OnClick (fun e -> (e.target :?> Browser.HTMLElement).focus())
@@ -122,36 +136,24 @@ let view (model : Model) (dispatch : Msg -> unit) =
                         yield div [ Class "playground"] [ Tetris.view model.Tetris ]
                         yield div [ Class "center-h info score"] 
                             [
-                                div [] [str (sprintf "分数：%d ❤ 等级：%d" (model.Tetris.Score) (Tetris.getTetrisLevel (model.Tetris)))]
-                                div [] [str (sprintf " 🙏 %s 秒" (string (model.TimeCost / 10)))]
+                                yield div [] [str (sprintf "分数：%d ❤ 等级：%d" (model.Tetris.Score) (Tetris.getTetrisLevel (model.Tetris)))]
+                                yield div [] [str (sprintf " 🙏 %s 秒" (string (model.TimeCost / 10)))]
+                                if model.Tetris.IsOver then yield div [] [str "😝游戏结束"]
                             ]
                         yield div [ Class "controls" ]
                             [
-                                Button.button [
-                                    Button.Color IsDanger; Button.Size IsSmall
-                                    Button.OnClick (fun e -> e.stopPropagation(); HideDetail |> dispatch) ]
-                                    [ Icon.faIcon [ Icon.Size IsLarge ] [ Fa.icon Fa.I.Expand ]
-                                      span [] [str (if model.HideDetail then "更多" else "隐藏")] ]
-                                Button.button [
-                                    Button.Color IsDanger; Button.Size IsSmall
-                                    Button.OnClick (fun e -> e.stopPropagation(); BeginRestart |> dispatch) ]
-                                    [ Icon.faIcon [ Icon.Size IsLarge ] [ Fa.icon Fa.I.Refresh ]
-                                      span [] [str "重新开始"] ]
-                                Button.button [
-                                    Button.Color IsDanger; Button.Size IsSmall
-                                    Button.OnClick (fun e -> e.stopPropagation(); Pause |> dispatch) ]
-                                    [ Icon.faIcon [ Icon.Size IsLarge ] [ Fa.icon Fa.I.Pause ]
-                                      span [] [str "暂停"] ]
-                                Button.button [
-                                    Button.Color IsDanger; Button.Size IsSmall
-                                    Button.OnClick (fun e -> e.stopPropagation(); Continue |> dispatch) ]
-                                    [ Icon.faIcon [ Icon.Size IsLarge ] [ Fa.icon Fa.I.Forward ]
-                                      span [] [str "继续"] ]
+                                iconButton (fun e -> e.stopPropagation(); HideDetail |> dispatch)
+                                    Fa.I.Expand
+                                    (if model.HideDetail then "更多" else "隐藏")
+                                iconButton (fun e -> e.stopPropagation(); BeginRestart |> dispatch)
+                                    Fa.I.Refresh "重新开始"
+                                iconButton (fun e -> e.stopPropagation(); (if model.IsPaused then Continue else Pause) |> dispatch)
+                                    (if model.IsPaused then Fa.I.Forward else Fa.I.Pause)
+                                    (if model.IsPaused then "继续" else "暂停")
                             ]
                         if not model.HideDetail then 
                             yield div [ Class "center-v info" ]
                                 [
-                                    if model.Tetris.IsOver then yield div [] [str "游戏结束"]
                                     yield div [] [str "支持手势和键盘(*上键为旋转)"]
                                     yield div [] [str "@slaveoftime 🖖"]
                                 ]
@@ -162,16 +164,10 @@ let view (model : Model) (dispatch : Msg -> unit) =
                         div [ Class "info" ] [ str "你确定要重新开始吗?" ]
                         div [ Class "controls" ]
                             [
-                                Button.button [
-                                    Button.Color IsDanger; Button.Size IsSmall
-                                    Button.OnClick (fun e -> e.stopPropagation(); Restart |> dispatch) ]
-                                    [ Icon.faIcon [ Icon.Size IsLarge ] [ Fa.icon Fa.I.Refresh ]
-                                      span [] [str "是"] ]
-                                Button.button [
-                                    Button.Color IsDanger; Button.Size IsSmall
-                                    Button.OnClick (fun e -> e.stopPropagation(); CancelRestart |> dispatch) ]
-                                    [ Icon.faIcon [ Icon.Size IsLarge ] [ Fa.icon Fa.I.Pause ]
-                                      span [] [str "否"] ]
+                                iconButton (fun e -> e.stopPropagation(); Restart |> dispatch)
+                                    Fa.I.Refresh "是"
+                                iconButton (fun e -> e.stopPropagation(); CancelRestart |> dispatch)
+                                    Fa.I.Pause "否"
                             ]
                     ]
         ]

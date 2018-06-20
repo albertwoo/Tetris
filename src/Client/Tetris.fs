@@ -21,7 +21,6 @@ type Model = {
 
 type Msg = | Action of Action | ReachBottom | ReachLeft | ReachRight
 
-let mutable context: Fable.Import.Browser.CanvasRenderingContext2D option = None
 let private updateCanvas model =
     let squareBorder = 1
     let backgroundColor = "#efe9dc"
@@ -30,14 +29,10 @@ let private updateCanvas model =
         let r, g, b, a = color
         sprintf "rgba(%d, %d, %d, %f)" r g b a
 
-    if context.IsNone then
-        let canvases = Browser.document.getElementsByName("tetris-canvas")
-        if canvases.length > 0. then
-            let canvas =  canvases.[0] :?> Browser.HTMLCanvasElement
-            context <- Some(canvas.getContext_2d())
-        
-    if context.IsSome then
-        let context = context.Value
+    let canvases = Browser.document.getElementsByName("tetris-canvas")
+    if canvases.length > 0. then
+        let canvas =  canvases.[0] :?> Browser.HTMLCanvasElement
+        let context = canvas.getContext_2d()
         let rows, columns = fst model.Boundry + 1, snd model.Boundry + 1
         let screenWidth, screenHeight = columns * model.SquareSize, rows * model.SquareSize
 
@@ -65,12 +60,12 @@ let private updateCanvas model =
                 for square in mb.Squares do drawSquare square.Location (generateColorString square.Color) targetContext
                 targetContext
             | _ -> targetContext
-    
+
         context
         |> drawGrid
         |> fun ctx ->
-            if model.MovingBlock.IsSome &&
-               not (model.MovingBlock.Value.Squares |> List.exists (fun x -> fst x.Location < 4)) then
+            if model.MovingBlock.IsSome && model.PreviewBlock.IsSome &&
+               not (isSquaresCollided model.MovingBlock.Value.Squares model.PreviewBlock.Value.Squares) then
                drawBlock model.PreviewBlock ctx
             else ctx
         |> drawBlock model.MovingBlock
@@ -86,6 +81,10 @@ let private newBlock columns =
             Squares =
                 block.Squares
                 |> List.map (fun x -> { x with Location = fst x.Location, snd x.Location + columns / 2}) }
+let private setBlockToBaseLine block =
+    let maxRow = block.Squares |> List.maxBy (fun x -> fst x.Location) |> fun x -> fst x.Location
+    { block with 
+        Squares = block.Squares |> List.map (fun x -> { x with Location = fst x.Location - maxRow, snd x.Location }) }
 
 let private getPredictionBlock boundry squares block =
     moveUntilBlocked boundry squares Down block
@@ -103,7 +102,7 @@ let init () =
         Boundry = rows - 1, columns - 1
         AllSquares = []
         PreviewBlock = Some(newBlock columns)
-        MovingBlock = Some(newBlock columns)
+        MovingBlock = Some(newBlock columns |> setBlockToBaseLine)
         PrectionBlock = None
         IsOver = false
         Score = 0
@@ -140,7 +139,7 @@ let update msg model =
                     let squares, score = cleanSquares model.Boundry (model.AllSquares @ mb.Squares)
                     m <- { model with
                                 PreviewBlock = Some(newBlock (snd model.Boundry + 1))
-                                MovingBlock = model.PreviewBlock
+                                MovingBlock = Some(model.PreviewBlock.Value |> setBlockToBaseLine)
                                 PrectionBlock = Some(getPredictionBlock model.Boundry squares model.PreviewBlock.Value)
                                 AllSquares = squares
                                 Score = model.Score + score 
@@ -164,7 +163,7 @@ let update msg model =
             let score = model.Score + lines
             { model with
                 PreviewBlock = Some(newBlock (snd model.Boundry + 1))
-                MovingBlock = model.PreviewBlock
+                MovingBlock = Some(model.PreviewBlock.Value |> setBlockToBaseLine)
                 PrectionBlock = None
                 AllSquares = squares
                 Score = score 

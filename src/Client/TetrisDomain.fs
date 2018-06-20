@@ -105,9 +105,10 @@ let generateBlock color blockType =
             ]
         }
 
+let isSquaresCollided squares1 squares2 =
+    squares1 |> List.exists (fun x -> squares2 |> List.exists (fun y -> x.Location = y.Location))
 let isBlocked boundry squares block =
-    if squares |> List.exists (fun x ->
-        block.Squares |> List.exists (fun y -> x.Location = y.Location)) then true
+    if isSquaresCollided squares block.Squares then true
     else block.Squares |> List.exists (fun x ->
         fst x.Location > fst boundry || snd x.Location < 0 || snd x.Location > snd boundry)
 
@@ -153,7 +154,7 @@ let cleanSquares boundry squares =
             if fst x.Location < row then { x with Location = (fst x.Location + 1, snd x.Location) }
             else x)
     let rec clean squares rowSquares =
-        if List.length rowSquares = 0 then squares
+        if List.isEmpty rowSquares then squares
         else clean
                 (removeRow squares (rowSquares |> List.head |> fst))
                 (List.skip 1 rowSquares)
@@ -163,5 +164,5 @@ let cleanSquares boundry squares =
     clean squares matchedRowSquares, score
     
 let calculateSpeed defaultSpeed score = 
-    let s = defaultSpeed - score / 6
-    if s < 1 then 2 else s
+    let s = defaultSpeed - score / 10
+    if s < 1 then 1 else s
