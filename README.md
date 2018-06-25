@@ -45,7 +45,7 @@ Fable只是一个编译器，除了view其他的都是单纯的逻辑，而view�
 项目初始化是用社区里一个模板生成的[https://github.com/SAFE-Stack]，包括的内容很多，如自动化编译，打包，热更新，测试等，代码也有很多如Client, Server, Test等，目前不需要Server，所以目前的主要代码都在src/Client下面。
 
 `TetrisDomain.fs`定义了俄罗斯方块的基本类型以及一些操作比如操作Block，查看是否相撞，或者清除满足条件的行等。Square是指最小的马赛克方块，Block是指下落的物体：
-```fsahrp
+```fsharp
 type Square = { Location: int * int; Color: int * int * int * float }
 type BlockType = T | L | J | I | O | Z | RZ | X
 type Block = { Type: BlockType; Squares: Square list }
@@ -67,6 +67,7 @@ type Model = {
     Speed: int
     SpeedCount: int }
 type Msg = | Action of Action | ReachBottom | ReachLeft | ReachRight
+...
 ```
 `App.fs`是整个程序的入口，会把Tetris定义的东西整合进来，也包含了一些界面的布局，开始，暂停，重新开始等操作。
 ```fsharp
@@ -87,6 +88,7 @@ type Msg =
     | TouchStart of float * float | TouchMove of float * float | TouchEnd of float * float
     | Pause | Continue
     | HideDetail
+...
 ```
 整个程序的组件的拆分没有做得很好，逻辑不是很清晰，作为学习勉强接受吧。
 整个效果如下，也可以[在线体验](https://albertwoo.github.io/TetrisHtml/%23root)，触控最佳，键盘勉强可用：
