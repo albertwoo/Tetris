@@ -91,7 +91,7 @@ type Msg =
 ...
 ```
 整个程序的组件的拆分没有做得很好，逻辑不是很清晰，作为学习勉强接受吧。
-整个效果如下，也可以[在线体验](https://albertwoo.github.io/TetrisHtml/%23root)，触控最佳，键盘勉强可用：
+整个效果如下，也可以[在线体验](https://albertwoo.github.io/TetrisHtml/#root)，触控最佳，键盘勉强可用：
 
 
 # 结语
