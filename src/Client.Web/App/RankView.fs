@@ -2,36 +2,8 @@
 
 open Fable.React
 open Fable.React.Props
+open Fun.ReactSpring
 open Client.Controls
-
-
-[<RequireQualifiedAccess>]
-type RankInfoProp =
-    | CellProps of (IHTMLProp list) list
-    | ContainerProps of IHTMLProp list
-
-let rankInfoRow =
-    FunctionComponent.Of(
-        fun props ->
-            div </> [
-                yield! props |> UnionProps.concat (function RankInfoProp.ContainerProps x -> Some x | _ -> None)
-                Classes [ 
-                    Tw.flex; Tw.``flex-row``; Tw.``items-center``
-                    Tw.``text-gray-light``
-                ]
-                Children [
-                    yield!
-                        props
-                        |> UnionProps.concat (function RankInfoProp.CellProps x -> Some x | _ -> None)
-                        |> List.map (fun ps ->
-                            span </> [
-                                yield! ps
-                                Classes [ Tw.``flex-1``; Tw.``text-center`` ]
-                            ] 
-                        )
-                ]
-            ]
-    )
 
 
 let render state dispatch =
@@ -47,48 +19,65 @@ let render state dispatch =
                     Tw.``text-gray-light``; Tw.``mt-02``
                 ]
                 Children [
-                    rankInfoRow [
-                        RankInfoProp.ContainerProps [
+                    List.row [
+                        ListRowProp.ContainerProps [
                             Classes [ Tw.``pt-02``; Tw.``pb-01``; Tw.``opacity-75``; Tw.``text-xs`` ]
                         ]
-                        RankInfoProp.CellProps [
-                            []
-                            [ Text "分数" ]
-                            [ Text "⏱时间" ]
-                            [ Text "昵称" ]
+                        ListRowProp.Cell [
+                            (None, emptyView)
+                            (Some 0.2, emptyView)
+                            (Some 1.0, str "分数")
+                            (Some 1.0, str "⏱时间")
+                            (Some 1.0, str "昵称")
                         ]
                     ]
-                    for info in state.RankInfos do
+                    for (i, info) in state.RankInfos |> List.indexed do
                         let maxScore = state.RankInfos.Head.Score
                         let relativeV = info.Score * 100 / maxScore
-                        rankInfoRow [
-                            RankInfoProp.ContainerProps [
+                        List.row [
+                            ListRowProp.ContainerProps [
                                 Classes [ 
                                     Tw.``my-02``; Tw.``py-01``; Tw.relative; Tw.``text-gray-lighter``
                                     Tw.``hover:bg-brand-dark``; Tw.``cursor-pointer``
                                 ]
                                 OnClick (fun _ -> Some info |> SelectRankInfo |> dispatch)
                             ]
-                            RankInfoProp.CellProps [
-                                [
-                                    Classes [ Tw.``bg-brand``; Tw.absolute; Tw.``left-0``; Tw.``top-0``; Tw.``bottom-0`` ]
-                                    Style [
-                                        Width (sprintf "%d%%" relativeV)
-                                        Opacity (sprintf "%d%%" relativeV)
-                                        ZIndex -1
+                            ListRowProp.Cell [
+                                (
+                                    None, 
+                                    spring [
+                                        SpringRenderProp.From {| width = 0.0 |}
+                                        SpringRenderProp.To {| width = 1.0 |}
+                                        SpringRenderProp.Delay (float i * 100.)
+                                        SpringRenderProp.ChildrenByFn (fun op -> [
+                                            div </> [
+                                                Classes [ Tw.``bg-brand``; Tw.absolute; Tw.``left-0``; Tw.``top-0``; Tw.``bottom-0`` ]
+                                                Style [
+                                                    Width (sprintf "%f%%" (float relativeV * op.width))
+                                                    Opacity (sprintf "%d%%" relativeV)
+                                                    ZIndex -1
+                                                ]
+                                            ]
+                                        ])
                                     ]
-                                ]
-                                [
-                                    Classes [
-                                        Tw.``text-xl``; Tw.``text-gray-lighter``; Tw.``hover:text-gray-lightest``
-                                        if state.SelectedRankInfo = Some info then
+                                )
+                                (
+                                    Some 0.2,
+                                    div </> [
+                                        Classes [
+                                            Tw.``text-xl``; Tw.``text-gray-lighter``; Tw.``hover:text-gray-lightest``; Tw.``pl-03``
                                             Icons.``icon-play-circle``
+                                            if state.SelectedRankInfo = Some info then
+                                                Tw.``opacity-75``
+                                            else
+                                                Tw.``opacity-25``
+                                        ]
+                                        OnClick (fun _ -> StartReply |> dispatch)
                                     ]
-                                    OnClick (fun _ -> StartReply |> dispatch)
-                                ]
-                                [ Text (sprintf "#%d" info.Score) ]
-                                [ Text (sprintf "%d<S>" info.TimeCost) ]
-                                [ Text info.Name ]
+                                )
+                                (Some 1.0, str (sprintf "#%d" info.Score))
+                                (Some 1.0, str (sprintf "%d<S>" info.TimeCost))
+                                (Some 1.0, str info.Name)
                             ]
                         ]
                 ]
