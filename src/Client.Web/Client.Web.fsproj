@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Common.fs" />
+    <Compile Include="Controls\Common.fs" />
+    <Compile Include="App\Domain.fs" />
+    <Compile Include="App\States.fs" />
+    <Compile Include="App\Controls.fs" />
+    <Compile Include="App\RankView.fs" />
+    <Compile Include="App\PlaygroundView.fs" />
+    <Compile Include="App\ReplyingGround.fs" />
+    <Compile Include="App\Views.fs" />
+    <Compile Include="Startup.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Fable.Elmish" Version="3.0.6" />
+    <PackageReference Include="Fable.Elmish.HMR" Version="4.0.1" />
+    <PackageReference Include="Fable.Elmish.React" Version="3.0.1" />
+    <PackageReference Include="Fable.Elmish.Debugger" Version="3.1.0" />
+    <PackageReference Include="Fable.React" Version="5.3.6" />
+    <PackageReference Include="Fun.LightForm.Fable" Version="1.0.4" />
+    <PackageReference Include="Fun.Result" Version="1.0.1" />
+    <PackageReference Include="Zanaptak.TypedCssClasses" Version="0.2.0" />
+  </ItemGroup>
+</Project>
