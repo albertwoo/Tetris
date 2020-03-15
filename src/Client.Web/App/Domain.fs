@@ -1,5 +1,6 @@
 namespace rec Client.App
 
+open Client
 open Client.Common
 
 
@@ -11,7 +12,8 @@ type State =
       IsLoading: bool
       IsPlaying: bool
       IsReplying: bool
-      ReplyingData: NeedDefine option }
+      ReplyingData: NeedDefine option
+      PlagroundState: Playground.State option }
 
 
 type Msg =
@@ -28,6 +30,8 @@ type Msg =
 
     | StartPlay
     | StopPlay    
+
+    | PlaygroundMsg of Playground.Msg
 
 
 type OnlineInfo =

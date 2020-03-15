@@ -10,6 +10,7 @@ let onlineInfo (state: State) =
         Classes [ 
             Tw.``bg-brand-dark``; Tw.``text-xs``; Tw.``py-01``; Tw.``text-center``
             Tw.``text-white``; Tw.``opacity-75``
+            Tw.``fixed``; Tw.``top-0``; Tw.``right-0``; Tw.``left-0``
         ]
         Text (
             match state.OnlineInfo with
@@ -59,6 +60,7 @@ let playButton state dispatch =
 
 let render state dispatch =
     div </> [
+        Classes [ Tw.``h-full`` ]
         Children [
             onlineInfo state
             githubBrand

@@ -6,6 +6,15 @@
 
 html {
     @apply bg-black;
+    height: 100%;
+}
+
+body {
+    height: 100%;
+}
+
+#root {
+    height: 100%;
 }
 
 /*.custom-blue-button {

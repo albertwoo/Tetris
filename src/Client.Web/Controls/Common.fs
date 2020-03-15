@@ -15,6 +15,18 @@ type Icons = CssClasses<IconsCssPath, Naming.Verbatim>
 
 [<RequireQualifiedAccess>]
 module Button =
+    let danger attrs =
+        button </> [
+            yield! attrs
+            Classes [
+                Tw.``text-2xl``; Tw.``text-center``; Tw.``py-02``; Tw.``px-08``
+                Tw.``rounded-full``; Tw.``shadow-lg``; Tw.``bg-red-600``; Tw.``text-white``
+                Tw.``border-red-600``; Tw.``border-2``; Tw.``font-bold``
+                Tw.``hover:shadow-xl``; Tw.``hover:border-white``
+                Tw.``outline-none``; Tw.``focus:outline-none``
+            ]
+        ]
+
     let primary attrs =
         button </> [
             yield! attrs

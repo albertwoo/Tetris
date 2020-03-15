@@ -2,6 +2,7 @@ module Client.App.States
 
 open System
 open Elmish
+open Client
 
 
 let fakeRankInfos =
@@ -22,7 +23,8 @@ let init () =
       IsLoading = false
       IsPlaying = false
       IsReplying = false
-      ReplyingData = None }
+      ReplyingData = None
+      PlagroundState = None }
     , Cmd.batch [
         Cmd.ofMsg GetRankInfos
         Cmd.ofSub(fun dispatch ->
@@ -70,5 +72,25 @@ let update msg state =
             ReplyingData = None }
         , Cmd.none
 
-    | StartPlay -> { state with IsPlaying = true }, Cmd.none
-    | StopPlay -> { state with IsPlaying = false }, Cmd.none
+    | StartPlay -> 
+        let newS, newC = Playground.States.init()
+        { state with 
+            IsPlaying = true
+            PlagroundState = Some newS }
+        , Cmd.batch [
+            Cmd.map PlaygroundMsg newC
+            Cmd.ofMsg (Playground.Start |> PlaygroundMsg)
+          ]
+
+    | StopPlay -> 
+        { state with 
+            IsPlaying = false
+            PlagroundState = None }, Cmd.none
+
+    | PlaygroundMsg msg' ->
+        match state.PlagroundState with
+        | None -> state, Cmd.none
+        | Some s ->
+            let newS, newCmd = Playground.States.update msg' s
+            { state with PlagroundState = Some newS }
+            , Cmd.map PlaygroundMsg newCmd

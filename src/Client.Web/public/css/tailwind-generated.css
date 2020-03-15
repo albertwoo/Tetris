@@ -631,6 +631,15 @@ video {
 
 html {
   background-color: #202120;
+  height: 100%;
+}
+
+body {
+  height: 100%;
+}
+
+#root {
+  height: 100%;
 }
 
 /*.custom-blue-button {

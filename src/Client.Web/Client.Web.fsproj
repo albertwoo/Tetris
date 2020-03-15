@@ -6,6 +6,9 @@
     <Compile Include="Common.fs" />
     <Compile Include="Controls\Common.fs" />
     <Compile Include="Controls\List.fs" />
+    <Compile Include="Playground\Domain.fs" />
+    <Compile Include="Playground\States.fs" />
+    <Compile Include="Playground\Views.fs" />
     <Compile Include="App\Domain.fs" />
     <Compile Include="App\States.fs" />
     <Compile Include="App\Controls.fs" />
@@ -25,5 +28,8 @@
     <PackageReference Include="Fun.ReactSpring" Version="1.0.0-beta5" />
     <PackageReference Include="Fun.Result" Version="1.0.1" />
     <PackageReference Include="Zanaptak.TypedCssClasses" Version="0.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tetris.Core\Tetris.Core.fsproj" />
   </ItemGroup>
 </Project>
