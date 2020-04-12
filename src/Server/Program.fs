@@ -15,6 +15,7 @@ open Orleans
 open Orleans.Hosting
 open Orleans.Configuration
 open Fun.Result
+open Server.Common
 
 
 let publicPath = 
@@ -81,7 +82,7 @@ let main args =
             .UseOrleans(fun siloBuilder ->
                 siloBuilder
                     .AddMemoryGrainStorageAsDefault()
-                    .AddLiteDbGrainStorage("LiteDb", config.GetValue("AppSettings:OrleansDbConnection"))
+                    .AddLiteDbGrainStorage(Constants.LiteDbStore, config.GetValue("AppSettings:OrleansDbConnection"))
                     .UseDashboard()
                     .UseLocalhostClustering()
                     .Configure(fun (opts: ClusterOptions) ->
