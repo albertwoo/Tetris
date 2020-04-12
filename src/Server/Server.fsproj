@@ -1,17 +1,31 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
-
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
-
   <ItemGroup>
+    <Compile Include="Common\Constants.fs" />
+    <Compile Include="Common\Json.fs" />
+    <Compile Include="Grains.Interfaces\Player.fs" />
+    <Compile Include="Grains.Interfaces\GameBorad.fs" />
+    <Compile Include="Grains\PlayerGrain.fs" />
+    <Compile Include="Grains\GameBoardGrain.fs" />
+    <Compile Include="LiteDbGrainStorage.fs" />
     <Compile Include="Routes.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Fun.Result" Version="1.0.1" />
     <PackageReference Include="Giraffe" Version="4.0.1" />
+    <PackageReference Include="LiteDB" Version="5.0.5" />
+    <PackageReference Include="Microsoft.FSharpLu.Json" Version="0.11.6" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator" Version="3.1.5" />
+    <PackageReference Include="OrleansDashboard" Version="3.0.8" />
   </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\Tetris.Core\Tetris.Core.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="4.7.1" />
+  </ItemGroup>
 </Project>

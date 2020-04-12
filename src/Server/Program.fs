@@ -2,6 +2,7 @@ module Server.Startup
 
 open System
 open System.IO
+open System.Net
 open Microsoft.Net.Http.Headers
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
@@ -10,6 +11,9 @@ open Microsoft.Extensions.Primitives
 open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.DependencyInjection
 open Giraffe
+open Orleans
+open Orleans.Hosting
+open Orleans.Configuration
 open Fun.Result
 
 
@@ -21,7 +25,7 @@ let publicPath =
     #endif
 
 
-let addServices (config: IConfiguration) (services: IServiceCollection) =
+let addServices (config: IConfigurationRoot) (services: IServiceCollection) =
     services
         .AddCors()
         .AddGiraffe()
@@ -58,6 +62,7 @@ let buildConfiguration (args: string[]) =
         .AddEnvironmentVariables()
         .Build()
 
+
 [<EntryPoint>]
 let main args =
     let config = buildConfiguration args
@@ -71,6 +76,28 @@ let main args =
                   .UseWebRoot(publicPath)
                   .Configure(Action<IApplicationBuilder> configureApp)
                   .ConfigureServices(addServices config)
+                |> ignore
+            )
+            .UseOrleans(fun siloBuilder ->
+                siloBuilder
+                    .AddMemoryGrainStorageAsDefault()
+                    .AddLiteDbGrainStorage("LiteDb", config.GetValue("AppSettings:OrleansDbConnection"))
+                    .UseDashboard()
+                    .UseLocalhostClustering()
+                    .Configure(fun (opts: ClusterOptions) ->
+                        opts.ClusterId <- "dev"
+                        opts.ServiceId <- "HellowWorldAPIService"
+                    )
+                    .Configure(fun (opts: EndpointOptions) ->
+                        opts.AdvertisedIPAddress <- IPAddress.Loopback
+                    )
+                    .ConfigureApplicationParts(fun parts ->
+                        parts
+                            .AddFromAppDomain()
+                            .WithReferences()
+                            .WithCodeGeneration()
+                        |> ignore
+                    )
                 |> ignore
             )
             .Build()
