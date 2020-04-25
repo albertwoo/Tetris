@@ -68,7 +68,7 @@ let update msg state =
               |> Cmd.OfAsync.result
     | GetRecordDetail (AsyncOperation.Finished data) ->
         let newS, newC = Playground.States.init()
-        let newS = { newS with Events = data }
+        let newS = { newS with Events = data; IsViewMode = true }
         { state with Plaground = PlaygroundState.Replaying (Deferred.Loaded newS)  }
         , Cmd.batch [
             Cmd.map PlaygroundMsg newC
@@ -87,6 +87,7 @@ let update msg state =
 
     | StartPlay -> 
         let newS, newC = Playground.States.init()
+        let newS = { newS with IsViewMode = false }
         { state with Plaground = PlaygroundState.Playing newS }
         , Cmd.batch [
             Cmd.map PlaygroundMsg newC

@@ -20,7 +20,8 @@ let init() =
     { Events = []
       Playground = defaultPlayground 
       StartTime = None
-      IsReplaying = false }
+      IsReplaying = false
+      IsViewMode = true }
     , Cmd.none
 
 
