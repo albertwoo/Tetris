@@ -1,41 +1,24 @@
 module Client.App.States
 
-open System
 open Elmish
 open Client
 
 
-let fakeRankInfos =
-    [
-        for i in 0..10 do
-            { Id = int64 i
-              Name = sprintf "slaveoftime-%d" i
-              Score = Random().Next(100, 10000)
-              TimeCost = Random().Next(1000, 100000) }
-    ]
-
-
 let init () =
     { ErrorInfo = None
-      OnlineInfo = None
-      RankInfos = []
+      GameBoard = Deferred.NotStartYet
       SelectedRankInfo = None
-      IsLoading = false
       IsPlaying = false
-      IsReplying = false
-      ReplyingData = None
+      ReplayingData = Deferred.NotStartYet
       PlagroundState = None }
     , Cmd.batch [
-        Cmd.ofMsg GetRankInfos
+        Cmd.ofMsg (GetGameBoard AsyncOperation.Start)
         Cmd.ofSub(fun dispatch ->
-            // Simulate signalR
             Browser.Dom.window.setInterval(
-                fun _ ->
-                    { PlayerCount = Random().Next(10, 20)
-                      HightestScore = Random().Next(100, 10000) }
-                    |> GotOnlineInfo
-                    |> dispatch
-                , 1000
+                fun _ -> 
+                    dispatch PingServer
+                    dispatch (GetGameBoard AsyncOperation.Start)
+                , 10000
             )
             |> ignore
         )
@@ -46,30 +29,56 @@ let update msg state =
     match msg with
     | OnError e -> { state with ErrorInfo = e }, Cmd.none
 
-    | GetRankInfos ->
-        { state with IsLoading = true }
-        , Cmd.ofMsg (GotRankInfos fakeRankInfos)
+    | PingServer ->
+        state
+        , Http.postJson "/api/game/ping" ""
+          |> Http.handleAsync (fun _ -> Pong) (Some >> OnError)
+          |> Cmd.OfAsync.result
+    | Pong -> state, Cmd.none
 
-    | GotRankInfos data ->
-        { state with
-            IsLoading = false
-            RankInfos = data |> List.sortByDescending (fun x -> x.Score) }
+    | GetGameBoard AsyncOperation.Start ->
+        let gameboard =
+            match state.GameBoard with
+            | DeferredValue x -> Deferred.Reloading x
+            | _ -> Deferred.Loading
+        { state with GameBoard = gameboard }
+        , Http.get "/api/game/board"
+          |> Http.handleAsyncOperation GetGameBoard
+          |> Cmd.OfAsync.result
+    | GetGameBoard (AsyncOperation.Finished data) ->
+        { state with GameBoard = Deferred.Loaded data }
         , Cmd.none
-
-    | GotOnlineInfo data -> { state with OnlineInfo = Some data }, Cmd.none
+    | GetGameBoard (AsyncOperation.Failed e) ->
+        let gameboard =
+            match state.GameBoard with
+            | DeferredValue x -> Deferred.ReloadingFailed (x, e)
+            | _ -> Deferred.LoadFailed e
+        { state with GameBoard = gameboard }
+        , Cmd.none
 
     | SelectRankInfo s -> { state with SelectedRankInfo = s }, Cmd.none
 
-    | StartReply -> { state with IsReplying = true }, Cmd.none
 
-    | GotReplyingData data ->
-        { state with ReplyingData = Some data }
+    | GetRecordDetail AsyncOperation.Start ->
+        match state.SelectedRankInfo with
+        | None -> state, Cmd.none
+        | Some rank ->
+            { state with ReplayingData = Deferred.Loading }
+            , Http.get (sprintf "/api/player/%s/record/%d/events" rank.PlayerName rank.Id)
+              |> Http.handleAsyncOperation GetRecordDetail
+              |> Cmd.OfAsync.result
+    | GetRecordDetail (AsyncOperation.Finished data) ->
+        { state with ReplayingData = Deferred.Loaded data }
+        , Cmd.none
+    | GetRecordDetail (AsyncOperation.Failed e) ->
+        { state with ReplayingData = Deferred.LoadFailed e }
         , Cmd.none
 
-    | StopReply ->
-        { state with
-            IsReplying = false
-            ReplyingData = None }
+    | StartReplay -> 
+        state
+        , Cmd.ofMsg (GetRecordDetail AsyncOperation.Start)
+    | StopReplay ->
+        { state with ReplayingData = Deferred.NotStartYet }
         , Cmd.none
 
     | StartPlay -> 
@@ -81,7 +90,6 @@ let update msg state =
             Cmd.map PlaygroundMsg newC
             Cmd.ofMsg (Playground.Start |> PlaygroundMsg)
           ]
-
     | StopPlay -> 
         { state with 
             IsPlaying = false

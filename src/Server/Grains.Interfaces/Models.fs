@@ -34,4 +34,5 @@ type Record =
       PlayerName: string
       GameEvents: TetrisEvent list
       Score: int
+      TimeCostInMs: int
       RecordDate: DateTime }

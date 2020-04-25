@@ -5,21 +5,6 @@ open Fable.React.Props
 open Client.Controls
 
 
-let onlineInfo (state: State) =
-    div </> [
-        Classes [ 
-            Tw.``bg-brand-dark``; Tw.``text-xs``; Tw.``py-01``; Tw.``text-center``
-            Tw.``text-white``; Tw.``opacity-75``
-            Tw.``fixed``; Tw.``top-0``; Tw.``right-0``; Tw.``left-0``
-        ]
-        Text (
-            match state.OnlineInfo with
-            | Some info -> sprintf "%d正在玩/最高分%d" info.PlayerCount info.HightestScore
-            | None -> "..."
-        )
-    ]
-
-
 let heading =
     div </> [
         Children [
@@ -62,15 +47,15 @@ let render state dispatch =
     div </> [
         Classes [ Tw.``h-full`` ]
         Children [
-            onlineInfo state
+            OnlineInfo.render state
             githubBrand
 
-            match state.IsPlaying, state.IsReplying with
+            match state.IsPlaying, state.ReplayingData with
             | true, _ ->
                 PlaygroundView.render state dispatch
-            | _, true ->
+            | _, Deferred.Loaded _ ->
                 ReplyingGround.render state dispatch
-            | false, false ->
+            | false, _ ->
                 heading
                 playButton state dispatch
                 RankView.render state dispatch

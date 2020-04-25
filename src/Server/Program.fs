@@ -84,7 +84,10 @@ let main args =
                 siloBuilder
                     .AddMemoryGrainStorageAsDefault()
                     .AddLiteDbGrainStorage(Constants.LiteDbStore, config.GetConnectionString(Constants.AppDbConnectionName))
-                    .UseDashboard()
+                    .UseDashboard(fun opt -> 
+                        opt.Port <- config.GetValue<int>("App:OrleansDashboard:Port")
+                        opt.Username <- config.GetValue("App:OrleansDashboard:Username")
+                        opt.Password <- config.GetValue("App:OrleansDashboard:Password"))
                     .UseLocalhostClustering()
                     .Configure(fun (opts: ClusterOptions) ->
                         opts.ClusterId <- "dev"

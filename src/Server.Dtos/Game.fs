@@ -9,7 +9,7 @@ type NewRecord =
       PlayerPassword: string
       GameEvents: TetrisEvent list
       Score: int
-      RecordDate: DateTime }
+      TimeCostInMs: int }
 
 type GameBoard =
     { OnlineCount: int
@@ -19,4 +19,7 @@ type RecordBriefInfo =
     { Id: int
       PlayerName: string
       Score: int
+      TimeCostInMs: int
       RecordDate: DateTime }
+
+type RecordEvents = TetrisEvent list

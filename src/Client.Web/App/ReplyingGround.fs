@@ -14,7 +14,7 @@ let render state dispatch =
                 Children [
                     Button.primary [
                         Text "结束Replay"
-                        OnClick (fun _ -> StopReply |> dispatch)
+                        OnClick (fun _ -> StopReplay |> dispatch)
                     ]
                 ]
             ]

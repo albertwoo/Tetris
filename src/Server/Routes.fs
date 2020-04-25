@@ -33,7 +33,14 @@ let all: HttpHandler =
                             let! state = gamebord.GetState()
                             let board: GameBoard =
                                 { OnlineCount = state.OnlineIPs.Count
-                                  TopRanks = state.Ranks |> List.map (fun x -> { Id = x.Id; PlayerName = x.PlayerName; Score = x.Score; RecordDate = x.RecordDate }) }
+                                  TopRanks = 
+                                    state.Ranks 
+                                    |> List.map (fun x -> 
+                                        { Id = x.Id
+                                          PlayerName = x.PlayerName
+                                          Score = x.Score
+                                          RecordDate = x.RecordDate; 
+                                          TimeCostInMs = x.TimeCostInMs }) }
                             return! json board  nxt ctx
                         }
                             
@@ -43,7 +50,14 @@ let all: HttpHandler =
                             let! payload = ctx.BindJsonAsync<NewRecord>()
                             let factory = ctx.GetService<IGrainFactory>()
                             let player = factory.GetGrain<IPlayerGrain>(payload.PlayerName)
-                            let! id = player.AddRecord(payload.PlayerPassword, { Id = 0; PlayerName = payload.PlayerName; GameEvents = payload.GameEvents; Score = payload.Score; RecordDate = DateTime.Now })
+                            let newRecord =
+                                { Id = 0
+                                  PlayerName = payload.PlayerName
+                                  GameEvents = payload.GameEvents
+                                  Score = payload.Score
+                                  RecordDate = DateTime.Now
+                                  TimeCostInMs = payload.TimeCostInMs }
+                            let! id = player.AddRecord(payload.PlayerPassword, newRecord)
                             return! HttpStatusCodeHandlers.Successful.CREATED id nxt ctx
                         }
 
@@ -54,6 +68,16 @@ let all: HttpHandler =
                             let player = factory.GetGrain<IPlayerGrain>(playerName)
                             let! record = player.GetRecord(recordId)
                             return! json record nxt ctx
+                        })
+
+            GET     >=> routeCif "/player/%s/record/%i/events"
+                        (fun (playerName, recordId) nxt ctx ->
+                        task {
+                            let factory = ctx.GetService<IGrainFactory>()
+                            let player = factory.GetGrain<IPlayerGrain>(playerName)
+                            let! record = player.GetRecord(recordId)
+                            let evts = record |> Option.map (fun x -> x.GameEvents) |> Option.defaultValue []
+                            return! json evts nxt ctx
                         })
         ])
     ]

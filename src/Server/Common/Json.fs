@@ -12,11 +12,11 @@ let private jsonSettings =
     JsonSerializerSettings(
         ContractResolver = 
             RequireNonOptionalPropertiesContractResolver(
-                NamingStrategy = 
-                    CamelCaseNamingStrategy(
-                        ProcessDictionaryKeys = false,
-                        OverrideSpecifiedNames = true
-                    )
+                //NamingStrategy =
+                //    CamelCaseNamingStrategy(
+                //        ProcessDictionaryKeys = false,
+                //        OverrideSpecifiedNames = false
+                //    )
             ),
         Converters = [| CompactUnionJsonConverter(true, true) |]
     )

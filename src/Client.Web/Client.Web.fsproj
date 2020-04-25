@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Common.fs" />
+    <Compile Include="Http.fs" />
     <Compile Include="Controls\Common.fs" />
     <Compile Include="Controls\List.fs" />
     <Compile Include="Playground\Domain.fs" />
@@ -13,6 +14,7 @@
     <Compile Include="App\States.fs" />
     <Compile Include="App\Controls.fs" />
     <Compile Include="App\RankView.fs" />
+    <Compile Include="App\OnlineInfo.fs" />
     <Compile Include="App\PlaygroundView.fs" />
     <Compile Include="App\ReplyingGround.fs" />
     <Compile Include="App\Views.fs" />
@@ -24,12 +26,15 @@
     <PackageReference Include="Fable.Elmish.React" Version="3.0.1" />
     <PackageReference Include="Fable.Elmish.Debugger" Version="3.2.0" />
     <PackageReference Include="Fable.React" Version="6.2.0" />
+    <PackageReference Include="Fable.SimpleHttp" Version="3.0.0" />
+    <PackageReference Include="Fable.SimpleJson" Version="3.8.2" />
     <PackageReference Include="Fun.LightForm.Fable" Version="1.0.4" />
     <PackageReference Include="Fun.ReactSpring" Version="1.0.0-beta5" />
     <PackageReference Include="Fun.Result" Version="1.0.1" />
     <PackageReference Include="Zanaptak.TypedCssClasses" Version="0.2.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Server.Dtos\Server.Dtos.fsproj" />
     <ProjectReference Include="..\Tetris.Core\Tetris.Core.fsproj" />
   </ItemGroup>
   <ItemGroup>
