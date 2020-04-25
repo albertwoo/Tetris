@@ -7,6 +7,7 @@ open Orleans
 open Orleans.Storage
 open Orleans.Runtime
 open Orleans.Hosting
+open Orleans.EventSourcing
 open LiteDB
 open Server.Common.Json
 

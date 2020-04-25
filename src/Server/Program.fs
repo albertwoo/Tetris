@@ -83,6 +83,7 @@ let main args =
                 siloBuilder
                     .AddMemoryGrainStorageAsDefault()
                     .AddLiteDbGrainStorage(Constants.LiteDbStore, config.GetValue("AppSettings:OrleansDbConnection"))
+                    .AddCustomStorageBasedLogConsistencyProvider(Constants.LiteDbLogStore)
                     .UseDashboard()
                     .UseLocalhostClustering()
                     .Configure(fun (opts: ClusterOptions) ->

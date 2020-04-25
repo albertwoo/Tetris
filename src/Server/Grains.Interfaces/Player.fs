@@ -8,15 +8,29 @@ open Tetris.Core
 
 type IPlayerGrain =
     inherit IGrainWithStringKey
-    abstract member AddCredential: PlayerCredential -> Task<unit>
-    abstract member AddRecord: Record -> Task<unit>
+    abstract member InitCredential: Password -> Task<unit>
+    abstract member AddRecord: Password * Record -> Task<Result<unit, AddRecordError>>
+    abstract member GetRecord: RecordId -> Task<Record option>
 
+
+type Password = string
+type RecordId = int
 
 [<CLIMutable>]
 type PlayerState =
     { NickName: string
       Password: string
-      Records: Record list }
+      TopRecord: Record option }
+    static member defaultState =
+        { NickName = ""
+          Password = ""
+          TopRecord = None }
+
+[<RequireQualifiedAccess>]
+type PlayerEvent =
+    | InitCredential of Password
+    | NewRecord of Record
+
 
 [<CLIMutable>]
 type PlayerCredential =
@@ -33,3 +47,7 @@ type Record =
 type TetrisEvent =
     { TimeStamp: DateTime
       Event: Event }
+
+[<RequireQualifiedAccess>]
+type AddRecordError =
+    | PasswordMissMatch

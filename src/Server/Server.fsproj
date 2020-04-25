@@ -14,12 +14,14 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Fun.Result" Version="1.0.1" />
-    <PackageReference Include="Giraffe" Version="4.0.1" />
-    <PackageReference Include="LiteDB" Version="5.0.5" />
+    <PackageReference Include="CosmoStore.LiteDb" Version="3.0.4" />
+    <PackageReference Include="Fun.Result" Version="1.0.2-beta1" />
+    <PackageReference Include="Giraffe" Version="4.1.0" />
+    <PackageReference Include="LiteDB" Version="5.0.7" />
     <PackageReference Include="Microsoft.FSharpLu.Json" Version="0.11.6" />
-    <PackageReference Include="Microsoft.Orleans.Server" Version="3.1.5" />
-    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator" Version="3.1.5" />
+    <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator" Version="3.1.6" />
     <PackageReference Include="OrleansDashboard" Version="3.0.8" />
   </ItemGroup>
   <ItemGroup>
