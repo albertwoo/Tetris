@@ -28,7 +28,7 @@ type PlayerInfo =
 
 let render =
     FunctionComponent.Of(
-        fun (state, dispatch) ->
+        fun (playground: Client.Playground.State, dispatch) ->
             let form = 
                 Hooks.useStateLazy (fun () -> 
                     { Name = ""; Password = "" }
@@ -45,6 +45,18 @@ let render =
                         Styles [ Width 400 ]
                         Classes [ Tw.``bg-gray-darkest``; Tw.rounded; Tw.``shadow-lg`` ]
                         Children [
+                            div </> [
+                                Classes [ Tw.flex; Tw.``flex-col``; Tw.``justify-center``; Tw.``items-center`` ]
+                                Children [
+                                    p </> [
+                                        Text (sprintf "#%d"  playground.Playground.Score)
+                                        Classes [ 
+                                            Tw.``text-2xl``; Tw.``opacity-75``; Tw.``mt-04``; Tw.``mb-02``
+                                            Tw.``text-white``; Tw.``font-bold``
+                                        ]
+                                    ]
+                                ]
+                            ]
                             lightForm [
                                 LightFormProp.InitForm form.current
                                 LightFormProp.OnFormChanged form.update
@@ -80,22 +92,20 @@ let render =
                                         Text "提交"
                                         Classes [ Tw.``ml-04`` ]
                                         OnClick (fun _ ->
-                                            match state.Plaground, tryGenerateValueByForm<PlayerInfo> form.current with
-                                            | PlaygroundState.Submiting p, Ok value ->
-                                                match p.StartTime, p.Events with
+                                            match tryGenerateValueByForm<PlayerInfo> form.current with
+                                            | Ok value ->
+                                                match playground.StartTime, playground.Events with
                                                 | Some startTime, _::_ ->
                                                     { PlayerName = value.Name
                                                       PlayerPassword = value.Password
-                                                      GameEvents = p.Events
-                                                      Score = p.Playground.Score
+                                                      GameEvents = playground.Events
+                                                      Score = playground.Playground.Score
                                                       TimeCostInMs = (DateTime.Now - startTime).TotalMilliseconds |> int }
                                                     |> UploadRecord
                                                     |> dispatch
                                                 | _ ->
                                                     dispatch ClosePlay
-                                            | _, Error e -> ClientError.DtoParseError (string e) |> Some |> Msg.OnError |> dispatch
-                                            | _ ->
-                                                ()
+                                            | Error e -> ClientError.DtoParseError (string e) |> Some |> Msg.OnError |> dispatch
                                         )
                                     ]
                                 ]

@@ -10,7 +10,7 @@ let defaultPlayground =
     {
         IsGameOver = false
         Score = 0
-        Border = { Width = 15; Height = 30 }
+        Border = { Width = 18; Height = 30 }
         Blocks = []
         MovingBlock = None
         RemainSquares = []
@@ -33,7 +33,7 @@ let update msg state =
             Playground = defaultPlayground
             StartTime = Some DateTime.Now }
         , Cmd.batch [
-            Cmd.ofMsg (Utils.generateRamdomBlock() |> Event.NewBlock |> NewEvent)
+            Cmd.ofMsg (Utils.generateRamdomBlock(state.Playground.Border.Width / 2 - 2) |> Event.NewBlock |> NewEvent)
             Cmd.ofMsg Tick
           ]
 

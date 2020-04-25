@@ -7,9 +7,9 @@ open Utils
 let updateBlock block operation =
     match operation with
     | Operation.RotateClockWise -> rotate block
-    | Operation.MoveLeft        -> move block moveL
-    | Operation.MoveRight       -> move block moveR
-    | Operation.MoveDown        -> move block moveD
+    | Operation.MoveLeft        -> move moveL block 
+    | Operation.MoveRight       -> move moveR block 
+    | Operation.MoveDown        -> move moveD block 
 
 
 let updateBlocks border blocks event =

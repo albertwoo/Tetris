@@ -8,10 +8,10 @@ open Client.Controls
 
 let render state dispatch =
     div </> [
-        Classes [ Tw.``h-full`` ]
+        Classes [ Tw.``py-10``; Tw.``overflow-hidden`` ]
         Children [
             div </> [
-                Classes [ Tw.``h-full``; Tw.flex; Tw.``flex-col``; Tw.``justify-center``; Tw.``items-center`` ]
+                Classes [ Tw.flex; Tw.``flex-col``; Tw.``justify-center``; Tw.``items-center`` ]
                 Children [
                     match state.Plaground with
                     | PlaygroundState.Replaying (DeferredValue s)
@@ -21,7 +21,7 @@ let render state dispatch =
 
                     div </> [
                         Classes [ 
-                            Tw.``fixed``; Tw.``bottom-0``; Tw.flex; Tw.``flex-row``;
+                            Tw.``mt-04``; Tw.flex; Tw.``flex-row``;
                             Tw.``items-center``; Tw.``justify-center``
                         ]
                         Children [
@@ -30,18 +30,16 @@ let render state dispatch =
                                 Button.danger [
                                     Text "关闭"
                                     OnClick (fun _ -> StopReplay |> dispatch)
-                                    Classes [ Tw.``my-10`` ]
                                 ]
                                 Button.primary [
                                     Text "重播"
                                     OnClick (fun _ -> Playground.ReplayEvent 0 |> PlaygroundMsg |> dispatch)
-                                    Classes [ Tw.``my-10`` ]
+                                    Classes [ Tw.``ml-04`` ]
                                 ]
                             | PlaygroundState.Playing _ ->
                                 Button.danger [
                                     Text "结束"
                                     OnClick (fun _ -> StopPlay |> dispatch)
-                                    Classes [ Tw.``my-10`` ]
                                 ]
                             | _ ->
                                 ()

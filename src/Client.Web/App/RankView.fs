@@ -57,9 +57,33 @@ let private rankView (gameboard: GameBoard) state dispatch =
                             )
                         ]
                     )
-                    (Some 1.0, str (sprintf "#%d" info.Score))
-                    (Some 1.0, str (sprintf "%d<S>" (info.TimeCostInMs / 1000)))
-                    (Some 1.0, str info.PlayerName)
+                    (
+                        Some 1.0, 
+                        span </> [
+                            Text (sprintf "#%d" info.Score)
+                            Classes [ Tw.``font-bold`` ]
+                        ]
+                    )
+                    (
+                        Some 1.0, 
+                        span [] [
+                            span </> [
+                                Text (sprintf "%d" (info.TimeCostInMs / 1000))
+                                Classes [ Tw.``font-semibold`` ]
+                            ]
+                            span </> [
+                                Text " s"
+                                Classes [ Tw.``opacity-75`` ]
+                            ]
+                        ]
+                    )
+                    (
+                        Some 1.0,
+                        span </> [
+                            Text (if info.PlayerName.Length > 10 then info.PlayerName.Substring(0, 10) else info.PlayerName)
+                            Classes [ Tw.``text-xs``; Tw.``opacity-75`` ]
+                        ]
+                    )
                 ]
             ]
     ]
@@ -67,7 +91,7 @@ let private rankView (gameboard: GameBoard) state dispatch =
 
 let render state dispatch =
     div </> [
-        Classes [ Tw.``pt-20`` ]
+        Classes [ Tw.``py-04`` ]
         Children [
             h2 </> [
                 Text "#排行榜（TOP 10）"

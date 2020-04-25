@@ -24,6 +24,7 @@ module Button =
                 Tw.``border-red-600``; Tw.``border-2``; Tw.``font-bold``
                 Tw.``hover:shadow-xl``; Tw.``hover:border-white``
                 Tw.``outline-none``; Tw.``focus:outline-none``
+                Tw.``opacity-75``; Tw.``hover:opacity-100``
             ]
         ]
 
@@ -36,6 +37,7 @@ module Button =
                 Tw.``border-brand``; Tw.``border-2``; Tw.``font-bold``
                 Tw.``hover:shadow-xl``; Tw.``hover:border-white``
                 Tw.``outline-none``; Tw.``focus:outline-none``
+                Tw.``opacity-75``; Tw.``hover:opacity-100``
             ]
         ]
 
