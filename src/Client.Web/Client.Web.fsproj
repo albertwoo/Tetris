@@ -17,6 +17,7 @@
     <Compile Include="App\OnlineInfo.fs" />
     <Compile Include="App\PlaygroundView.fs" />
     <Compile Include="App\ReplyingGround.fs" />
+    <Compile Include="App\SubmitRecord.fs" />
     <Compile Include="App\Views.fs" />
     <Compile Include="Startup.fs" />
   </ItemGroup>
@@ -24,8 +25,8 @@
     <PackageReference Include="Fable.Elmish" Version="3.0.6" />
     <PackageReference Include="Fable.Elmish.HMR" Version="4.0.1" />
     <PackageReference Include="Fable.Elmish.React" Version="3.0.1" />
-    <PackageReference Include="Fable.Elmish.Debugger" Version="3.2.0" />
-    <PackageReference Include="Fable.React" Version="6.2.0" />
+    <PackageReference Include="Fable.Elmish.Debugger" Version="3.1.0" />
+    <PackageReference Include="Fable.React" Version="5.3.6" />
     <PackageReference Include="Fable.SimpleHttp" Version="3.0.0" />
     <PackageReference Include="Fable.SimpleJson" Version="3.8.2" />
     <PackageReference Include="Fun.LightForm.Fable" Version="1.0.4" />

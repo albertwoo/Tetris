@@ -8,9 +8,9 @@ let init () =
     { ErrorInfo = None
       GameBoard = Deferred.NotStartYet
       SelectedRankInfo = None
-      IsPlaying = false
       ReplayingData = Deferred.NotStartYet
-      PlagroundState = None }
+      PlagroundState = PlayState.Closed
+      IsUploading = false }
     , Cmd.batch [
         Cmd.ofMsg (GetGameBoard AsyncOperation.Start)
         Cmd.ofSub(fun dispatch ->
@@ -83,22 +83,39 @@ let update msg state =
 
     | StartPlay -> 
         let newS, newC = Playground.States.init()
-        { state with 
-            IsPlaying = true
-            PlagroundState = Some newS }
+        { state with PlagroundState = PlayState.Playing newS }
         , Cmd.batch [
             Cmd.map PlaygroundMsg newC
             Cmd.ofMsg (Playground.Start |> PlaygroundMsg)
           ]
     | StopPlay -> 
         { state with 
-            IsPlaying = false
-            PlagroundState = None }, Cmd.none
+            PlagroundState =
+                match state.PlagroundState with
+                | PlayState.Playing x -> PlayState.Submiting x 
+                | _ -> PlayState.Closed }
+        , Cmd.none
+    | ClosePlay ->
+        { state with PlagroundState = PlayState.Closed }
+        , Cmd.none
 
     | PlaygroundMsg msg' ->
         match state.PlagroundState with
-        | None -> state, Cmd.none
-        | Some s ->
+        | PlayState.Playing s -> 
             let newS, newCmd = Playground.States.update msg' s
-            { state with PlagroundState = Some newS }
+            { state with PlagroundState = PlayState.Playing newS }
             , Cmd.map PlaygroundMsg newCmd
+        | _ ->
+            state, Cmd.none
+
+    | UploadRecord record ->
+        { state with IsUploading = true }
+        , Http.postJson "/api/player/record" record
+          |> Http.handleAsync (fun _ -> UploadedRecord) (Some >> OnError)
+          |> Cmd.OfAsync.result
+    | UploadedRecord ->
+        { state with IsUploading = false }
+        , Cmd.batch [
+            Cmd.ofMsg ClosePlay
+            Cmd.ofMsg (GetGameBoard AsyncOperation.Start)
+          ]

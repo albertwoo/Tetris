@@ -58,7 +58,9 @@ let all: HttpHandler =
                                   RecordDate = DateTime.Now
                                   TimeCostInMs = payload.TimeCostInMs }
                             let! id = player.AddRecord(payload.PlayerPassword, newRecord)
-                            return! HttpStatusCodeHandlers.Successful.CREATED id nxt ctx
+                            match id with
+                            | Ok id   -> return! HttpStatusCodeHandlers.Successful.CREATED id nxt ctx
+                            | Error e -> return! HttpStatusCodeHandlers.RequestErrors.BAD_REQUEST e nxt ctx
                         }
 
             GET     >=> routeCif "/player/%s/record/%i"
@@ -67,7 +69,9 @@ let all: HttpHandler =
                             let factory = ctx.GetService<IGrainFactory>()
                             let player = factory.GetGrain<IPlayerGrain>(playerName)
                             let! record = player.GetRecord(recordId)
-                            return! json record nxt ctx
+                            match record with
+                            | Some x -> return! json record nxt ctx
+                            | None   -> return! HttpStatusCodeHandlers.RequestErrors.NOT_FOUND "" nxt ctx
                         })
 
             GET     >=> routeCif "/player/%s/record/%i/events"
@@ -76,8 +80,9 @@ let all: HttpHandler =
                             let factory = ctx.GetService<IGrainFactory>()
                             let player = factory.GetGrain<IPlayerGrain>(playerName)
                             let! record = player.GetRecord(recordId)
-                            let evts = record |> Option.map (fun x -> x.GameEvents) |> Option.defaultValue []
-                            return! json evts nxt ctx
+                            match record with
+                            | Some x -> return! json x.GameEvents nxt ctx
+                            | None   -> return! HttpStatusCodeHandlers.RequestErrors.NOT_FOUND "" nxt ctx
                         })
         ])
     ]

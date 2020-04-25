@@ -8,9 +8,9 @@ type State =
     { ErrorInfo: ClientError option
       GameBoard: Deferred<GameBoard>
       SelectedRankInfo: RecordBriefInfo option
-      IsPlaying: bool
       ReplayingData: Deferred<RecordEvents>
-      PlagroundState: Playground.State option }
+      PlagroundState: PlayState
+      IsUploading: bool }
 
 
 type Msg =
@@ -27,6 +27,17 @@ type Msg =
     | StopReplay
 
     | StartPlay
-    | StopPlay    
+    | StopPlay
+    | ClosePlay
+
+    | UploadRecord of NewRecord
+    | UploadedRecord
 
     | PlaygroundMsg of Playground.Msg
+
+
+[<RequireQualifiedAccess>]
+type PlayState =
+    | Playing of Playground.State
+    | Submiting of Playground.State
+    | Closed

@@ -25,9 +25,9 @@ let render state dispatch =
                 Classes [ Tw.``h-full``; Tw.flex; Tw.``flex-col``; Tw.``justify-center``; Tw.``items-center`` ]
                 Children [
                     match state.PlagroundState with
-                    | None -> ()
-                    | Some s ->
+                    | PlayState.Playing s ->
                         Playground.Views.render s (PlaygroundMsg >> dispatch)
+                    | _ -> ()
 
                     div </> [
                         Classes [
