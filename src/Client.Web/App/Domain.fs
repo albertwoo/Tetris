@@ -1,45 +1,48 @@
 namespace rec Client.App
 
+open System
 open Client
-open Client.Common
+open Server.Dtos.Game
 
 
 type State =
     { ErrorInfo: ClientError option
-      OnlineInfo: OnlineInfo option
-      RankInfos: RankInfo list
-      SelectedRankInfo: RankInfo option
-      IsLoading: bool
-      IsPlaying: bool
-      IsReplying: bool
-      ReplyingData: NeedDefine option
-      PlagroundState: Playground.State option }
+      GameBoard: Deferred<GameBoard>
+      SelectedRankInfo: RecordBriefInfo option
+      Plaground: PlaygroundState
+      IsUploading: bool }
 
 
 type Msg =
     | OnError of ClientError option
-    | GetRankInfos
-    | GotRankInfos of RankInfo list
-    | GotOnlineInfo of OnlineInfo
+    
+    | PingServer
+    | Pong
+    
+    | GetGameBoard of AsyncOperation<GameBoard>
+    | SelectRankInfo of RecordBriefInfo option
 
-    | SelectRankInfo of RankInfo option
-
-    | StartReply
-    | GotReplyingData of NeedDefine
-    | StopReply
+    | StartReplay
+    | GetRecordDetail of AsyncOperation<RecordEvents>
+    | StopReplay
 
     | StartPlay
-    | StopPlay    
+    | StopPlay
+    | ClosePlay
+
+    | UploadRecord of RobotCheckerValue * NewRecord
+    | UploadedRecord
 
     | PlaygroundMsg of Playground.Msg
 
 
-type OnlineInfo =
-    { PlayerCount: int
-      HightestScore: int }
+[<RequireQualifiedAccess>]
+type PlaygroundState =
+    | Replaying of Deferred<Playground.State>
+    | Playing of Playground.State
+    | Submiting of Playground.State
+    | Closed
 
-type RankInfo =
-    { Id: int64
-      Score: int
-      TimeCost: int
-      Name: string }
+type RobotCheckerValue =
+    { Id: Guid
+      Value: float }

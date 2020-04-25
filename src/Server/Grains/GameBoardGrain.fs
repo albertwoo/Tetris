@@ -1,59 +1,68 @@
 namespace Server.Grains
 
 open System
+open System.Threading.Tasks
 open Orleans
-open Orleans.Providers
+open Orleans.Runtime
 open FSharp.Control.Tasks
 open Server.Grains.Interfaces
 open Server.Common
 
 
-[<StorageProvider(ProviderName = Constants.LiteDbStore)>]
-type GameBoardGrain (factory: IGrainFactory) =
-    inherit Grain<GameState>()
+type GameBoardGrain
+    (
+        [<PersistentState("GameBoard", Constants.LiteDbStore)>] state: IPersistentState<GameBoardState>
+    ) as this =
 
-    member _.State 
-        with get() = 
-            if box base.State = null then GameState.defaultValue
-            else base.State
-        and set x = base.State <- x
+    inherit Grain()
 
-    member _.SaveState() = base.WriteStateAsync()
+    member _.SafeState 
+        with get() =
+            if box state.State |> isNull then GameBoardState.defaultValue
+            else state.State
+        and set s =
+            state.State <- s
+
+    member _.RefreshOnline() =
+        task {
+            this.SafeState <-
+                { this.SafeState with 
+                    OnlineIPs = 
+                        this.SafeState.OnlineIPs
+                        |> Map.filter (fun _ t -> t.AddSeconds 10. > DateTime.Now) }
+            do! state.WriteStateAsync()
+        }
+
+    override _.OnActivateAsync() =
+        this.RegisterTimer
+            (fun _ -> this.RefreshOnline() :> Task
+            ,this.SafeState
+            ,TimeSpan.FromSeconds 5.
+            ,TimeSpan.FromSeconds 5.)
+        |> ignore
+        task { () } :> Task
 
     interface IGameBoardGrain with
-        member this.UpdateGame(evt) =
+        member _.Ping (ip) =
             task {
-                let! newState =
-                    match evt with
-                    | GameEvent.AddRecord (playerCred, record) ->
-                        task {
-                            let player = factory.GetGrain<IPlayerGrain>(playerCred.NickName)
-                            do! player.AddRecord record
-                            let newRank = 
-                                { PlayerName = playerCred.NickName
-                                  TimeSpentInSec = 1
-                                  Score = record.Score
-                                  RecordTime = DateTime.Now }
-                            return 
-                                { this.State with Ranks = newRank::this.State.Ranks }
-                        }
-                    | GameEvent.IncreaseOnlineCount ->
-                        task { return { this.State with OnlineCount = this.State.OnlineCount + uint32 1 } }
-                    | GameEvent.DecreaseOnlineCount ->
-                        task { return { this.State with OnlineCount = this.State.OnlineCount - uint32 1 } }
-                this.State <- newState
-                do! this.SaveState()
+                this.SafeState <- { this.SafeState with OnlineIPs = this.SafeState.OnlineIPs.Add(ip, DateTime.Now) }
+                do! state.WriteStateAsync()
                 return ()
             }
 
-        member this.GetTopRanks count =
+        member _.AddRecord (record) =
             task {
-                return 
-                    this.State.Ranks 
-                    |> Seq.sortByDescending (fun x -> x.Score) 
-                    |> fun x -> if Seq.length x < count then x else Seq.take count x
-                    |> Seq.toList
+                let ranks =
+                    record::this.SafeState.Ranks
+                    |> List.sortByDescending (fun x -> x.Score)
+                    |> List.chunkBySize 10
+                    |> List.item 0
+
+                this.SafeState <- { this.SafeState with Ranks = ranks }
+                do! state.WriteStateAsync()
             }
 
-        member this.GetOnlineCount () =
-            task { return int this.State.OnlineCount }
+        member _.GetState () =
+            task {
+                return this.SafeState
+            }

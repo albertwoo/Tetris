@@ -20,7 +20,7 @@ let play playground event =
                         | CollidedWithBorderBottom playground.Border ->
                             match operation with
                             | Operation.MoveDown
-                            | Operation.RotateClockWise -> generateRamdomBlock() |> Event.NewBlock
+                            | Operation.RotateClockWise -> generateRamdomBlock(playground.Border.Width / 2 - 2) |> Event.NewBlock
                             | _ -> ()
                         | _ ->
                             ()

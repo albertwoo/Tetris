@@ -31,6 +31,7 @@ let addServices (config: IConfigurationRoot) (services: IServiceCollection) =
         .AddCors()
         .AddGiraffe()
         .AddResponseCaching()
+        .AddSingleton<Giraffe.Serialization.Json.IJsonSerializer>(Thoth.Json.Giraffe.ThothSerializer())
         .AddResponseCompression()
     |> ignore
     
@@ -82,8 +83,11 @@ let main args =
             .UseOrleans(fun siloBuilder ->
                 siloBuilder
                     .AddMemoryGrainStorageAsDefault()
-                    .AddLiteDbGrainStorage(Constants.LiteDbStore, config.GetValue("AppSettings:OrleansDbConnection"))
-                    .UseDashboard()
+                    .AddLiteDbGrainStorage(Constants.LiteDbStore, config.GetConnectionString(Constants.AppDbConnectionName))
+                    .UseDashboard(fun opt -> 
+                        opt.Port <- config.GetValue<int>("App:OrleansDashboard:Port")
+                        opt.Username <- config.GetValue("App:OrleansDashboard:Username")
+                        opt.Password <- config.GetValue("App:OrleansDashboard:Password"))
                     .UseLocalhostClustering()
                     .Configure(fun (opts: ClusterOptions) ->
                         opts.ClusterId <- "dev"

@@ -5,21 +5,6 @@ open Fable.React.Props
 open Client.Controls
 
 
-let onlineInfo (state: State) =
-    div </> [
-        Classes [ 
-            Tw.``bg-brand-dark``; Tw.``text-xs``; Tw.``py-01``; Tw.``text-center``
-            Tw.``text-white``; Tw.``opacity-75``
-            Tw.``fixed``; Tw.``top-0``; Tw.``right-0``; Tw.``left-0``
-        ]
-        Text (
-            match state.OnlineInfo with
-            | Some info -> sprintf "%d正在玩/最高分%d" info.PlayerCount info.HightestScore
-            | None -> "..."
-        )
-    ]
-
-
 let heading =
     div </> [
         Children [
@@ -46,12 +31,12 @@ let heading =
     ]
 
 
-let playButton state dispatch =
+let playButton dispatch =
     div </> [
-        Classes [ Tw.flex; Tw.``flex-col``; Tw.``items-center``; Tw.``py-04`` ]
+        Classes [ Tw.flex; Tw.``flex-col``; Tw.``items-center``; Tw.``py-04``; Tw.``mt-04`` ]
         Children [
             Button.primary [
-                Text "开始对局"
+                Text "开始游戏"
                 OnClick (fun _ -> StartPlay |> dispatch)
             ]
         ]
@@ -60,19 +45,30 @@ let playButton state dispatch =
 
 let render state dispatch =
     div </> [
-        Classes [ Tw.``h-full`` ]
+        Classes [ Tw.``h-full``; Tw.``font-sans`` ]
         Children [
-            onlineInfo state
+            OnlineInfoView.render state
             githubBrand
 
-            match state.IsPlaying, state.IsReplying with
-            | true, _ ->
-                PlaygroundView.render state dispatch
-            | _, true ->
-                ReplyingGround.render state dispatch
-            | false, false ->
-                heading
-                playButton state dispatch
-                RankView.render state dispatch
+            div </> [
+                Classes [ Tw.``h-full``; Tw.``w-full``; Tw.``mx-auto``; Tw.flex; Tw.``flex-col``; Tw.``justify-center`` ]
+                Styles [ MaxWidth 720 ]
+                Children [
+                    match state.Plaground with
+                    | PlaygroundState.Replaying _
+                    | PlaygroundState.Playing _ ->
+                        PlaygroundView.render state dispatch
+                    | PlaygroundState.Submiting p ->
+                        SubmitRecordView.render (p, dispatch)
+                    | _ ->
+                        heading
+                        RankView.render state dispatch
+                        playButton dispatch
+                ]
+            ]
+
+            match state.ErrorInfo with
+            | Some e -> errorView e (Msg.OnError >> dispatch)
+            | None -> ()
         ]
     ]

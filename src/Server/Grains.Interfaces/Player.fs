@@ -1,35 +1,16 @@
 ﻿namespace rec Server.Grains.Interfaces
 
-open System
 open System.Threading.Tasks
 open Orleans
-open Tetris.Core
 
 
 type IPlayerGrain =
     inherit IGrainWithStringKey
-    abstract member AddCredential: PlayerCredential -> Task<unit>
-    abstract member AddRecord: Record -> Task<unit>
+    abstract member InitCredential: Password -> Task<unit>
+    abstract member AddRecord: Password * Record -> Task<Result<RecordId, AddRecordError>>
+    abstract member GetRecord: RecordId -> Task<Record option>
 
 
-[<CLIMutable>]
-type PlayerState =
-    { NickName: string
-      Password: string
-      Records: Record list }
-
-[<CLIMutable>]
-type PlayerCredential =
-    { NickName: string
-      Password: string }
-
-[<CLIMutable>]
-type Record =
-    { GameEvents: TetrisEvent list
-      Score: int
-      RecordDate: DateTime }
-
-[<CLIMutable>]
-type TetrisEvent =
-    { TimeStamp: DateTime
-      Event: Event }
+[<RequireQualifiedAccess>]
+type AddRecordError =
+    | PasswordMissMatch

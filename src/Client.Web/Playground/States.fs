@@ -10,7 +10,7 @@ let defaultPlayground =
     {
         IsGameOver = false
         Score = 0
-        Border = { Width = 15; Height = 30 }
+        Border = { Width = 18; Height = 30 }
         Blocks = []
         MovingBlock = None
         RemainSquares = []
@@ -20,7 +20,8 @@ let init() =
     { Events = []
       Playground = defaultPlayground 
       StartTime = None
-      IsReplaying = false }
+      IsReplaying = false
+      IsViewMode = true }
     , Cmd.none
 
 
@@ -32,7 +33,7 @@ let update msg state =
             Playground = defaultPlayground
             StartTime = Some DateTime.Now }
         , Cmd.batch [
-            Cmd.ofMsg (Utils.generateRamdomBlock() |> Event.NewBlock |> NewEvent)
+            Cmd.ofMsg (Utils.generateRamdomBlock(state.Playground.Border.Width / 2 - 2) |> Event.NewBlock |> NewEvent)
             Cmd.ofMsg Tick
           ]
 
@@ -62,14 +63,13 @@ let update msg state =
         then state, Cmd.none
         else
             let newEvents = Behavior.play state.Playground event
-            Browser.Dom.console.error state.Playground
             { state with
-                Events = state.Events@newEvents
+                Events = state.Events@(newEvents |> List.map (fun e -> { TimeStamp = DateTime.Now; Event = e }))
                 Playground = newEvents |> List.fold Projection.updatePlayground state.Playground }
             , Cmd.none
 
     | ReplayEvent index ->
-        let isFinished = index + 1 = state.Events.Length
+        let isFinished = index + 1 >= state.Events.Length
         { state with
             IsReplaying = not isFinished
             Playground =
@@ -78,7 +78,10 @@ let update msg state =
                     let playground =
                         if index = 0 then defaultPlayground
                         else state.Playground
-                    state.Events |> Seq.item index |> Projection.updatePlayground playground }
+                    state.Events 
+                    |> List.map (fun x -> x.Event) 
+                    |> Seq.item index 
+                    |> Projection.updatePlayground playground }
         , if isFinished then Cmd.none
           else
             Cmd.OfAsync.result(

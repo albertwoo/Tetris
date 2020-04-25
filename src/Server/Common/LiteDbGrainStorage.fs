@@ -1,4 +1,4 @@
-﻿namespace Server
+﻿namespace Server.Common
 
 open System.Threading.Tasks
 open FSharp.Control.Tasks
@@ -8,6 +8,7 @@ open Orleans.Storage
 open Orleans.Runtime
 open Orleans.Hosting
 open LiteDB
+open LiteDB.FSharp
 open Server.Common.Json
 
 
@@ -18,7 +19,7 @@ type GrainData =
 
 
 type LiteDbGrainStorage (liteDbPath: string) =
-    let createDb() = new LiteDatabase(liteDbPath)
+    let createDb() = new LiteDatabase(liteDbPath, FSharpBsonMapper())
 
     let getGrains (db: LiteDatabase) = db.GetCollection<GrainData>("Grains")
     let createGrainName grainType (ref: GrainReference) = sprintf "%s-%s" grainType (ref.ToKeyString())

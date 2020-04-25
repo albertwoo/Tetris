@@ -20,7 +20,7 @@ let moveL square = { square with X = square.X - 1 }
 let moveR square = { square with X = square.X + 1 }
 let moveD square = { square with Y = square.Y + 1 }
 
-let move block moveSquare =
+let move moveSquare block =
     { block with
         Squares = block.Squares |> List.map moveSquare
         CenterSquare = block.CenterSquare |> Option.map moveSquare }
@@ -110,8 +110,13 @@ let predefinedBlocks =
         }
     )
 
-let generateRamdomBlock () =
+let generateRamdomBlock moveRight =
+    let move block =
+        [1..moveRight]
+        |> List.fold (fun s _ -> move moveR s) block
+
     predefinedBlocks
     |> List.item (
         System.Random().Next(0, predefinedBlocks.Length - 1)
     )
+    |> move

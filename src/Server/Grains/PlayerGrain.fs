@@ -1,23 +1,69 @@
 ﻿namespace Server.Grans
 
-open System.Threading.Tasks
 open Orleans
+open Orleans.Runtime
+open FSharp.Control.Tasks
+open Microsoft.Extensions.Configuration
+open LiteDB
+open LiteDB.FSharp
+open Fun.Result
+
+open Server.Common
 open Server.Grains.Interfaces
 
 
-type PlayerGrain() =
-    inherit Grain<PlayerState>()
-        
-    interface IPlayerGrain with
-        member this.AddRecord record = 
-            this.State <- 
-                { this.State with
-                    Records = record::this.State.Records }
-            Task.FromResult ()
+type PlayerGrain
+    (
+        [<PersistentState("PlayerState", Constants.LiteDbStore)>]
+        state: IPersistentState<PlayerState>,
+        grainFactory: IGrainFactory,
+        configuration: IConfiguration
+    ) as this =
 
-        member this.AddCredential x =
-            this.State <-
-                { this.State with
-                    NickName = x.NickName
-                    Password = x.Password }
-            Task.FromResult ()
+    inherit Grain()
+
+    // We may have a lot of records, so we did not keep it in the PlayerState directly
+    // Add save records history for future use
+    let db = new LiteDatabase(configuration.GetConnectionString(Constants.AppDbConnectionName), FSharpBsonMapper())
+
+    member _.SafeState 
+        with get() =
+            if box state.State |> isNull then PlayerState.defaultState
+            else state.State
+        and set s =
+            state.State <- s
+
+    interface IPlayerGrain with
+        member _.InitCredential password =
+            task {
+                match this.SafeState.Password with
+                | SafeString _ -> return ()
+                | NullOrEmptyString ->
+                    this.SafeState <- { this.SafeState with Password = password }
+            }
+
+        member _.AddRecord (password, record) =
+            task {
+                do! (this :> IPlayerGrain).InitCredential(password)
+                if this.SafeState.Password = password then
+                    let records = db.GetCollection<Record>()
+                    let id = records.Insert { record with PlayerName = this.GetPrimaryKeyString() }
+
+                    let gameBoard = grainFactory.GetGrain<IGameBoardGrain>(int64 Constants.GameZone1)
+                    do! gameBoard.AddRecord { record with Id = id.AsInt32 }
+                    do! state.WriteStateAsync()
+                    return Ok id.AsInt32
+
+                else
+                    return Error AddRecordError.PasswordMissMatch
+            }
+
+        member _.GetRecord (recordId) = 
+            task {
+                let records = db.GetCollection<Record>()
+                let record = records.FindById(BsonValue(recordId))
+                return 
+                    if box record |> isNull then None
+                    else Some record
+            }
+       

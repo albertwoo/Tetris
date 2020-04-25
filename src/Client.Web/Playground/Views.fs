@@ -6,45 +6,50 @@ open Tetris.Core
 open Client.Controls
 
 
-let scalePx x = sprintf "%dpx" (x * 18)
-
-
-let square (s: Square) attrs =
-    div </> [
-        Style [
-            Position PositionOptions.Absolute
-            Left (s.X |> scalePx)
-            Top (s.Y |> scalePx)
-            BorderWidth "1px"
-            Width (scalePx 1)
-            Height (scalePx 1)
+let private playButtn attrs =
+    button </> [
+        Classes [ 
+            Tw.``px-02``; Tw.``m-02``; Tw.``text-white``
+            Tw.``hover:bg-brand``; Tw.``focus:outline-none``
+            Tw.``rounded-full``; Tw.``w-10``; Tw.``h-10``
         ]
         yield! attrs
     ]
 
 
 let render state dispatch =
-    div </> [
-        Style [
-            Width (state.Playground.Border.Width |> scalePx)
-            Height (state.Playground.Border.Height |> scalePx)
-            Position PositionOptions.Relative
-        ]
-        Children [
-            for s in state.Playground.RemainSquares do
-                square s [
-                    Classes [ Tw.``bg-gray``; Tw.``opacity-25`` ]
-                ]
+    FunctionComponent.Of(
+        fun (state, dispatch) ->
+            let move =  Event.NewOperation >> NewEvent >> dispatch
+            Hooks.useDeviceInput state dispatch
+            div [] [
+                TetrisView.render state
 
-            for s in state.Playground.MovingBlock |> Option.map Utils.getBlockSquares |> Option.defaultValue [] do
-                square s [
-                    Classes [ Tw.``bg-brand`` ]
+                div </> [
+                    Classes [
+                        Tw.flex; Tw.``flex-row``; Tw.``justify-center``; Tw.``items-center``
+                        Tw.``mt-04``; Tw.``opacity-50``
+                    ]
+                    Children [
+                        if not state.IsViewMode then
+                            playButtn [
+                                Classes [ Icons.``icon-keyboard_arrow_left``; Tw.``text-2xl`` ]
+                                OnClick (fun _ -> Operation.MoveLeft |> move)
+                            ]
+                            playButtn [
+                                Classes [ Icons.``icon-keyboard_arrow_down``; Tw.``text-2xl`` ]
+                                OnClick (fun _ -> Operation.MoveDown |> move)
+                            ]
+                            playButtn [
+                                Classes [ Icons.``icon-rotate-right``; Tw.``text-sm`` ]
+                                OnClick (fun _ -> Operation.RotateClockWise |> move)
+                            ]
+                            playButtn [
+                                Classes [ Icons.``icon-keyboard_arrow_right``; Tw.``text-2xl`` ]
+                                OnClick (fun _ -> Operation.MoveRight |> move)
+                            ]
+                    ]
                 ]
+            ]
 
-            for column in 0..state.Playground.Border.Width-1 do
-                let s = { X = column; Y = state.Playground.Border.Height }
-                square s [
-                    Classes [ Tw.``bg-gray``; Tw.``opacity-50`` ]
-                ]
-        ]
-    ]
+    ) (state, dispatch)

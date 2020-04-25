@@ -5,10 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Domain.fs" />
-    <Compile Include="Utils.fs" />
-    <Compile Include="Projection.fs" />
-    <Compile Include="Behavior.fs" />
+    <Compile Include="Common.fs" />
+    <Compile Include="Game.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tetris.Core\Tetris.Core.fsproj" />
   </ItemGroup>
 
   <ItemGroup>
