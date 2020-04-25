@@ -14,9 +14,9 @@
     <Compile Include="App\States.fs" />
     <Compile Include="App\Controls.fs" />
     <Compile Include="App\RankView.fs" />
-    <Compile Include="App\OnlineInfo.fs" />
+    <Compile Include="App\OnlineInfoView.fs" />
     <Compile Include="App\PlaygroundView.fs" />
-    <Compile Include="App\SubmitRecord.fs" />
+    <Compile Include="App\SubmitRecordView.fs" />
     <Compile Include="App\Views.fs" />
     <Compile Include="Startup.fs" />
   </ItemGroup>

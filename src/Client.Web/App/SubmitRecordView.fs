@@ -1,4 +1,4 @@
-﻿module Client.App.SubmitRecord
+﻿module Client.App.SubmitRecordView
 
 open System
 open Fable.React

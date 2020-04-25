@@ -1,4 +1,4 @@
-﻿module Client.App.OnlineInfo
+﻿module Client.App.OnlineInfoView
 
 open Fable.React
 open Client.Controls

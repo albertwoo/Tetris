@@ -47,7 +47,7 @@ let render state dispatch =
     div </> [
         Classes [ Tw.``h-full`` ]
         Children [
-            OnlineInfo.render state
+            OnlineInfoView.render state
             githubBrand
 
             match state.Plaground with
@@ -55,7 +55,7 @@ let render state dispatch =
             | PlaygroundState.Playing _ ->
                 PlaygroundView.render state dispatch
             | PlaygroundState.Submiting _ ->
-                SubmitRecord.render (state, dispatch)
+                SubmitRecordView.render (state, dispatch)
             | _ ->
                 heading
                 playButton state dispatch
