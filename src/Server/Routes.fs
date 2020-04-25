@@ -7,7 +7,31 @@ open Orleans
 
 open Server.Common
 open Server.Grains.Interfaces
+open Server.Dtos
 open Server.Dtos.Game
+
+
+let robotCheckHeader: HttpHandler =
+    fun nxt ctx ->
+        task {
+            let FobitErrorMsg = "Robot check failed"
+            if ctx.Request.Headers.ContainsKey RobotCheckerIdKey &&
+               ctx.Request.Headers.ContainsKey RobotCheckerValueKey
+            then
+                match Guid.TryParse(ctx.Request.Headers.Item(RobotCheckerIdKey).ToString()),
+                      System.Single.TryParse(ctx.Request.Headers.Item(RobotCheckerValueKey).ToString())
+                    with
+                    | (true, id), (true, value)->
+                        let factory = ctx.GetService<IGrainFactory>()
+                        let robotChecker = factory.GetGrain<IRobotCheckerGrain>(id)
+                        let! result = robotChecker.Check value
+                        if result then return! nxt ctx
+                        else return! HttpStatusCodeHandlers.RequestErrors.FORBIDDEN FobitErrorMsg nxt ctx
+                    | _ ->
+                        return! HttpStatusCodeHandlers.RequestErrors.FORBIDDEN FobitErrorMsg nxt ctx
+            else
+                return! HttpStatusCodeHandlers.RequestErrors.FORBIDDEN FobitErrorMsg nxt ctx
+        }
 
 
 let all: HttpHandler =
@@ -45,6 +69,7 @@ let all: HttpHandler =
                         }
                             
             POST    >=> routeCi "/player/record"
+                    >=> robotCheckHeader
                     >=> fun nxt ctx ->
                         task {
                             let! payload = ctx.BindJsonAsync<NewRecord>()
@@ -84,5 +109,16 @@ let all: HttpHandler =
                             | Some x -> return! json x.GameEvents nxt ctx
                             | None   -> return! HttpStatusCodeHandlers.RequestErrors.NOT_FOUND "" nxt ctx
                         })
+
+            GET     >=> routeCi "/robot/checker"
+                    >=> fun nxt ctx ->
+                        task {
+                            let factory = ctx.GetService<IGrainFactory>()
+                            let id = Guid.NewGuid()
+                            let robotChecker = factory.GetGrain<IRobotCheckerGrain>(id)
+                            let! base64 = robotChecker.GetCheckerImage()
+                            let data = { Id = id; Base64ImageSource = base64 }
+                            return! json data nxt ctx
+                        }
         ])
     ]

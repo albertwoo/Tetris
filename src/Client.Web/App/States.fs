@@ -1,6 +1,8 @@
 module Client.App.States
 
 open Elmish
+open Fable.SimpleHttp
+open Server.Dtos
 open Client
 
 
@@ -117,9 +119,13 @@ let update msg state =
         | _ ->
             state, Cmd.none
 
-    | UploadRecord record ->
+    | UploadRecord (checker, record) ->
         { state with IsUploading = true }
         , Http.postJson "/api/player/record" record
+          |> Http.headers [
+                Header(RobotCheckerIdKey, checker.Id.ToString())
+                Header(RobotCheckerValueKey, checker.Value.ToString())
+          ]
           |> Http.handleAsync (fun _ -> UploadedRecord) (Some >> OnError)
           |> Cmd.OfAsync.result
     | UploadedRecord ->

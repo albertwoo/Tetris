@@ -9,8 +9,10 @@
     <Compile Include="Grains.Interfaces\Models.fs" />
     <Compile Include="Grains.Interfaces\GameBorad.fs" />
     <Compile Include="Grains.Interfaces\Player.fs" />
+    <Compile Include="Grains.Interfaces\RobotChecker.fs" />
     <Compile Include="Grains\GameBoardGrain.fs" />
     <Compile Include="Grains\PlayerGrain.fs" />
+    <Compile Include="Grains\RobotCheckerGrain.fs" />
     <Compile Include="Routes.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
@@ -24,6 +26,8 @@
     <PackageReference Include="Microsoft.Orleans.Server" Version="3.1.6" />
     <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator" Version="3.1.6" />
     <PackageReference Include="OrleansDashboard" Version="3.1.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-beta0007" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0007" />
     <PackageReference Include="Thoth.Json.Giraffe" Version="4.0.0" />
   </ItemGroup>
   <ItemGroup>

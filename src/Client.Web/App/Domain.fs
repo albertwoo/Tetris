@@ -1,5 +1,6 @@
 namespace rec Client.App
 
+open System
 open Client
 open Server.Dtos.Game
 
@@ -29,7 +30,7 @@ type Msg =
     | StopPlay
     | ClosePlay
 
-    | UploadRecord of NewRecord
+    | UploadRecord of RobotCheckerValue * NewRecord
     | UploadedRecord
 
     | PlaygroundMsg of Playground.Msg
@@ -41,3 +42,7 @@ type PlaygroundState =
     | Playing of Playground.State
     | Submiting of Playground.State
     | Closed
+
+type RobotCheckerValue =
+    { Id: Guid
+      Value: float }
