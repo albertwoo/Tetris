@@ -62,9 +62,8 @@ let update msg state =
         then state, Cmd.none
         else
             let newEvents = Behavior.play state.Playground event
-            Browser.Dom.console.error state.Playground
             { state with
-                Events = state.Events@newEvents
+                Events = state.Events@(newEvents |> List.map (fun e -> { TimeStamp = DateTime.Now; Event = e }))
                 Playground = newEvents |> List.fold Projection.updatePlayground state.Playground }
             , Cmd.none
 
@@ -78,7 +77,10 @@ let update msg state =
                     let playground =
                         if index = 0 then defaultPlayground
                         else state.Playground
-                    state.Events |> Seq.item index |> Projection.updatePlayground playground }
+                    state.Events 
+                    |> List.map (fun x -> x.Event) 
+                    |> Seq.item index 
+                    |> Projection.updatePlayground playground }
         , if isFinished then Cmd.none
           else
             Cmd.OfAsync.result(

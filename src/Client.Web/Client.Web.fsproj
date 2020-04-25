@@ -28,7 +28,6 @@
     <PackageReference Include="Fable.Elmish.Debugger" Version="3.1.0" />
     <PackageReference Include="Fable.React" Version="5.3.6" />
     <PackageReference Include="Fable.SimpleHttp" Version="3.0.0" />
-    <PackageReference Include="Fable.SimpleJson" Version="3.8.2" />
     <PackageReference Include="Fun.LightForm.Fable" Version="1.0.4" />
     <PackageReference Include="Fun.ReactSpring" Version="1.0.0-beta5" />
     <PackageReference Include="Fun.Result" Version="1.0.1" />

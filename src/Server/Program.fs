@@ -31,7 +31,7 @@ let addServices (config: IConfigurationRoot) (services: IServiceCollection) =
         .AddCors()
         .AddGiraffe()
         .AddResponseCaching()
-        .AddSingleton<Giraffe.Serialization.Json.IJsonSerializer>(Json.FSharpLuJsonSerializer())
+        .AddSingleton<Giraffe.Serialization.Json.IJsonSerializer>(Thoth.Json.Giraffe.ThothSerializer())
         .AddResponseCompression()
     |> ignore
     

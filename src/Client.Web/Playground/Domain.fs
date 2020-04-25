@@ -5,7 +5,7 @@ open System
 
 
 type State =
-    { Events: Event list
+    { Events: TetrisEvent list
       Playground: Playground
       StartTime: DateTime option
       IsReplaying: bool }

@@ -1,5 +1,6 @@
 ﻿module Client.App.SubmitRecord
 
+open System
 open Fable.React
 open Fable.React.Props
 open Fun.LightForm
@@ -81,13 +82,17 @@ let render =
                                         OnClick (fun _ ->
                                             match state.PlagroundState, tryGenerateValueByForm<PlayerInfo> form.current with
                                             | PlayState.Submiting p, Ok value ->
-                                                { PlayerName = value.Name
-                                                  PlayerPassword = value.Password
-                                                  GameEvents = []
-                                                  Score = p.Playground.Score
-                                                  TimeCostInMs = 0 }
-                                                |> UploadRecord
-                                                |> dispatch
+                                                match p.StartTime, p.Events with
+                                                | Some startTime, _::_ ->
+                                                    { PlayerName = value.Name
+                                                      PlayerPassword = value.Password
+                                                      GameEvents = p.Events
+                                                      Score = p.Playground.Score
+                                                      TimeCostInMs = (DateTime.Now - startTime).TotalMilliseconds |> int }
+                                                    |> UploadRecord
+                                                    |> dispatch
+                                                | _ ->
+                                                    dispatch ClosePlay
                                             | _, Error e -> ClientError.DtoParseError (string e) |> Some |> Msg.OnError |> dispatch
                                             | _ ->
                                                 ()

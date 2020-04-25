@@ -1,25 +1,26 @@
 ﻿module Client.Http
 
 open Fable.SimpleHttp
-open Fable.SimpleJson
 open Fun.Result
+open Thoth.Json
 
 
-let inline fromJson<'T> str = Json.tryParseAs<'T> str
+let inline fromJson<'T> str = Decode.Auto.fromString<'T>(str, isCamelCase = false)
 
-let toJson obj = Json.stringify obj
+let inline toJson obj = Encode.Auto.toString(4, obj, isCamelCase = false)
 
-let requestJson url method data =
+
+let inline requestJson url method data =
     Http.request url
     |> Http.method method
     |> Http.content (toJson data |> BodyContent.Text)
     |> Http.header (Headers.contentType "application/json")
 
 
-let get url = Http.request url |> Http.method GET
-let delete url = Http.request url |> Http.method DELETE
-let postJson url data = requestJson url POST data
-let putJson url data = requestJson url PUT data
+let inline get url = Http.request url |> Http.method GET
+let inline delete url = Http.request url |> Http.method DELETE
+let inline postJson url data = requestJson url POST data
+let inline putJson url data = requestJson url PUT data
 
 
 let handle map (resp: HttpResponse) =
