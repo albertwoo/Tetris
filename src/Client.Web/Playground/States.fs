@@ -68,7 +68,7 @@ let update msg state =
             , Cmd.none
 
     | ReplayEvent index ->
-        let isFinished = index + 1 = state.Events.Length
+        let isFinished = index + 1 >= state.Events.Length
         { state with
             IsReplaying = not isFinished
             Playground =

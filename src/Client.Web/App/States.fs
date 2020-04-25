@@ -8,8 +8,7 @@ let init () =
     { ErrorInfo = None
       GameBoard = Deferred.NotStartYet
       SelectedRankInfo = None
-      ReplayingData = Deferred.NotStartYet
-      PlagroundState = PlayState.Closed
+      Plaground = PlaygroundState.Closed
       IsUploading = false }
     , Cmd.batch [
         Cmd.ofMsg (GetGameBoard AsyncOperation.Start)
@@ -63,47 +62,56 @@ let update msg state =
         match state.SelectedRankInfo with
         | None -> state, Cmd.none
         | Some rank ->
-            { state with ReplayingData = Deferred.Loading }
+            { state with Plaground = PlaygroundState.Replaying Deferred.Loading }
             , Http.get (sprintf "/api/player/%s/record/%d/events" rank.PlayerName rank.Id)
               |> Http.handleAsyncOperation GetRecordDetail
               |> Cmd.OfAsync.result
     | GetRecordDetail (AsyncOperation.Finished data) ->
-        { state with ReplayingData = Deferred.Loaded data }
-        , Cmd.none
+        let newS, newC = Playground.States.init()
+        let newS = { newS with Events = data }
+        { state with Plaground = PlaygroundState.Replaying (Deferred.Loaded newS)  }
+        , Cmd.batch [
+            Cmd.map PlaygroundMsg newC
+            Cmd.ofMsg (Playground.ReplayEvent 0 |> PlaygroundMsg)
+          ]
     | GetRecordDetail (AsyncOperation.Failed e) ->
-        { state with ReplayingData = Deferred.LoadFailed e }
+        { state with Plaground = PlaygroundState.Closed }
         , Cmd.none
 
     | StartReplay -> 
         state
         , Cmd.ofMsg (GetRecordDetail AsyncOperation.Start)
     | StopReplay ->
-        { state with ReplayingData = Deferred.NotStartYet }
+        { state with Plaground = PlaygroundState.Closed }
         , Cmd.none
 
     | StartPlay -> 
         let newS, newC = Playground.States.init()
-        { state with PlagroundState = PlayState.Playing newS }
+        { state with Plaground = PlaygroundState.Playing newS }
         , Cmd.batch [
             Cmd.map PlaygroundMsg newC
             Cmd.ofMsg (Playground.Start |> PlaygroundMsg)
           ]
     | StopPlay -> 
         { state with 
-            PlagroundState =
-                match state.PlagroundState with
-                | PlayState.Playing x -> PlayState.Submiting x 
-                | _ -> PlayState.Closed }
+            Plaground =
+                match state.Plaground with
+                | PlaygroundState.Playing x -> PlaygroundState.Submiting x 
+                | _ -> PlaygroundState.Closed }
         , Cmd.none
     | ClosePlay ->
-        { state with PlagroundState = PlayState.Closed }
+        { state with Plaground = PlaygroundState.Closed }
         , Cmd.none
 
     | PlaygroundMsg msg' ->
-        match state.PlagroundState with
-        | PlayState.Playing s -> 
+        match state.Plaground with
+        | PlaygroundState.Replaying (DeferredValue s) ->
             let newS, newCmd = Playground.States.update msg' s
-            { state with PlagroundState = PlayState.Playing newS }
+            { state with Plaground = PlaygroundState.Replaying (Deferred.Loaded newS) }
+            , Cmd.map PlaygroundMsg newCmd
+        | PlaygroundState.Playing s -> 
+            let newS, newCmd = Playground.States.update msg' s
+            { state with Plaground = PlaygroundState.Playing newS }
             , Cmd.map PlaygroundMsg newCmd
         | _ ->
             state, Cmd.none

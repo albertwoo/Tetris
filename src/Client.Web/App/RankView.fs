@@ -50,7 +50,11 @@ let private rankView (gameboard: GameBoard) state dispatch =
                                 else
                                     Tw.``opacity-25``
                             ]
-                            OnClick (fun _ -> StartReplay |> dispatch)
+                            OnClick (fun e ->
+                                e.stopPropagation()
+                                Some info |> SelectRankInfo |> dispatch
+                                StartReplay |> dispatch
+                            )
                         ]
                     )
                     (Some 1.0, str (sprintf "#%d" info.Score))

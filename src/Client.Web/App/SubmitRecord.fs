@@ -80,8 +80,8 @@ let render =
                                         Text "提交"
                                         Classes [ Tw.``ml-04`` ]
                                         OnClick (fun _ ->
-                                            match state.PlagroundState, tryGenerateValueByForm<PlayerInfo> form.current with
-                                            | PlayState.Submiting p, Ok value ->
+                                            match state.Plaground, tryGenerateValueByForm<PlayerInfo> form.current with
+                                            | PlaygroundState.Submiting p, Ok value ->
                                                 match p.StartTime, p.Events with
                                                 | Some startTime, _::_ ->
                                                     { PlayerName = value.Name

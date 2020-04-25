@@ -16,7 +16,6 @@
     <Compile Include="App\RankView.fs" />
     <Compile Include="App\OnlineInfo.fs" />
     <Compile Include="App\PlaygroundView.fs" />
-    <Compile Include="App\ReplyingGround.fs" />
     <Compile Include="App\SubmitRecord.fs" />
     <Compile Include="App\Views.fs" />
     <Compile Include="Startup.fs" />

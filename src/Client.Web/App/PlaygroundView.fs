@@ -24,35 +24,40 @@ let render state dispatch =
             div </> [
                 Classes [ Tw.``h-full``; Tw.flex; Tw.``flex-col``; Tw.``justify-center``; Tw.``items-center`` ]
                 Children [
-                    match state.PlagroundState with
-                    | PlayState.Playing s ->
+                    match state.Plaground with
+                    | PlaygroundState.Replaying (DeferredValue s)
+                    | PlaygroundState.Playing s ->
                         Playground.Views.render s (PlaygroundMsg >> dispatch)
                     | _ -> ()
 
-                    div </> [
-                        Classes [
-                            Tw.flex; Tw.``flex-row``; Tw.``justify-center``; Tw.``items-center``
-                            Tw.``mt-04``; Tw.``opacity-50``
+                    match state.Plaground with
+                    | PlaygroundState.Playing _ ->
+                        div </> [
+                            Classes [
+                                Tw.flex; Tw.``flex-row``; Tw.``justify-center``; Tw.``items-center``
+                                Tw.``mt-04``; Tw.``opacity-50``
+                            ]
+                            Children [
+                                playButtn [
+                                    Classes [ Icons.``icon-keyboard_arrow_left``; Tw.``text-2xl`` ]
+                                    OnClick (fun _ -> Operation.MoveLeft |> Event.NewOperation |> Playground.NewEvent |> PlaygroundMsg |> dispatch)
+                                ]
+                                playButtn [
+                                    Classes [ Icons.``icon-keyboard_arrow_down``; Tw.``text-2xl`` ]
+                                    OnClick (fun _ -> Operation.MoveDown |> Event.NewOperation |> Playground.NewEvent |> PlaygroundMsg |> dispatch)
+                                ]
+                                playButtn [
+                                    Classes [ Icons.``icon-rotate-right``; Tw.``text-sm`` ]
+                                    OnClick (fun _ -> Operation.RotateClockWise |> Event.NewOperation |> Playground.NewEvent |> PlaygroundMsg |> dispatch)
+                                ]
+                                playButtn [
+                                    Classes [ Icons.``icon-keyboard_arrow_right``; Tw.``text-2xl`` ]
+                                    OnClick (fun _ -> Operation.MoveRight |> Event.NewOperation |> Playground.NewEvent |> PlaygroundMsg |> dispatch)
+                                ]
+                            ]
                         ]
-                        Children [
-                            playButtn [
-                                Classes [ Icons.``icon-keyboard_arrow_left``; Tw.``text-2xl`` ]
-                                OnClick (fun _ -> Operation.MoveLeft |> Event.NewOperation |> Playground.NewEvent |> PlaygroundMsg |> dispatch)
-                            ]
-                            playButtn [
-                                Classes [ Icons.``icon-keyboard_arrow_down``; Tw.``text-2xl`` ]
-                                OnClick (fun _ -> Operation.MoveDown |> Event.NewOperation |> Playground.NewEvent |> PlaygroundMsg |> dispatch)
-                            ]
-                            playButtn [
-                                Classes [ Icons.``icon-rotate-right``; Tw.``text-sm`` ]
-                                OnClick (fun _ -> Operation.RotateClockWise |> Event.NewOperation |> Playground.NewEvent |> PlaygroundMsg |> dispatch)
-                            ]
-                            playButtn [
-                                Classes [ Icons.``icon-keyboard_arrow_right``; Tw.``text-2xl`` ]
-                                OnClick (fun _ -> Operation.MoveRight |> Event.NewOperation |> Playground.NewEvent |> PlaygroundMsg |> dispatch)
-                            ]
-                        ]
-                    ]
+                    | _ ->
+                        ()
 
                     div </> [
                         Classes [ 
@@ -60,11 +65,26 @@ let render state dispatch =
                             Tw.``items-center``; Tw.``justify-center``
                         ]
                         Children [
-                            Button.danger [
-                                Text "结束"
-                                OnClick (fun _ -> StopPlay |> dispatch)
-                                Classes [ Tw.``my-10`` ]
-                            ]
+                            match state.Plaground with
+                            | PlaygroundState.Replaying _ ->
+                                Button.danger [
+                                    Text "关闭"
+                                    OnClick (fun _ -> StopReplay |> dispatch)
+                                    Classes [ Tw.``my-10`` ]
+                                ]
+                                Button.primary [
+                                    Text "重播"
+                                    OnClick (fun _ -> Playground.ReplayEvent 0 |> PlaygroundMsg |> dispatch)
+                                    Classes [ Tw.``my-10`` ]
+                                ]
+                            | PlaygroundState.Playing _ ->
+                                Button.danger [
+                                    Text "结束"
+                                    OnClick (fun _ -> StopPlay |> dispatch)
+                                    Classes [ Tw.``my-10`` ]
+                                ]
+                            | _ ->
+                                ()
                         ]
                     ]
                 ]

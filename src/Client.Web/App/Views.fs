@@ -50,13 +50,12 @@ let render state dispatch =
             OnlineInfo.render state
             githubBrand
 
-            match state.PlagroundState, state.ReplayingData with
-            | PlayState.Playing _, _ ->
+            match state.Plaground with
+            | PlaygroundState.Replaying _
+            | PlaygroundState.Playing _ ->
                 PlaygroundView.render state dispatch
-            | PlayState.Submiting _,  _ ->
+            | PlaygroundState.Submiting _ ->
                 SubmitRecord.render (state, dispatch)
-            | _, Deferred.Loaded _ ->
-                ReplyingGround.render state dispatch
             | _ ->
                 heading
                 playButton state dispatch
