@@ -1,72 +1,69 @@
 ﻿namespace Server.Grans
 
-open System
-open System.Collections.Generic
 open Orleans
 open Orleans.Runtime
-open Orleans.Providers
-open Orleans.EventSourcing
-open Orleans.EventSourcing.CustomStorage
 open FSharp.Control.Tasks
-open CosmoStore
+open Microsoft.Extensions.Configuration
+open LiteDB
+open LiteDB.FSharp
 open Fun.Result
 
 open Server.Common
 open Server.Grains.Interfaces
 
 
-[<LogConsistencyProvider(ProviderName = Constants.LiteDbLogStore)>]
 type PlayerGrain
     (
-        [<PersistentState("PlayerState", Constants.LiteDbStore)>] snapshot: IPersistentState<PlayerState>,
-        [<PersistentState("PlayerState-Version", Constants.LiteDbStore)>] version: IPersistentState<int>
+        [<PersistentState("PlayerState", Constants.LiteDbStore)>]
+        state: IPersistentState<PlayerState>,
+        grainFactory: IGrainFactory,
+        configuration: IConfiguration
     ) as this =
 
-    inherit JournaledGrain<PlayerState, PlayerEvent>()
+    inherit Grain()
 
-    let eventStore: CosmoStore.EventStore<PlayerEvent, int64>  = 
-        CosmoStore.LiteDb.EventStore.getEventStore
-            { CosmoStore.LiteDb.Configuration.Empty with Name = "" }
+    // We may have a lot of records, so we did not keep it in the PlayerState directly
+    // Add save records history for future use
+    let db = new LiteDatabase(configuration.GetConnectionString(Constants.AppDbConnectionName), FSharpBsonMapper())
 
-    let streamId = "PlayerStream" + this.GetPrimaryKeyString()
+    member _.SafeState 
+        with get() =
+            if box state.State |> isNull then PlayerState.defaultState
+            else state.State
+        and set s =
+            state.State <- s
 
-
-    override _.TransitionState (state, evt) =
-        snapshot.State <-
-            match evt with
-            | PlayerEvent.InitCredential p when String.IsNullOrEmpty(state.Password) -> { state with Password = p }
-            | PlayerEvent.InitCredential _ -> state
-            | PlayerEvent.NewRecord r ->
-                match state.TopRecord with
-                | Some t when t.Score < r.Score -> { state with TopRecord = Some r }
-                | _ -> state
-
-
-    interface ICustomStorageInterface<PlayerState, PlayerEvent> with
-        member _.ReadStateFromStorage() =
+    interface IPlayerGrain with
+        member _.InitCredential password =
             task {
-                return KeyValuePair (version.State, snapshot.State)
+                match this.SafeState.Password with
+                | SafeString _ -> return ()
+                | NullOrEmptyString ->
+                    this.SafeState <- { this.SafeState with Password = password }
             }
 
-        member _.ApplyUpdatesToStorage (updates, expectedVersion) =
+        member _.AddRecord (password, record) =
             task {
-                try
-                    do! snapshot.WriteStateAsync()
-                    do!
-                        updates
-                        |> Seq.map (fun x ->
-                            { Id = Guid.NewGuid()
-                              CorrelationId = None 
-                              CausationId = None
-                              Name = ""
-                              Data = x
-                              Metadata = None }
-                        )
-                        |> Seq.toList
-                        |> eventStore.AppendEvents streamId (ExpectedVersion.Exact (int64 expectedVersion))
-                        |> Task.map ignore
-                    return true
-                with _ ->
-                    return false
+                do! (this :> IPlayerGrain).InitCredential(password)
+                if this.SafeState.Password = password then
+                    let records = db.GetCollection<Record>()
+                    let id = records.Insert { record with PlayerName = this.GetPrimaryKeyString() }
+
+                    let gameBoard = grainFactory.GetGrain<IGameBoardGrain>(int64 Constants.GameZone1)
+                    do! gameBoard.AddRecord { record with Id = id.AsInt32 }
+                    do! state.WriteStateAsync()
+                    return Ok id.AsInt32
+
+                else
+                    return Error AddRecordError.PasswordMissMatch
+            }
+
+        member _.GetRecord (recordId) = 
+            task {
+                let records = db.GetCollection<Record>()
+                let record = records.FindById(BsonValue(recordId))
+                return 
+                    if box record |> isNull then None
+                    else Some record
             }
        

@@ -1,5 +1,7 @@
 ﻿namespace rec Tetris.Core
 
+open System
+
 
 type Playground =
     { IsGameOver: bool
@@ -35,3 +37,6 @@ type Border =
       Height: int }
 
 
+type TetrisEvent =
+    { TimeStamp: DateTime
+      Event: Event }

@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Models.fs" />
+    <Compile Include="GameBorad.fs" />
+    <Compile Include="Player.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Orleans.Server" Version="3.1.6" />
+    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator" Version="3.1.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\Tetris.Core\Tetris.Core.fsproj" />
+  </ItemGroup>
+</Project>

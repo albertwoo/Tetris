@@ -1,4 +1,4 @@
-﻿namespace rec Server.Grains.Interfaces
+﻿namespace rec Tetris.Grains.Interfaces
 
 open System.Threading.Tasks
 open Orleans
