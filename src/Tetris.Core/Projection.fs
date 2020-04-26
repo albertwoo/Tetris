@@ -1,6 +1,7 @@
 ﻿// Update state based on event
 module Tetris.Core.Projection
 
+open System
 open Utils
 
 
@@ -73,13 +74,18 @@ let updatePlayground playground evt =
         | _ -> false
     
     let score =
-        playground.Score 
-        + (
-            (remainSquares |> Seq.groupBy (fun s -> s.Y) |> Seq.length) // curent rows number
-            -
-            (playground.RemainSquares |> Seq.groupBy (fun s -> s.Y) |> Seq.length) // old rows number
-          ) 
-          * 10
+        match evt with
+        | Event.NewBlock _ ->
+            let deltaRow = 
+                Math.Abs (
+                    (playground.RemainSquares |> Seq.groupBy (fun s -> s.Y) |> Seq.length) // old rows number
+                    -
+                    (remainSquares |> Seq.groupBy (fun s -> s.Y) |> Seq.length) // curent rows number
+                ) 
+            let scale = Math.Pow(2., float (deltaRow / 4)) |> int
+            playground.Score + deltaRow * scale * 10
+        | _ ->
+            playground.Score
         
     {
         IsGameOver = isGameOver
