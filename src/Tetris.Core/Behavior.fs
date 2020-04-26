@@ -32,8 +32,9 @@ let play playground event =
 
 
 let rec moveToEnd playground operation evts =
+    let newEvents = play playground (Event.NewOperation operation)
     match playground.MovingBlock with
-    | None -> playground, evts
+    | None -> evts
     | Some block ->
         match operation with
         | Operation.MoveDown | Operation.MoveLeft | Operation.MoveRight ->
@@ -42,10 +43,9 @@ let rec moveToEnd playground operation evts =
             | CollidedWithBorderLeft playground.Border
             | CollidedWithBorderRight playground.Border
             | CollidedWithBorderBottom playground.Border -> 
-                playground, evts
+                evts
             | _ ->
-                let newEvents = play playground (Event.NewOperation operation)
                 let newPlayground = newEvents |> List.fold Projection.updatePlayground playground
-                moveToEnd newPlayground operation (evts@newEvents)
+                moveToEnd newPlayground operation evts@newEvents
         | _ ->
-            playground, evts
+            evts

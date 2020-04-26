@@ -16,9 +16,10 @@ let private defaultPlayground =
         RemainSquares = []
     }
 
-let private convertToTetrisEvent newEvents =
-    newEvents 
-    |> List.map (fun e -> { TimeStamp = DateTime.Now; Event = e })
+let private updateStateWithTetrisEvents state newEvents =
+    { state with
+        Events = state.Events@(newEvents |> List.map (fun e -> { TimeStamp = DateTime.Now; Event = e }))
+        Playground = newEvents |> List.fold Projection.updatePlayground state.Playground }
 
 
 let init() =
@@ -67,20 +68,16 @@ let update msg state =
         if state.IsReplaying || state.Playground.IsGameOver 
         then state, Cmd.none
         else
-            let newEvents = Behavior.play state.Playground event
-            { state with
-                Events = state.Events@(convertToTetrisEvent newEvents)
-                Playground = newEvents |> List.fold Projection.updatePlayground state.Playground }
+            Behavior.play state.Playground event
+            |> updateStateWithTetrisEvents state
             , Cmd.none
 
     | MoveToEnd operation ->
         if state.IsReplaying || state.Playground.IsGameOver 
         then state, Cmd.none
         else
-            let newPlayground, newEvents = Behavior.moveToEnd state.Playground operation []
-            { state with
-                Events = state.Events@(convertToTetrisEvent newEvents)
-                Playground = newPlayground }
+            Behavior.moveToEnd state.Playground operation []
+            |> updateStateWithTetrisEvents state
             , Cmd.none
 
     | ReplayEvent index ->
