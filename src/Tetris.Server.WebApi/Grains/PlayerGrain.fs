@@ -8,8 +8,8 @@ open LiteDB
 open LiteDB.FSharp
 open Fun.Result
 
-open Server.Common
-open Server.Grains.Interfaces
+open Tetris.Server.WebApi.Common
+open Tetris.Server.WebApi.Grain.Interfaces
 
 
 type PlayerGrain
@@ -23,7 +23,7 @@ type PlayerGrain
     inherit Grain()
 
     // We may have a lot of records, so we did not keep it in the PlayerState directly
-    // Add save records history for future use
+    // Save records history for future usage
     let db = new LiteDatabase(configuration.GetConnectionString(Constants.AppDbConnectionName), FSharpBsonMapper())
 
     member _.SafeState 

@@ -2,7 +2,7 @@ namespace rec Client.App
 
 open System
 open Client
-open Server.Dtos.Game
+open Tetris.Server.WebApi.Dtos.Game
 
 
 type State =

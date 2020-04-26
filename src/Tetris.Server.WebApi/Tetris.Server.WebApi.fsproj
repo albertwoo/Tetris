@@ -6,9 +6,7 @@
     <Compile Include="Common\Constants.fs" />
     <Compile Include="Common\Json.fs" />
     <Compile Include="Common\LiteDbGrainStorage.fs" />
-    <Compile Include="Grains.Interfaces\Models.fs" />
-    <Compile Include="Grains.Interfaces\GameBorad.fs" />
-    <Compile Include="Grains.Interfaces\Player.fs" />
+    <Compile Include="Grains.Interfaces\Game.fs" />
     <Compile Include="Grains.Interfaces\RobotChecker.fs" />
     <Compile Include="Grains\GameBoardGrain.fs" />
     <Compile Include="Grains\PlayerGrain.fs" />
@@ -21,7 +19,6 @@
     <PackageReference Include="Giraffe" Version="4.1.0" />
     <PackageReference Include="LiteDB" Version="4.1.4" />
     <PackageReference Include="LiteDB.FSharp" Version="2.15.0" />
-    <PackageReference Include="Microsoft.FSharpLu.Json" Version="0.11.6" />
     <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="3.1.6" />
     <PackageReference Include="Microsoft.Orleans.Server" Version="3.1.6" />
     <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator" Version="3.1.6" />
@@ -31,8 +28,8 @@
     <PackageReference Include="Thoth.Json.Giraffe" Version="4.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Server.Dtos\Server.Dtos.fsproj" />
     <ProjectReference Include="..\Tetris.Core\Tetris.Core.fsproj" />
+    <ProjectReference Include="..\Tetris.Server.WebApi.Dtos\Tetris.Server.WebApi.Dtos.fsproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.7.1" />

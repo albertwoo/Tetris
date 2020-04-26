@@ -3,7 +3,7 @@
 open Fable.React
 open Fable.React.Props
 open Fun.ReactSpring
-open Server.Dtos.Game
+open Tetris.Server.WebApi.Dtos.Game
 open Client.Controls
 
 

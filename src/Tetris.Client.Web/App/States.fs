@@ -2,7 +2,7 @@ module Client.App.States
 
 open Elmish
 open Fable.SimpleHttp
-open Server.Dtos
+open Tetris.Server.WebApi.Dtos
 open Client
 
 

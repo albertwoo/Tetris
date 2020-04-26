@@ -1,12 +1,12 @@
-namespace Server.Grains
+namespace Tetris.Server.WebApi.Grain
 
 open System
 open System.Threading.Tasks
 open Orleans
 open Orleans.Runtime
 open FSharp.Control.Tasks
-open Server.Grains.Interfaces
-open Server.Common
+open Tetris.Server.WebApi.Common
+open Tetris.Server.WebApi.Grain.Interfaces
 
 
 type GameBoardGrain

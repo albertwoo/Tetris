@@ -1,4 +1,4 @@
-﻿namespace rec Server.Dtos.Game
+﻿namespace rec Tetris.Server.WebApi.Dtos.Game
 
 open System
 open Tetris.Core

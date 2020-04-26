@@ -10,7 +10,7 @@ var CONFIG = {
     // The tags to include the generated JS and CSS will be automatically injected in the HTML template
     // See https://github.com/jantimon/html-webpack-plugin
     indexHtmlTemplate: './public/index.html',
-    fsharpEntry: './Client.Web.fsproj',
+    fsharpEntry: './Tetris.Client.Web.fsproj',
     tailwindCss: './public/css/tailwind-source.css',
     outputDir: './deploy',
     assetsDir: './public',

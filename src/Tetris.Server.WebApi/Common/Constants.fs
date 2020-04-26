@@ -1,4 +1,4 @@
-﻿module Server.Common.Constants
+﻿module Tetris.Server.WebApi.Common.Constants
 
 
 let [<Literal>] AppDbConnectionName = "App"

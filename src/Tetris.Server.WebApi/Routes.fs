@@ -5,10 +5,10 @@ open Giraffe
 open FSharp.Control.Tasks
 open Orleans
 
-open Server.Common
-open Server.Grains.Interfaces
-open Server.Dtos
-open Server.Dtos.Game
+open Tetris.Server.WebApi.Common
+open Tetris.Server.WebApi.Grain.Interfaces
+open Tetris.Server.WebApi.Dtos
+open Tetris.Server.WebApi.Dtos.Game
 
 
 let robotCheckHeader: HttpHandler =
@@ -117,7 +117,8 @@ let all: HttpHandler =
                             let id = Guid.NewGuid()
                             let robotChecker = factory.GetGrain<IRobotCheckerGrain>(id)
                             let! base64 = robotChecker.GetCheckerImage()
-                            let data = { Id = id; Base64ImageSource = base64 }
+                            let! expireDate = robotChecker.GetExpireDate()
+                            let data = { Id = id; Base64ImageSource = base64; ExpireDate = expireDate }
                             return! json data nxt ctx
                         }
         ])

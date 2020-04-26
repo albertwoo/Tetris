@@ -6,8 +6,8 @@ open Fable.React.Props
 open Fun.LightForm
 open Fun.LightForm.Validators
 open Fun.LightForm.FormView
-open Server.Dtos
-open Server.Dtos.Game
+open Tetris.Server.WebApi.Dtos
+open Tetris.Server.WebApi.Dtos.Game
 open Client
 open Client.Controls
 

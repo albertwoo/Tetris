@@ -1,4 +1,4 @@
-﻿namespace Server.Common
+﻿namespace Tetris.Server.WebApi.Common
 
 open System.Threading.Tasks
 open FSharp.Control.Tasks
@@ -9,7 +9,7 @@ open Orleans.Runtime
 open Orleans.Hosting
 open LiteDB
 open LiteDB.FSharp
-open Server.Common.Json
+open Tetris.Server.WebApi.Common.Json
 
 
 [<CLIMutable>]
@@ -51,7 +51,9 @@ type LiteDbGrainStorage (liteDbPath: string) =
                 let value = grains.FindById(BsonValue(createGrainName grainType grainReference))
                 grainState.State <- 
                     if box value = null then null
-                    else fromJson grainState.Type value.Value
+                    else match fromJson grainState.Type value.Value with
+                         | Ok x -> x
+                         | Error e -> failwithf "Data imcompatible: %s" e
             } :> Task
 
 

@@ -1,13 +1,13 @@
-﻿namespace Server.Grains
+﻿namespace Tetris.Server.WebApi.Grain
 
 open System
-open Server.Grains.Interfaces
 open FSharp.Control.Tasks
 open Orleans
 open SixLabors.ImageSharp
 open SixLabors.Primitives
 open SixLabors.ImageSharp.PixelFormats
 open SixLabors.ImageSharp.Processing
+open Tetris.Server.WebApi.Grain.Interfaces
 
 
 type RobotCheckerGrain() =
@@ -16,14 +16,13 @@ type RobotCheckerGrain() =
     let width = 560.f
     let height = 100.f
     let scale = 10.f
-    let expiredDate = DateTime.Now.AddMinutes(2.)
+    let expireDate = DateTime.Now.AddSeconds(15.)
     let expected = System.Random().Next(0, int(width - (3.f * scale))) |> float32
 
     interface IRobotCheckerGrain with
         member _.Check value =
             task {
-                let x = expected
-                if DateTime.Now > expiredDate then return false
+                if DateTime.Now > expireDate then return false
                 else return (width * value - expected) < 10.f
             }
 
@@ -42,4 +41,9 @@ type RobotCheckerGrain() =
                     |> ignore
                 )
                 return image.ToBase64String(Formats.Png.PngFormat.Instance)
+            }
+
+        member _.GetExpireDate () =
+            task {
+                return expireDate
             }

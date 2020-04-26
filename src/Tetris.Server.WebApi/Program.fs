@@ -15,7 +15,7 @@ open Orleans
 open Orleans.Hosting
 open Orleans.Configuration
 open Fun.Result
-open Server.Common
+open Tetris.Server.WebApi.Common
 
 
 let publicPath = 
@@ -90,8 +90,8 @@ let main args =
                         opt.Password <- config.GetValue("App:OrleansDashboard:Password"))
                     .UseLocalhostClustering()
                     .Configure(fun (opts: ClusterOptions) ->
-                        opts.ClusterId <- "dev"
-                        opts.ServiceId <- "HellowWorldAPIService"
+                        opts.ClusterId <- "tetris-dev"
+                        opts.ServiceId <- "tetris-game"
                     )
                     .Configure(fun (opts: EndpointOptions) ->
                         opts.AdvertisedIPAddress <- IPAddress.Loopback

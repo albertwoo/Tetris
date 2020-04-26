@@ -1,4 +1,4 @@
-﻿namespace Server.Dtos
+﻿namespace Tetris.Server.WebApi.Dtos
 
 open System
 
@@ -11,4 +11,5 @@ module Constants =
 
 type RobotChecker =
     { Id: Guid
-      Base64ImageSource: string }
+      Base64ImageSource: string
+      ExpireDate: DateTime }
