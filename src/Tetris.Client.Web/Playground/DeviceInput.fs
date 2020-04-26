@@ -17,24 +17,25 @@ type IHooks with
         let tryMoving (x, y) =
             match touchMove.current with
             | Some (x0, y0) ->
-                touchMove.current <- (Some (x, y))
                 let dx, dy = x - x0, y - y0
-                let threshholdH = 25.
-                let threshholdV = 5.
-                if Math.Abs dx > Math.Abs dy && Math.Abs dx > threshholdH then
-                    if dx < 0. 
-                    then Some Operation.MoveLeft
-                    else Some Operation.MoveRight
-                elif Math.Abs dx < Math.Abs dy && dy > threshholdV then
-                    Some Operation.MoveDown
-                else None
-                |> Option.iter move
-            | _ -> ()
+                let threshhold = 30.
+                if Math.Abs dx > Math.Abs dy && Math.Abs dx > threshhold then
+                    touchMove.current <- (Some (x, y))
+                    if dx > 0. 
+                    then move Operation.MoveLeft
+                    else move Operation.MoveRight
+                elif Math.Abs dx < Math.Abs dy && dy > threshhold then
+                    touchMove.current <- (Some (x, y))
+                    move Operation.MoveDown
+                else 
+                    ()
+            | _ -> 
+                ()
 
-        let tryFinallyMove () =
-            match touchStart.current, touchMove.current with
-            | Some (x0, y0), Some(x1, y1) ->
-                let threshhold = 3.
+        let tryFinallyMove (x1, y1) =
+            match touchStart.current with
+            | Some (x0, y0) ->
+                let threshhold = 5.
                 if Math.Abs(x0 - x1) < threshhold &&
                    Math.Abs(y0 - y1) < threshhold
                 then
@@ -52,8 +53,9 @@ type IHooks with
                 let onTouchMove (e: Browser.Types.Event) =
                     let e = e :?> Browser.Types.TouchEvent
                     tryMoving (e.changedTouches.[0].clientX, e.changedTouches.[0].clientY)
-                let onTouchEnd (_: Browser.Types.Event) =
-                    tryFinallyMove()
+                let onTouchEnd (e: Browser.Types.Event) =
+                    let e = e :?> Browser.Types.TouchEvent
+                    tryFinallyMove(e.changedTouches.[0].clientX, e.changedTouches.[0].clientY)
                     touchStart.current <- None
                     touchStartTime.current <- None
                     touchMove.current <- None
