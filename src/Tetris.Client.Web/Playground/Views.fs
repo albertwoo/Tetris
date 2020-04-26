@@ -24,6 +24,7 @@ let render =
             let containerId = Hooks.useState (sprintf "tetris-playground-%d" (System.Random().Next()))
             Hooks.useDeviceInput state dispatch containerId.current
             div </> [
+                Classes [ Tw.flex; Tw.``flex-col``; Tw.``items-center`` ]
                 Children [
                     div </> [
                         Id containerId.current

@@ -6,7 +6,7 @@ open Tetris.Core
 open Tetris.Client.Web.Controls
 
 
-let private scalePx x = sprintf "%dpx" (x * 17)
+let private scalePx x = sprintf "%dpx" (x * 18)
 
 
 let private square =
