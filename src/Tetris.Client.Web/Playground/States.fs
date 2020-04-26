@@ -16,10 +16,9 @@ let private defaultPlayground =
         RemainSquares = []
     }
 
-let private updateStateWithTetrisEvents state newEvents =
-    { state with
-        Events = state.Events@(newEvents |> List.map (fun e -> { TimeStamp = DateTime.Now; Event = e }))
-        Playground = newEvents |> List.fold Projection.updatePlayground state.Playground }
+let private convertToTetrisEvent newEvents =
+    newEvents 
+    |> List.map (fun e -> { TimeStamp = DateTime.Now; Event = e })
 
 
 let init() =
@@ -68,16 +67,29 @@ let update msg state =
         if state.IsReplaying || state.Playground.IsGameOver 
         then state, Cmd.none
         else
-            Behavior.play state.Playground event
-            |> updateStateWithTetrisEvents state
+            let newEvents = Behavior.play state.Playground event
+            { state with
+                Events = state.Events@(newEvents |> convertToTetrisEvent)
+                Playground = newEvents |> List.fold Projection.updatePlayground state.Playground }
             , Cmd.none
 
     | MoveToEnd operation ->
         if state.IsReplaying || state.Playground.IsGameOver 
         then state, Cmd.none
         else
-            Behavior.moveToEnd state.Playground operation
-            |> updateStateWithTetrisEvents state
+            let newOperations = Behavior.moveToEnd state.Playground operation
+            let movingBlock =
+                state.Playground.MovingBlock 
+                |> Option.map (fun block -> List.fold Projection.updateBlock block newOperations)
+            let predictionBlock =
+                movingBlock
+                |> Option.map (Projection.updatePredictionBlock state.Playground.Border state.Playground.RemainSquares)
+            { state with
+                Events = state.Events@(newOperations |> List.map Event.NewOperation |> convertToTetrisEvent)
+                Playground = 
+                    { state.Playground with 
+                        MovingBlock = movingBlock
+                        PredictionBlock = predictionBlock } }
             , Cmd.none
 
     | ReplayEvent index ->

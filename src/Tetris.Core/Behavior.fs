@@ -45,7 +45,7 @@ let moveToEnd playground operation =
                 | CollidedWithBorderBottom playground.Border -> 
                     evts
                 | newBlock ->
-                    loop newBlock (evts@[ Event.NewOperation operation ])
+                    loop newBlock (evts@[ operation ])
             loop block []
         | _ ->
             []
