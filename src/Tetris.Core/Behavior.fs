@@ -31,21 +31,21 @@ let play playground event =
     ]
 
 
-let rec moveToEnd playground operation evts =
-    let newEvents = play playground (Event.NewOperation operation)
+let moveToEnd playground operation =
     match playground.MovingBlock with
-    | None -> evts
+    | None -> []
     | Some block ->
         match operation with
         | Operation.MoveDown | Operation.MoveLeft | Operation.MoveRight ->
-            match Projection.updateBlock block operation with
-            | CollidedWithSquares playground.RemainSquares
-            | CollidedWithBorderLeft playground.Border
-            | CollidedWithBorderRight playground.Border
-            | CollidedWithBorderBottom playground.Border -> 
-                evts
-            | _ ->
-                let newPlayground = newEvents |> List.fold Projection.updatePlayground playground
-                moveToEnd newPlayground operation evts@newEvents
+            let rec loop block evts =
+                match Projection.updateBlock block operation with
+                | CollidedWithSquares playground.RemainSquares
+                | CollidedWithBorderLeft playground.Border
+                | CollidedWithBorderRight playground.Border
+                | CollidedWithBorderBottom playground.Border -> 
+                    evts
+                | newBlock ->
+                    loop newBlock (evts@[ Event.NewOperation operation ])
+            loop block []
         | _ ->
-            evts
+            []

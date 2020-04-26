@@ -76,7 +76,7 @@ let update msg state =
         if state.IsReplaying || state.Playground.IsGameOver 
         then state, Cmd.none
         else
-            Behavior.moveToEnd state.Playground operation []
+            Behavior.moveToEnd state.Playground operation
             |> updateStateWithTetrisEvents state
             , Cmd.none
 
