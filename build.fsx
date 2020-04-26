@@ -20,8 +20,8 @@ Target.initEnvironment ()
 let [<Literal>] TranslationFile = "Translation.lang"
 
 
-let serverPath          = __SOURCE_DIRECTORY__ </> "src/Server"
-let clientWebPath       = __SOURCE_DIRECTORY__ </> "src/Client.Web"
+let serverPath          = __SOURCE_DIRECTORY__ </> "src/Tetris.Server.WebApi"
+let clientWebPath       = __SOURCE_DIRECTORY__ </> "src/Tetris.Client.Web"
 
 let deployDir           = __SOURCE_DIRECTORY__ </> "deploy"
 let publishDir          = deployDir </> "publish"
@@ -124,7 +124,7 @@ Target.create "BuildServer" <| fun _ ->
 
 
 Target.create "RunClientWeb" <| fun _ ->
-    let buildTailwind() = yarn "tailwind build ../Client.Web/public/css/tailwind-source.css -o ../Client.Web/public/css/tailwind-generated.css -c ../Client.Web/tailwind.config.js" clientWebPath
+    let buildTailwind() = yarn "tailwind build ../Tetris.Client.Web/public/css/tailwind-source.css -o ../Tetris.Client.Web/public/css/tailwind-generated.css -c ../Tetris.Client.Web/tailwind.config.js" clientWebPath
     let buildTranslation() = translateI18n "src" (serverPath </> TranslationFile)
     [
         async {

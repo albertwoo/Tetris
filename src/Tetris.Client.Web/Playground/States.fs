@@ -6,7 +6,7 @@ open Fun.Result
 open Tetris.Core
 
 
-let defaultPlayground =
+let private defaultPlayground =
     {
         IsGameOver = false
         Score = 0
@@ -15,6 +15,7 @@ let defaultPlayground =
         MovingBlock = None
         RemainSquares = []
     }
+
 
 let init() =
     { Events = []

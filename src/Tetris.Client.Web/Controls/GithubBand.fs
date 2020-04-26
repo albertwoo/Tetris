@@ -1,12 +1,12 @@
-﻿[<AutoOpen>]
-module Tetris.Client.Web.App.Controls
+﻿[<RequireQualifiedAccess>]
+module Tetris.Client.Web.Controls.GithubBand
 
 open Fable.React
 open Fable.React.Props
 open Tetris.Client.Web.Controls
 
 
-let githubBrand =
+let view =
     div </> [
         Classes [ Tw.``fixed``; Tw.``top-0``; Tw.``right-0`` ]
         Children [
@@ -26,5 +26,3 @@ let githubBrand =
             ]
         ]
     ]
-
-

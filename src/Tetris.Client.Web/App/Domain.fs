@@ -1,6 +1,5 @@
 namespace rec Tetris.Client.Web.App
 
-open System
 open Tetris.Client.Web
 open Tetris.Server.WebApi.Dtos.Game
 
@@ -30,7 +29,7 @@ type Msg =
     | StopPlay
     | ClosePlay
 
-    | UploadRecord of RobotCheckerValue * NewRecord
+    | UploadRecord of Tetris.Client.Web.Controls.RobotCheckerValue * NewRecord
     | UploadedRecord
 
     | PlaygroundMsg of Playground.Msg
@@ -42,7 +41,3 @@ type PlaygroundState =
     | Playing of Playground.State
     | Submiting of Playground.State
     | Closed
-
-type RobotCheckerValue =
-    { Id: Guid
-      Value: float }

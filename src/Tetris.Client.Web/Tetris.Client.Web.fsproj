@@ -8,6 +8,8 @@
     <Compile Include="Controls\Common.fs" />
     <Compile Include="Controls\Button.fs" />
     <Compile Include="Controls\List.fs" />
+    <Compile Include="Controls\GithubBand.fs" />
+    <Compile Include="Controls\RobotChecker.fs" />
     <Compile Include="Playground\Domain.fs" />
     <Compile Include="Playground\States.fs" />
     <Compile Include="Playground\DeviceInput.fs" />
@@ -15,7 +17,7 @@
     <Compile Include="Playground\Views.fs" />
     <Compile Include="App\Domain.fs" />
     <Compile Include="App\States.fs" />
-    <Compile Include="App\Controls.fs" />
+    <Compile Include="App\HeaderView.fs" />
     <Compile Include="App\RankView.fs" />
     <Compile Include="App\OnlineInfoView.fs" />
     <Compile Include="App\PlaygroundView.fs" />
