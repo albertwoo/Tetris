@@ -29,3 +29,23 @@ let play playground event =
                             ()
                     ]
     ]
+
+
+let rec moveToEnd playground operation evts =
+    let newEvents = play playground (Event.NewOperation operation)
+    match playground.MovingBlock with
+    | None -> evts
+    | Some block ->
+        match operation with
+        | Operation.MoveDown | Operation.MoveLeft | Operation.MoveRight ->
+            match Projection.updateBlock block operation with
+            | CollidedWithSquares playground.RemainSquares
+            | CollidedWithBorderLeft playground.Border
+            | CollidedWithBorderRight playground.Border
+            | CollidedWithBorderBottom playground.Border -> 
+                evts
+            | _ ->
+                let newPlayground = newEvents |> List.fold Projection.updatePlayground playground
+                moveToEnd newPlayground operation evts@newEvents
+        | _ ->
+            evts

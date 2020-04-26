@@ -11,7 +11,7 @@ let private scalePx x = sprintf "%dpx" (x * 18)
 
 let private square =
     FunctionComponent.Of 
-        (fun (s: Square, attrs) ->
+        (fun (_, s: Square, attrs) ->
             div </> [
                 Style [
                     Position PositionOptions.Absolute
@@ -23,7 +23,7 @@ let private square =
                 ]
                 yield! attrs
             ]
-        ,memoizeWith = (fun (s1, _) (s2, _) -> s1 = s2)
+        ,memoizeWith = (fun (k1, s1, _) (k2, s2, _) -> s1 = s2 && k1 = k2)
     )
 
 
@@ -36,23 +36,23 @@ let render state =
         ]
         Children [
             for s in state.Playground.RemainSquares do
-                square (s, [
+                square ("remain", s, [
                     Classes [ Tw.``bg-gray``; Tw.``opacity-25`` ]
                 ])
 
             for s in state.Playground.MovingBlock |> Option.map Utils.getBlockSquares |> Option.defaultValue [] do
-                square (s, [
+                square ("moving", s, [
                     Classes [ Tw.``bg-brand`` ]
                 ])
 
             for s in state.Playground.PredictionBlock |> Option.map Utils.getBlockSquares |> Option.defaultValue [] do
-                square (s, [
+                square ("prediction", s, [
                     Classes [ Tw.``bg-brand``; Tw.``opacity-25`` ]
                 ])
 
             for column in 0..state.Playground.Border.Width-1 do
                 let s = { X = column; Y = state.Playground.Border.Height }
-                square (s, [
+                square ("border", s, [
                     Classes [ Tw.``bg-gray``; Tw.``opacity-50`` ]
                 ])
         ]

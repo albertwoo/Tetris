@@ -33,13 +33,19 @@ type IHooks with
                 ()
 
         let tryFinallyMove (x1, y1) =
-            match touchStart.current with
-            | Some (x0, y0) ->
+            match touchStart.current, touchStartTime.current with
+            | Some (x0, y0), Some startTime ->
                 let threshhold = 5.
-                if Math.Abs(x0 - x1) < threshhold &&
-                   Math.Abs(y0 - y1) < threshhold
-                then
+                let isQuickMove = (DateTime.Now - startTime).TotalMilliseconds < 200.
+                let dx, dy = Math.Abs(x1 - x0), Math.Abs(y1 - y0)
+                if dx < threshhold && dy < threshhold then 
                     move Operation.RotateClockWise
+                elif isQuickMove && dy > 80. && dy > dx then 
+                    MoveToEnd Operation.MoveDown |> dispatch
+                elif isQuickMove && x1 - x0 > 80. && dx > dy then 
+                    MoveToEnd Operation.MoveRight |> dispatch
+                elif isQuickMove && x1 - x0 < -80. && dx > dy then 
+                    MoveToEnd Operation.MoveLeft |> dispatch
             | _ ->
                 ()
 

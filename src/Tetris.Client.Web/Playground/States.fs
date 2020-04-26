@@ -69,6 +69,12 @@ let update msg state =
                 Playground = newEvents |> List.fold Projection.updatePlayground state.Playground }
             , Cmd.none
 
+    | MoveToEnd operation ->
+        state
+        , Behavior.moveToEnd state.Playground operation []
+          |> List.map (NewEvent >> Cmd.ofMsg) 
+          |> Cmd.batch
+
     | ReplayEvent index ->
         let isFinished = index + 1 >= state.Events.Length
         { state with

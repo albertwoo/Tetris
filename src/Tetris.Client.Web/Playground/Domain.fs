@@ -16,4 +16,5 @@ type Msg =
     | Start
     | Tick
     | NewEvent of Event
+    | MoveToEnd of Operation
     | ReplayEvent of eventIndex: int
