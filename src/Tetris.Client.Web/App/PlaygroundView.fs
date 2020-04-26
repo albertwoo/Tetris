@@ -15,7 +15,7 @@ let render state dispatch =
                 Children [
                     div </> [
                         Classes [ 
-                            Tw.``mt-04``; Tw.flex; Tw.``flex-row``;
+                            Tw.``mt-02``; Tw.flex; Tw.``flex-row``;
                             Tw.``items-center``; Tw.``justify-center``
                         ]
                         Children [

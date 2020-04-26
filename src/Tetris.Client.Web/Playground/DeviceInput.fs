@@ -7,7 +7,7 @@ open Tetris.Core
 
 
 type IHooks with
-    member _.useDeviceInput state dispatch  =
+    member _.useDeviceInput state dispatch containerId =
         let touchStart: IRefHook<(float * float) option> = Hooks.useRef None
         let touchStartTime: IRefHook<DateTime option> = Hooks.useRef None
         let touchMove: IRefHook<(float * float) option> = Hooks.useRef None
@@ -67,17 +67,18 @@ type IHooks with
                     else None
                     |> Option.iter move
 
+                let container = Browser.Dom.document.getElementById containerId
                 if not state.IsViewMode then
-                    Browser.Dom.window.addEventListener("touchstart", onTouchStart)
-                    Browser.Dom.window.addEventListener("touchmove", onTouchMove)
-                    Browser.Dom.window.addEventListener("touchend", onTouchEnd)
+                    container.addEventListener("touchstart", onTouchStart)
+                    container.addEventListener("touchmove", onTouchMove)
+                    container.addEventListener("touchend", onTouchEnd)
                     Browser.Dom.window.addEventListener("keydown", onKeyDown)
 
                 { new IDisposable with
                     member _.Dispose() =
-                        Browser.Dom.window.removeEventListener("touchstart", onTouchStart)
-                        Browser.Dom.window.removeEventListener("touchmove", onTouchMove)
-                        Browser.Dom.window.removeEventListener("touchend", onTouchEnd)
+                        container.removeEventListener("touchstart", onTouchStart)
+                        container.removeEventListener("touchmove", onTouchMove)
+                        container.removeEventListener("touchend", onTouchEnd)
                         Browser.Dom.window.removeEventListener("keydown", onKeyDown)
                 }
             ,[||])

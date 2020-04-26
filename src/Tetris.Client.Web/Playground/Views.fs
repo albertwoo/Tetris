@@ -11,7 +11,7 @@ let private playButtn attrs =
         Classes [ 
             Tw.``px-02``; Tw.``py-02``; Tw.``m-04``; Tw.``text-white``
             Tw.``hover:bg-brand``; Tw.``focus:outline-none``
-            Tw.``rounded-full``; Tw.``w-10``; Tw.``h-10``
+            Tw.``rounded-full``; Tw.``w-12``; Tw.``h-12``
         ]
         yield! attrs
     ]
@@ -21,11 +21,14 @@ let render =
     FunctionComponent.Of(
         fun (state, dispatch) ->
             let move =  Event.NewOperation >> NewEvent >> dispatch
-            Hooks.useDeviceInput state dispatch
+            let containerId = Hooks.useState (sprintf "tetris-playground-%d" (System.Random().Next()))
+            Hooks.useDeviceInput state dispatch containerId.current
             div </> [
                 Children [
-                    TetrisView.render state
-
+                    div </> [
+                        Id containerId.current
+                        Children [ TetrisView.render state ]
+                    ]
                     div </> [
                         Classes [
                             Tw.flex; Tw.``flex-row``; Tw.``justify-center``; Tw.``items-center``
