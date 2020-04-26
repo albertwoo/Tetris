@@ -24,7 +24,7 @@ let private square =
                 yield! attrs
             ]
         ,memoizeWith = (fun (k1, s1, _) (k2, s2, _) -> s1 = s2 && k1 = k2)
-    )
+        ,withKey = (fun (k, s, _) -> sprintf "tetris-square-%s-%d-%d" k s.X s.Y))
 
 
 let render state = 
