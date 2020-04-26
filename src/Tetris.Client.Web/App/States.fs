@@ -1,9 +1,9 @@
-module Client.App.States
+module Tetris.Client.Web.App.States
 
 open Elmish
 open Fable.SimpleHttp
 open Tetris.Server.WebApi.Dtos
-open Client
+open Tetris.Client.Web
 
 
 let init () =
@@ -52,7 +52,7 @@ let update msg state =
     | GetGameBoard (AsyncOperation.Failed e) ->
         let gameboard =
             match state.GameBoard with
-            | DeferredValue x -> Deferred.ReloadingFailed (x, e)
+            | DeferredValue x -> Deferred.ReloadFailed (x, e)
             | _ -> Deferred.LoadFailed e
         { state with GameBoard = gameboard }
         , Cmd.none

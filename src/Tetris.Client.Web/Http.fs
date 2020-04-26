@@ -1,12 +1,11 @@
-﻿module Client.Http
+﻿module Tetris.Client.Web.Http
 
 open Fable.SimpleHttp
-open Fun.Result
 open Thoth.Json
+open Fun.Result
 
 
 let inline fromJson<'T> str = Decode.Auto.fromString<'T>(str, isCamelCase = false)
-
 let inline toJson obj = Encode.Auto.toString(4, obj, isCamelCase = false)
 
 
@@ -28,11 +27,12 @@ let handle map (resp: HttpResponse) =
     | x when x = 401 ->
         // Redirect to somewhere
         ClientError.ServerError "Not authenticated" |> Error
-    | x when x > 399 ->
+    | x when x > 399 && x < 500 ->
+        ClientError.RequestError resp.responseText |> Error
+    | x when x > 500 ->
         ClientError.ServerError resp.responseText |> Error
     | _ ->
-        map resp
-        |> Result.mapError ClientError.DtoParseError
+        map resp |> Result.mapError ClientError.DtoParseError
 
 let inline handleAsync (onOk: HttpResponse -> 'T2) (onError: ClientError -> 'T2) request =
     request

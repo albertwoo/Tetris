@@ -1,7 +1,7 @@
-﻿module Client.App.OnlineInfoView
+﻿module Tetris.Client.Web.App.OnlineInfoView
 
 open Fable.React
-open Client.Controls
+open Tetris.Client.Web.Controls
 
 
 let render (state: State) =

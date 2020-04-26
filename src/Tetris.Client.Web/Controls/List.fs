@@ -1,8 +1,8 @@
-﻿namespace Client.Controls
+﻿namespace Tetris.Client.Web.Controls
 
 open Fable.React
 open Fable.React.Props
-open Client.Controls
+open Tetris.Client.Web.Controls
 
 
 type FlexScale = float

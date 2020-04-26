@@ -1,4 +1,4 @@
-module Client.Startup
+module Tetris.Client.Web.Startup
 
 open Elmish
 open Elmish.React

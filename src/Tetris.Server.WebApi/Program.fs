@@ -20,7 +20,7 @@ open Tetris.Server.WebApi.Common
 
 let publicPath = 
     #if DEBUG
-    Path.GetFullPath "../Client.Web/deploy"
+    Path.GetFullPath "../Tetris.Client.Web/deploy"
     #else
     "wwwroot"
     #endif

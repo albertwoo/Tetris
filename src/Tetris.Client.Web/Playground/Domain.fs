@@ -1,4 +1,4 @@
-﻿namespace Client.Playground
+﻿namespace Tetris.Client.Web.Playground
 
 open Tetris.Core
 open System

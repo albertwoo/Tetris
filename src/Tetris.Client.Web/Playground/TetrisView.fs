@@ -1,9 +1,9 @@
-﻿module Client.Playground.TetrisView
+﻿module Tetris.Client.Web.Playground.TetrisView
 
 open Fable.React
 open Fable.React.Props
 open Tetris.Core
-open Client.Controls
+open Tetris.Client.Web.Controls
 
 
 let private scalePx x = sprintf "%dpx" (x * 18)

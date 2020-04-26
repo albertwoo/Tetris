@@ -1,9 +1,9 @@
-﻿module Client.Playground.Views
+﻿module Tetris.Client.Web.Playground.Views
 
 open Fable.React
 open Fable.React.Props
 open Tetris.Core
-open Client.Controls
+open Tetris.Client.Web.Controls
 
 
 let private playButtn attrs =

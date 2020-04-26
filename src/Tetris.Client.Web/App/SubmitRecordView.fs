@@ -1,4 +1,4 @@
-﻿module Client.App.SubmitRecordView
+﻿module Tetris.Client.Web.App.SubmitRecordView
 
 open System
 open Fable.React
@@ -8,8 +8,8 @@ open Fun.LightForm.Validators
 open Fun.LightForm.FormView
 open Tetris.Server.WebApi.Dtos
 open Tetris.Server.WebApi.Dtos.Game
-open Client
-open Client.Controls
+open Tetris.Client.Web
+open Tetris.Client.Web.Controls
 
 
 let private validators =
@@ -30,7 +30,7 @@ type PlayerInfo =
 
 let render =
     FunctionComponent.Of(
-        fun (playground: Client.Playground.State, dispatch) ->
+        fun (playground: Tetris.Client.Web.Playground.State, dispatch) ->
             let form = 
                 Hooks.useStateLazy (fun () -> 
                     { Name = ""; Password = "" }

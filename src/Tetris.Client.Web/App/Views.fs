@@ -1,8 +1,8 @@
-﻿module Client.App.Views
+﻿module Tetris.Client.Web.App.Views
 
 open Fable.React
 open Fable.React.Props
-open Client.Controls
+open Tetris.Client.Web.Controls
 
 
 let heading =

@@ -1,7 +1,7 @@
-namespace rec Client.App
+namespace rec Tetris.Client.Web.App
 
 open System
-open Client
+open Tetris.Client.Web
 open Tetris.Server.WebApi.Dtos.Game
 
 

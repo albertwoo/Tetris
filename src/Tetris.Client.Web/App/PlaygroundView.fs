@@ -1,9 +1,9 @@
-﻿module Client.App.PlaygroundView
+﻿module Tetris.Client.Web.App.PlaygroundView
 
 open Fable.React
 open Fable.React.Props
-open Client
-open Client.Controls
+open Tetris.Client.Web
+open Tetris.Client.Web.Controls
 
 
 let render state dispatch =

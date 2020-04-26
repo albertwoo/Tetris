@@ -1,9 +1,9 @@
 ﻿[<AutoOpen>]
-module Client.App.Controls
+module Tetris.Client.Web.App.Controls
 
 open Fable.React
 open Fable.React.Props
-open Client.Controls
+open Tetris.Client.Web.Controls
 
 
 let githubBrand =

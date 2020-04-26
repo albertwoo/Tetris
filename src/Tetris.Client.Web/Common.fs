@@ -11,6 +11,7 @@ type ServerError = string
 type ClientError =
     | GeneralError of ErrorCode * ErrorMessage
     | ServerError of ServerError
+    | RequestError of ErrorCode
     | UnknowExn of exn
     | DtoParseError of string
 
@@ -22,7 +23,7 @@ type Deferred<'T> =
     | Loaded of 'T
     | LoadFailed of ClientError
     | Reloading of 'T
-    | ReloadingFailed of 'T * ClientError
+    | ReloadFailed of 'T * ClientError
 
 [<RequireQualifiedAccess>]
 type AsyncOperation<'T> =
@@ -36,5 +37,5 @@ module Helpers =
     let (|DeferredValue|_|) = function
         | Deferred.Loaded x 
         | Deferred.Reloading x
-        | Deferred.ReloadingFailed (x, _) -> Some x
+        | Deferred.ReloadFailed (x, _) -> Some x
         | _ -> None

@@ -1,10 +1,10 @@
-﻿module Client.App.RankView
+﻿module Tetris.Client.Web.App.RankView
 
 open Fable.React
 open Fable.React.Props
 open Fun.ReactSpring
 open Tetris.Server.WebApi.Dtos.Game
-open Client.Controls
+open Tetris.Client.Web.Controls
 
 
 let private rankView (gameboard: GameBoard) state dispatch =

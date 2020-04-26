@@ -1,4 +1,4 @@
-﻿module Client.Playground.States
+﻿module Tetris.Client.Web.Playground.States
 
 open System
 open Elmish

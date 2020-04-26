@@ -1,5 +1,5 @@
 ﻿[<AutoOpen>]
-module Client.Playground.Hooks
+module Tetris.Client.Web.Playground.Hooks
 
 open System
 open Fable.React
