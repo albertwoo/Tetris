@@ -30,18 +30,18 @@ type AddRecordError =
 
 [<CLIMutable>]
 type GameBoardState =
-  { OnlineIPs: Map<IP, DateTime>
-    Ranks: Record list }
-  static member defaultValue =
-      { OnlineIPs = Map.empty
-        Ranks = [] }
+    { OnlineIPs: Map<IP, DateTime>
+      Ranks: Record list }
+    static member defaultValue =
+        { OnlineIPs = Map.empty
+          Ranks = [] }
 
 [<CLIMutable>]
 type PlayerState =
     { Name: string
       Password: string
       TopRecord: Record option }
-    static member defaultState =
+    static member defaultValue =
         { Name = ""
           Password = ""
           TopRecord = None }

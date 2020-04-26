@@ -82,7 +82,7 @@ let render =
                                 )
                             ]
 
-                            RobotChecker.render (Some >> robotCheckerValue.update)
+                            RobotChecker.render {| onCheck = Some >> robotCheckerValue.update |}
 
                             div </> [
                                 Classes [ 

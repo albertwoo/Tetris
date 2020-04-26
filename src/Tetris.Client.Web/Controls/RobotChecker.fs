@@ -17,7 +17,7 @@ type RobotCheckerValue =
 module RobotChecker =
     let render =
         FunctionComponent.Of (
-            fun (onCheck) ->
+            fun (props: {| onCheck: RobotCheckerValue -> unit |}) ->
                 let robotCheckerWidth = 20
                 let robotChecker: IStateHook<RobotChecker option> = Hooks.useState None
                 let robotCherkerX: IStateHook<float option> = Hooks.useState None
@@ -29,7 +29,7 @@ module RobotChecker =
                     robotCherkerX.update(Some x)
                     match robotChecker.current, robotCheckerContainer.current with
                     | Some checker, Some ref ->
-                        onCheck 
+                        props.onCheck
                             { Id = checker.Id
                               Value = x / ref.clientWidth }
                     | _ ->

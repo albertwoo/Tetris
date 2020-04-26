@@ -28,7 +28,7 @@ type PlayerGrain
 
     member _.SafeState 
         with get() =
-            if box state.State |> isNull then PlayerState.defaultState
+            if box state.State |> isNull then PlayerState.defaultValue
             else state.State
         and set s =
             state.State <- s

@@ -2,39 +2,42 @@
 <html lang="en">
 
 <head>
-  <title>
-    <!--SERVER_SIDE_PLACEHOLDER_TITLE-->
-  </title>
-  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!--SERVER_SIDE_METAS-->
-  <base href="/" />
-  <link rel="shortcut icon" type="image/png" href="/favicon.ico" />
-  <link rel="stylesheet" type="text/css" href="/icomoon/style.css?v=1" async />
+    <title>Tetris @slaveoftime</title>
+    <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--SERVER_SIDE_METAS-->
+    <base href="/" />
+    <link rel="shortcut icon" type="image/png" href="/favicon.ico" />
+    <link rel="stylesheet" type="text/css" href="/icomoon/style.css?v=1" async />
+    <style>
+        html {
+            height: 100%;
+        }
+    </style>
 </head>
 
 <body>
-  <div id="root">
-    <!--//SERVER_SIDE_PLACEHOLDER_HTML-->
-  </div>
-  <script>
-    //SERVER_SIDE_PLACEHOLDER_STATE
-  </script>
+    <div id="root">
+        <!--//SERVER_SIDE_PLACEHOLDER_HTML-->
+    </div>
+    <script>
+        //SERVER_SIDE_PLACEHOLDER_STATE
+    </script>
 
-  <script>
-    (function () {
-      if (typeof window.CustomEvent === "function") return false;
+    <script>
+        (function () {
+            if (typeof window.CustomEvent === "function") return false;
 
-      function CustomEvent(event, params) {
-        params = params || { bubbles: false, cancelable: false, detail: null };
-        var evt = document.createEvent('CustomEvent');
-        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-        return evt;
-      }
+            function CustomEvent(event, params) {
+                params = params || { bubbles: false, cancelable: false, detail: null };
+                var evt = document.createEvent('CustomEvent');
+                evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+                return evt;
+            }
 
-      window.CustomEvent = CustomEvent;
-    })();
-  </script>
+            window.CustomEvent = CustomEvent;
+        })();
+    </script>
 
 </body>
 

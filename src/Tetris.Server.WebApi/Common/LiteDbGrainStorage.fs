@@ -51,9 +51,7 @@ type LiteDbGrainStorage (liteDbPath: string) =
                 let value = grains.FindById(BsonValue(createGrainName grainType grainReference))
                 grainState.State <- 
                     if box value = null then null
-                    else match fromJson grainState.Type value.Value with
-                         | Ok x -> x
-                         | Error e -> failwithf "Data imcompatible: %s" e
+                    else fromJson grainState.Type value.Value
             } :> Task
 
 

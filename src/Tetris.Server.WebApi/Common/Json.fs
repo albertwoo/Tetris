@@ -1,6 +1,23 @@
 ﻿module Tetris.Server.WebApi.Common.Json
 
-open Thoth.Json.Net
+open Newtonsoft.Json
+open Microsoft.FSharpLu.Json
+open Microsoft.FSharpLu.Json.Compact.Strict
 
-let fromJson ty str = Decode.Auto.LowLevel.fromString(str, ty)
-let toJson obj = Encode.Auto.toString(4, obj) 
+
+let private jsonSettings =
+    JsonSerializerSettings(
+        ContractResolver = 
+            RequireNonOptionalPropertiesContractResolver(
+                //NamingStrategy =
+                //    CamelCaseNamingStrategy(
+                //        ProcessDictionaryKeys = false,
+                //        OverrideSpecifiedNames = false
+                //    )
+            ),
+        Converters = [| CompactUnionJsonConverter(true, true) |]
+    )
+
+
+let fromJson ty str = JsonConvert.DeserializeObject(str, ty, jsonSettings)
+let toJson obj = JsonConvert.SerializeObject(obj, jsonSettings)
