@@ -21,7 +21,7 @@ type IHooks with
                 let threshhold = 30.
                 if Math.Abs dx > Math.Abs dy && Math.Abs dx > threshhold then
                     touchMove.current <- (Some (x, y))
-                    if dx > 0. 
+                    if dx < 0. 
                     then move Operation.MoveLeft
                     else move Operation.MoveRight
                 elif Math.Abs dx < Math.Abs dy && dy > threshhold then
