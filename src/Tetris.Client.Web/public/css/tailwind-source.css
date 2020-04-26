@@ -1,0 +1,18 @@
+@tailwind base;
+
+@tailwind components;
+
+/* add custom component classes before utilities -- https://tailwindcss.com/docs/extracting-components */
+
+body {
+    @apply bg-black;
+    height: 100%;
+    -ms-content-zooming: none;
+    touch-action: auto;
+}
+
+#root {
+    height: 100%;
+}
+
+@tailwind utilities;

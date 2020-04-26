@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Common.fs" />
+    <Compile Include="Http.fs" />
+    <Compile Include="Controls\Common.fs" />
+    <Compile Include="Controls\Button.fs" />
+    <Compile Include="Controls\List.fs" />
+    <Compile Include="Controls\GithubBand.fs" />
+    <Compile Include="Controls\RobotChecker.fs" />
+    <Compile Include="Playground\Domain.fs" />
+    <Compile Include="Playground\States.fs" />
+    <Compile Include="Playground\DeviceInput.fs" />
+    <Compile Include="Playground\TetrisView.fs" />
+    <Compile Include="Playground\Views.fs" />
+    <Compile Include="App\Domain.fs" />
+    <Compile Include="App\States.fs" />
+    <Compile Include="App\HeaderView.fs" />
+    <Compile Include="App\RankView.fs" />
+    <Compile Include="App\OnlineInfoView.fs" />
+    <Compile Include="App\PlaygroundView.fs" />
+    <Compile Include="App\SubmitRecordView.fs" />
+    <Compile Include="App\Views.fs" />
+    <Compile Include="Startup.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Fable.Elmish" Version="3.0.6" />
+    <PackageReference Include="Fable.Elmish.HMR" Version="4.0.1" />
+    <PackageReference Include="Fable.Elmish.React" Version="3.0.1" />
+    <PackageReference Include="Fable.Elmish.Debugger" Version="3.1.0" />
+    <PackageReference Include="Fable.React" Version="5.3.6" />
+    <PackageReference Include="Fable.SimpleHttp" Version="3.0.0" />
+    <PackageReference Include="Fun.LightForm.Fable" Version="1.0.4" />
+    <PackageReference Include="Fun.ReactSpring" Version="1.0.0-beta5" />
+    <PackageReference Include="Fun.Result" Version="1.0.1" />
+    <PackageReference Include="Zanaptak.TypedCssClasses" Version="0.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Tetris.Core\Tetris.Core.fsproj" />
+    <ProjectReference Include="..\Tetris.Server.WebApi.Dtos\Tetris.Server.WebApi.Dtos.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="4.7.1" />
+  </ItemGroup>
+</Project>
