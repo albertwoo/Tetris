@@ -9,10 +9,12 @@ body {
     height: 100%;
     -ms-content-zooming: none;
     touch-action: auto;
+    overflow: hidden;
 }
 
 #root {
     height: 100%;
+    overflow: hidden;
 }
 
 @tailwind utilities;

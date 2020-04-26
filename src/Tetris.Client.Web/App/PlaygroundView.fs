@@ -13,10 +13,31 @@ let render state dispatch =
             div </> [
                 Classes [ Tw.flex; Tw.``flex-col``; Tw.``justify-center``; Tw.``items-center`` ]
                 Children [
+                    div </> [
+                        Classes [ 
+                            Tw.``mt-04``; Tw.flex; Tw.``flex-row``;
+                            Tw.``items-center``; Tw.``justify-center``
+                        ]
+                        Children [
+                            match state.Plaground with
+                            | PlaygroundState.Playing _ ->
+                                button </> [
+                                    OnClick (fun e -> e.preventDefault(); StopPlay |> dispatch)
+                                    Classes [ 
+                                        Icons.``icon-close``; Tw.``text-white``; Tw.``opacity-50``; Tw.``w-10``; Tw.``h-10``
+                                        Tw.``rounded-full``; Tw.border; Tw.``outline-none``; Tw.``mb-04``
+                                        Tw.``hover:bg-red-600``; Tw.``hover:opacity-100``; Tw.``focus:bg-red-600``; Tw.``focus:opacity-100``
+                                    ]
+                                ]
+                            | _ ->
+                                ()
+                        ]
+                    ]
+
                     match state.Plaground with
                     | PlaygroundState.Replaying (DeferredValue s)
                     | PlaygroundState.Playing s ->
-                        Playground.Views.render s (PlaygroundMsg >> dispatch)
+                        Playground.Views.render (s, PlaygroundMsg >> dispatch)
                     | _ -> ()
 
                     div </> [
@@ -35,11 +56,6 @@ let render state dispatch =
                                     Text "重播"
                                     OnClick (fun _ -> Playground.ReplayEvent 0 |> PlaygroundMsg |> dispatch)
                                     Classes [ Tw.``ml-04`` ]
-                                ]
-                            | PlaygroundState.Playing _ ->
-                                Button.danger [
-                                    Text "结束"
-                                    OnClick (fun _ -> StopPlay |> dispatch)
                                 ]
                             | _ ->
                                 ()
