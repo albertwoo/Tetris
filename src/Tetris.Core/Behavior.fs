@@ -11,17 +11,20 @@ let play playground event =
             match event with
             | Event.NewBlock _ -> []
             | Event.NewOperation operation ->
-                match playground.Blocks with
-                | [] -> []
-                | movingBlock::restBlocks ->
+                match playground.MovingBlock with
+                | None -> []
+                | Some movingBlock ->
                     [
                         match Projection.updateBlock movingBlock operation with
-                        | CollidedWithBlocks restBlocks
+                        | CollidedWithSquares playground.RemainSquares
                         | CollidedWithBorderBottom playground.Border ->
                             match operation with
                             | Operation.MoveDown
-                            | Operation.RotateClockWise -> generateRamdomBlock(playground.Border.Width / 2 - 2) |> Event.NewBlock
-                            | _ -> ()
+                            | Operation.RotateClockWise -> 
+                                generateRamdomBlock(playground.Border.Width / 2 - 2) 
+                                |> Event.NewBlock
+                            | _ -> 
+                                ()
                         | _ ->
                             ()
                     ]

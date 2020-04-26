@@ -7,8 +7,8 @@ type Playground =
     { IsGameOver: bool
       Score: int
       Border: Border
-      Blocks: Block list
       MovingBlock: Block option
+      PredictionBlock: Block option
       RemainSquares: Square list }
 
 

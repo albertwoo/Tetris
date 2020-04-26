@@ -40,6 +40,7 @@ let boolToOption = function true -> Some() | false -> None
 
 // FSharp active pattern
 let (|CollidedWithBlocks|_|) blocks block = blocks |> List.collect getBlockSquares |> isCollidedWith block |> boolToOption
+let (|CollidedWithSquares|_|) squares block = squares |> isCollidedWith block |> boolToOption
 
 let (|CollidedWithBorderLeft|_|) border block =
     [ for y in 0..border.Height -> { X = -1; Y = y } ]

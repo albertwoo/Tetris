@@ -11,8 +11,8 @@ let private defaultPlayground =
         IsGameOver = false
         Score = 0
         Border = { Width = 18; Height = 30 }
-        Blocks = []
         MovingBlock = None
+        PredictionBlock = None
         RemainSquares = []
     }
 

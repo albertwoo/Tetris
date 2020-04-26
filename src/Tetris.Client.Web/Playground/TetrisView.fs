@@ -45,6 +45,11 @@ let render state =
                     Classes [ Tw.``bg-brand`` ]
                 ])
 
+            for s in state.Playground.PredictionBlock |> Option.map Utils.getBlockSquares |> Option.defaultValue [] do
+                square (s, [
+                    Classes [ Tw.``bg-brand``; Tw.``opacity-25`` ]
+                ])
+
             for column in 0..state.Playground.Border.Width-1 do
                 let s = { X = column; Y = state.Playground.Border.Height }
                 square (s, [

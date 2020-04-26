@@ -12,24 +12,34 @@ let updateBlock block operation =
     | Operation.MoveDown        -> move moveD block 
 
 
-let updateBlocks border blocks event =
-    match event, blocks with
-    | Event.NewBlock block, _ -> block::blocks
-    | Event.NewOperation _, [] -> []
-    | Event.NewOperation operation, latestBlock::restBlocks ->
-        match updateBlock latestBlock operation with
-        | CollidedWithBlocks restBlocks
+let updateMovingBlock border remainSquares movingBlock event =
+    match event, movingBlock with
+    | Event.NewBlock block, _ -> Some block
+    | Event.NewOperation _, None -> None
+    | Event.NewOperation operation, Some block ->
+        match updateBlock block operation with
+        | CollidedWithSquares remainSquares
         | CollidedWithBorderLeft border
         | CollidedWithBorderRight border
-        | CollidedWithBorderBottom border -> blocks
-        | updatedBlock -> updatedBlock::restBlocks
+        | CollidedWithBorderBottom border -> Some block
+        | updatedBlock -> Some updatedBlock
 
 
-let updateRemainSquares border blocks reaminSquares event =
-    match event with
-    | Event.NewOperation _ -> reaminSquares
-    | Event.NewBlock _ ->
-        let allSquares = blocks |> List.collect getBlockSquares
+let rec updatePredictionBlock border remainSquares block =
+    match updateBlock block Operation.MoveDown with
+    | CollidedWithSquares remainSquares
+    | CollidedWithBorderBottom border -> block
+    | updatedBlock -> updatePredictionBlock border remainSquares updatedBlock
+
+
+let updateRemainSquares border reaminSquares movingBlock event =
+    match movingBlock, event with
+    | Some movingBlock, Event.NewBlock _ ->
+        let allSquares = 
+            match updateBlock movingBlock Operation.MoveDown with
+            | CollidedWithSquares reaminSquares
+            | CollidedWithBorderBottom border -> reaminSquares@(getBlockSquares movingBlock)
+            | _ -> reaminSquares
         let shouldEliminate row = row |> Seq.map (fun x -> x.X) |> Seq.distinct |> Seq.length |> (=) border.Width
         let allRows = allSquares |> Seq.groupBy (fun x -> x.Y)
         let rowsAfterEliminated = allRows |> Seq.filter (fun (_, row) ->  shouldEliminate row |> not)
@@ -48,34 +58,34 @@ let updateRemainSquares border blocks reaminSquares event =
             )
             (border.Height, []) // Bottom row
         |> snd
+    | _ -> 
+        reaminSquares
 
 
 let updatePlayground playground evt =
-    let allBlocks = updateBlocks playground.Border playground.Blocks evt
-
-    let movingBlock, currentBlocks =
-        match allBlocks with
-        | [] -> None, []
-        | [x] -> Some x, []
-        | x::rest -> Some x, rest
-
-    let currentRemainSquares = updateRemainSquares playground.Border currentBlocks playground.RemainSquares evt
-
+    let movingBlock = updateMovingBlock playground.Border playground.RemainSquares playground.MovingBlock evt
+    let remainSquares = updateRemainSquares playground.Border playground.RemainSquares playground.MovingBlock evt
+    let predictionBlock = movingBlock |> Option.map (updatePredictionBlock playground.Border remainSquares)
+    
+    let isGameOver =
+        match playground.MovingBlock with
+        | Some (CollidedWithSquares playground.RemainSquares) -> true
+        | _ -> false
+    
+    let score =
+        playground.Score 
+        + (
+            (remainSquares |> Seq.groupBy (fun s -> s.Y) |> Seq.length) // curent rows number
+            -
+            (playground.RemainSquares |> Seq.groupBy (fun s -> s.Y) |> Seq.length) // old rows number
+          ) 
+          * 10
+        
     {
-        IsGameOver = 
-            match movingBlock with
-            | Some (CollidedWithBlocks currentBlocks) -> true
-            | _ -> false
-        Score = 
-            playground.Score 
-            + (
-                (currentRemainSquares |> Seq.groupBy (fun s -> s.Y) |> Seq.length) // curent rows number
-                -
-                (playground.RemainSquares |> Seq.groupBy (fun s -> s.Y) |> Seq.length) // old rows number
-              ) 
-              * 10
+        IsGameOver = isGameOver
+        Score = score
         Border = playground.Border
-        Blocks = allBlocks
         MovingBlock = movingBlock
-        RemainSquares = currentRemainSquares
+        PredictionBlock = predictionBlock
+        RemainSquares = remainSquares
     }
