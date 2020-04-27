@@ -44,7 +44,7 @@ let all: HttpHandler =
                         task {
                             let factory = ctx.GetService<IGrainFactory>()
                             let gamebord = factory.GetGrain<IGameBoardGrain>(int64 Constants.GameZone1)
-                            let ip = ctx.Request.HttpContext.Connection.RemoteIpAddress.ToString()
+                            let ip = string ctx.Request.HttpContext.Connection.RemoteIpAddress
                             do! gamebord.Ping ip
                             return! text "pong" nxt ctx
                         }
