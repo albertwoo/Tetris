@@ -28,7 +28,7 @@ let render =
                 Children [
                     div </> [
                         Id containerId.current
-                        //Children [ TetrisView.render state ]
+                        //Children [ TetrisView.render state.Playground ]
                         Children [ TetrisView.renderCanvas state.Playground ]
                     ]
                     div </> [

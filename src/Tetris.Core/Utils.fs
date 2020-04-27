@@ -38,24 +38,45 @@ let isCollidedWith block squares2 =
 
 let boolToOption = function true -> Some() | false -> None
 
+
+let createLeftBorder size = [ for y in 0..size.Height -> { X = -1; Y = y } ]
+let createRightBorder size = [ for y in 0..size.Height -> { X = size.Width; Y = y } ]
+let createBottomBorder size = [ for x in 0..size.Width-1 -> { X = x; Y = size.Height } ]
+    
+
 // FSharp active pattern
 let (|CollidedWithBlocks|_|) blocks block = blocks |> List.collect getBlockSquares |> isCollidedWith block |> boolToOption
 let (|CollidedWithSquares|_|) squares block = squares |> isCollidedWith block |> boolToOption
 
-let (|CollidedWithBorderLeft|_|) border block =
-    [ for y in 0..border.Height -> { X = -1; Y = y } ]
+let (|CollidedWithBorderLeft|_|) size block =
+    createLeftBorder size
     |> isCollidedWith block
     |> boolToOption
 
-let (|CollidedWithBorderRight|_|) border block =
-    [ for y in 0..border.Height -> { X = border.Width; Y = y } ]
+let (|CollidedWithBorderRight|_|) size block =
+    createRightBorder size
     |> isCollidedWith block
     |> boolToOption
 
-let (|CollidedWithBorderBottom|_|) border block =
-    [ for x in 0..border.Width-1 -> { X = x; Y = border.Height } ]
+let (|CollidedWithBorderBottom|_|) size block =
+    createBottomBorder size
     |> isCollidedWith block
     |> boolToOption
+
+
+let createDefaultPlayground (width, height) =
+    let size = { Width = width; Height = height }
+    {
+        IsGameOver = false
+        Score = 0
+        Size = size
+        LeftBorder = createLeftBorder size
+        RightBorder = createRightBorder size
+        BottomBorder = createBottomBorder size
+        MovingBlock = None
+        PredictionBlock = None
+        RemainSquares = []
+    }
 
 
 type RelativeSquare =

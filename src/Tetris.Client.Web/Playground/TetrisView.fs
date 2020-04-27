@@ -29,31 +29,30 @@ let private square =
         ,withKey = (fun (k, s, _) -> sprintf "tetris-square-%s-%d-%d" k s.X s.Y))
 
 
-let render state =
+let render playground =
     div </> [
         Style [
-            Width (state.Playground.Border.Width |> scalePx)
-            Height (state.Playground.Border.Height |> scalePx)
+            Width (playground.Size.Width |> scalePx)
+            Height (playground.Size.Height |> scalePx)
             Position PositionOptions.Relative
         ]
         Children [
-            for s in state.Playground.RemainSquares do
+            for s in playground.RemainSquares do
                 square ("remain", s, [
                     Classes [ Tw.``bg-gray``; Tw.``opacity-25`` ]
                 ])
 
-            for s in state.Playground.MovingBlock |> Option.map Utils.getBlockSquares |> Option.defaultValue [] do
+            for s in playground.MovingBlock |> Option.map Utils.getBlockSquares |> Option.defaultValue [] do
                 square ("moving", s, [
                     Classes [ Tw.``bg-brand`` ]
                 ])
 
-            for s in state.Playground.PredictionBlock |> Option.map Utils.getBlockSquares |> Option.defaultValue [] do
+            for s in playground.PredictionBlock |> Option.map Utils.getBlockSquares |> Option.defaultValue [] do
                 square ("prediction", s, [
                     Classes [ Tw.``bg-brand``; Tw.``opacity-25`` ]
                 ])
 
-            for column in 0..state.Playground.Border.Width-1 do
-                let s = { X = column; Y = state.Playground.Border.Height }
+            for s in playground.BottomBorder do
                 square ("border", s, [
                     Classes [ Tw.``bg-gray``; Tw.``opacity-50`` ]
                 ])
@@ -92,7 +91,7 @@ let renderCanvas =
         match context.current with
         | None -> ()
         | Some context ->
-            let rows, columns = playground.Border.Height + 2, playground.Border.Width + 1
+            let rows, columns = playground.Size.Height + 2, playground.Size.Width + 1
             let screenWidth, screenHeight = columns * squareScale, rows * squareScale
             context.clearRect(0., 0., float screenWidth, float screenHeight)
             
@@ -100,9 +99,7 @@ let renderCanvas =
             drawBlock playground.MovingBlock "#127b19" context
             playground.RemainSquares |> List.iter (drawSquare "rgba(250,250,250,0.2)" context)
             
-            [0..playground.Border.Width] 
-            |> Seq.map (fun x -> { X = x; Y = playground.Border.Height })
-            |> Seq.iter (drawSquare "rgba(250,250,250,0.1)" context)
+            playground.BottomBorder |> Seq.iter (drawSquare "rgba(250,250,250,0.1)" context)
 
         canvas </> [
             Key (sprintf "tetris-playground-canvas-%d" canvasId.current)
@@ -111,7 +108,7 @@ let renderCanvas =
                 if canva |> isNull |> not then 
                     context.current <- Some(canva.getContext_2d())
             )
-            HTMLAttr.Width (sprintf "%d" (playground.Border.Width * squareScale) |> box)
-            HTMLAttr.Height (sprintf "%d" ((playground.Border.Height + 1) * squareScale) |> box)
+            HTMLAttr.Width (sprintf "%d" (playground.Size.Width * squareScale) |> box)
+            HTMLAttr.Height (sprintf "%d" ((playground.Size.Height + 1) * squareScale) |> box)
         ]
     )

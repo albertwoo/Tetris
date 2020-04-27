@@ -6,7 +6,10 @@ open System
 type Playground =
     { IsGameOver: bool
       Score: int
-      Border: Border
+      Size: Size
+      LeftBorder: Square list
+      RightBorder: Square list
+      BottomBorder: Square list
       MovingBlock: Block option
       PredictionBlock: Block option
       RemainSquares: Square list }
@@ -23,6 +26,10 @@ type Event =
     | NewBlock of Block
     | NewOperation of Operation
 
+type TetrisEvent =
+    { TimeStamp: DateTime
+      Event: Event }
+
 
 type Block =
     { Squares: Square list
@@ -32,11 +39,7 @@ type Square =
     { X: int
       Y: int }
 
-type Border =
+type Size =
     { Width: int
       Height: int }
 
-
-type TetrisEvent =
-    { TimeStamp: DateTime
-      Event: Event }

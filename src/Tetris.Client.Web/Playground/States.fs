@@ -6,15 +6,7 @@ open Fun.Result
 open Tetris.Core
 
 
-let private defaultPlayground =
-    {
-        IsGameOver = false
-        Score = 0
-        Border = { Width = 18; Height = 30 }
-        MovingBlock = None
-        PredictionBlock = None
-        RemainSquares = []
-    }
+let private defaultPlayground = Utils.createDefaultPlayground (18, 30)
 
 let private convertToTetrisEvent newEvents =
     newEvents 
@@ -38,7 +30,7 @@ let update msg state =
             Playground = defaultPlayground
             StartTime = Some DateTime.Now }
         , Cmd.batch [
-            Cmd.ofMsg (Utils.generateRamdomBlock(state.Playground.Border.Width / 2 - 2) |> Event.NewBlock |> NewEvent)
+            Cmd.ofMsg (Utils.generateRamdomBlock(state.Playground.Size.Width / 2 - 2) |> Event.NewBlock |> NewEvent)
             Cmd.ofMsg Tick
           ]
 
@@ -83,7 +75,7 @@ let update msg state =
                 |> Option.map (fun block -> List.fold Projection.updateBlock block newOperations)
             let predictionBlock =
                 movingBlock
-                |> Option.map (Projection.updatePredictionBlock state.Playground.Border state.Playground.RemainSquares)
+                |> Option.map (Projection.updatePredictionBlock state.Playground)
             { state with
                 Events = state.Events@(newOperations |> List.map Event.NewOperation |> convertToTetrisEvent)
                 Playground = 
