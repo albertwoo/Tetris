@@ -73,7 +73,7 @@ let updateRemainSquares playground event =
 let updatePlayground playground evt =
     let movingBlock = updateMovingBlock playground evt
     let remainSquares = updateRemainSquares playground evt
-    let predictionBlock = movingBlock |> Option.map (updatePredictionBlock playground)
+    let predictionBlock = movingBlock |> Option.map (updatePredictionBlock { playground with RemainSquares = remainSquares.RemainSquares })
     
     let isGameOver =
         match playground.MovingBlock with
