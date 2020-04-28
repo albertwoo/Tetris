@@ -66,11 +66,15 @@ let render state dispatch =
                                     Text "关闭"
                                     OnClick (fun _ -> StopReplay |> dispatch)
                                 ]
-                                Button.primary [
-                                    Text "重播"
-                                    OnClick (fun _ -> Playground.ReplayEvent 0 |> PlaygroundMsg |> dispatch)
-                                    Classes [ Tw.``ml-04`` ]
-                                ]
+                                match state.Plaground with
+                                | PlaygroundState.Replaying (DeferredValue p) when not p.IsReplaying ->
+                                    Button.primary [
+                                        Text "重播"
+                                        OnClick (fun _ -> Playground.ReplayEvent 0 |> PlaygroundMsg |> dispatch)
+                                        Classes [ Tw.``ml-04`` ]
+                                    ]
+                                | _ ->
+                                    ()
                             | _ ->
                                 ()
                         ]

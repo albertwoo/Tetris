@@ -41,11 +41,9 @@ let update msg state =
           else 
             Cmd.ofSub (fun dispatch ->
                 let timeout =
-                    match state.Playground.Score with
-                    | BetweenEqual 100 200 -> 800
-                    | BetweenEqual 200 500 -> 500
-                    | BetweenEqual 500 Int32.MaxValue -> 300
-                    | _ -> 1000
+                    match 1000 / Math.Max(state.Playground.Score / 500, 1) with
+                    | LessEqual 100 -> 100
+                    | x -> x
                 Browser.Dom.window.setTimeout(
                     fun _ ->
                         Operation.MoveDown |> Event.NewOperation |> NewEvent |> dispatch
@@ -102,7 +100,11 @@ let update msg state =
           else
             Cmd.OfAsync.result(
                 async {
-                    do! Async.Sleep 50
+                    do! Async.Sleep (
+                            match 50 / Math.Max(state.Events.Length / 500, 1) with
+                            | LessEqual 5 -> 5
+                            | x -> x
+                        )
                     return ReplayEvent (index + 1)
                 }
             )

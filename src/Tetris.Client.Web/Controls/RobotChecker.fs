@@ -96,7 +96,7 @@ module RobotChecker =
                         ]
                         p </> [
                             Classes [ Tw.``text-center``; Tw.``text-xs``; Tw.``opacity-50``; Tw.``text-warning`` ]
-                            Text "请在相应位置点击方块"
+                            Text "请击中方块以继续操作"
                         ]
                 ]
         )

@@ -16,6 +16,7 @@ let line =
 
             div </> [
                 Classes [ Tw.flex; Tw.``flex-row``; Tw.``items-center``; Tw.``justify-center`` ]
+                Styles [ MinWidth 100 ]
                 Children [
                     for i in [1..3] do
                         spring [
