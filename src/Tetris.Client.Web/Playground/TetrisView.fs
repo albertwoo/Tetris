@@ -36,6 +36,7 @@ let render playground =
             Height (playground.Size.Height |> scalePx)
             Position PositionOptions.Relative
         ]
+        Classes [ Tw.``mb-02`` ]
         Children [
             for s in playground.RemainSquares do
                 square ("remain", s, [
@@ -88,18 +89,23 @@ let renderCanvas =
         let context: IRefHook<Browser.Types.CanvasRenderingContext2D option> = Hooks.useRef None
         let canvasId = Hooks.useState (Random().Next(0, 10000))
         
-        match context.current with
-        | None -> ()
-        | Some context ->
-            let rows, columns = playground.Size.Height + 2, playground.Size.Width + 1
-            let screenWidth, screenHeight = columns * squareScale, rows * squareScale
-            context.clearRect(0., 0., float screenWidth, float screenHeight)
+        let draw () =
+            match context.current with
+            | None -> ()
+            | Some context ->
+                let rows, columns = playground.Size.Height + 1, playground.Size.Width + 1
+                let screenWidth, screenHeight = columns * squareScale, rows * squareScale
+                context.clearRect(0., 0., float screenWidth, float screenHeight)
             
-            drawBlock playground.PredictionBlock "rgba(18,123,25, 0.4)" context
-            drawBlock playground.MovingBlock "#127b19" context
-            playground.RemainSquares |> List.iter (drawSquare "rgba(250,250,250,0.2)" context)
+                drawBlock playground.PredictionBlock "rgba(18,123,25, 0.4)" context
+                drawBlock playground.MovingBlock "#127b19" context
+                playground.RemainSquares |> List.iter (drawSquare "rgba(250,250,250,0.2)" context)
             
-            playground.BottomBorder |> Seq.iter (drawSquare "rgba(250,250,250,0.1)" context)
+                playground.BottomBorder |> Seq.iter (drawSquare "rgba(250,250,250,0.1)" context)
+
+        Hooks.useEffect(draw, [||])
+
+        draw()
 
         canvas </> [
             Key (sprintf "tetris-playground-canvas-%d" canvasId.current)

@@ -38,6 +38,7 @@ let render =
                 )
 
             let robotCheckerValue = Hooks.useState None
+            let isUploading = Hooks.useState false
 
             div </> [
                 Classes [ 
@@ -91,16 +92,16 @@ let render =
                                 ]
                                 Children [
                                     Button.danger [
-                                        Text "取消"
+                                        Text "不保存"
                                         OnClick (fun _ -> ClosePlay |> dispatch)
                                     ]
-                                    match robotCheckerValue.current with
-                                    | None -> ()
-                                    | Some checkerValue ->
+                                    match robotCheckerValue.current, isUploading.current with
+                                    | Some checkerValue, false ->
                                         Button.primary [
                                             Text "提交"
                                             Classes [ Tw.``ml-04`` ]
                                             OnClick (fun _ ->
+                                                isUploading.update true
                                                 match tryGenerateValueByForm<PlayerInfo> form.current with
                                                 | Ok value ->
                                                     match playground.StartTime, playground.Events with
@@ -121,6 +122,10 @@ let render =
                                                     ClientError.DtoParseError (string e) |> Some |> Msg.OnError |> dispatch
                                             )
                                         ]
+                                    | _, true ->
+                                        Loader.line ()
+                                    | _ ->
+                                        ()
                                 ]
                             ]
                         ]

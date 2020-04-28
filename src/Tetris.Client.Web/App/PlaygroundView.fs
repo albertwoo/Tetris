@@ -16,7 +16,7 @@ let render state dispatch =
                     div </> [
                         Classes [ 
                             Tw.``mt-02``; Tw.flex; Tw.``flex-row``;
-                            Tw.``items-center``; Tw.``justify-center``; Tw.``mb-04``
+                            Tw.``items-center``; Tw.``justify-center``; Tw.``mb-02``
                         ]
                         Children [
                             match state.Plaground with
@@ -43,6 +43,12 @@ let render state dispatch =
                     ]
 
                     match state.Plaground with
+                    | PlaygroundState.Replaying (Deferred.Loading | Deferred.Reloading _) ->
+                        Loader.line()
+                    | _ ->
+                        ()
+
+                    match state.Plaground with
                     | PlaygroundState.Replaying (DeferredValue s)
                     | PlaygroundState.Playing s ->
                         Playground.Views.render (s, PlaygroundMsg >> dispatch)
@@ -50,7 +56,7 @@ let render state dispatch =
 
                     div </> [
                         Classes [ 
-                            Tw.``mt-04``; Tw.flex; Tw.``flex-row``;
+                            Tw.``mt-02``; Tw.flex; Tw.``flex-row``;
                             Tw.``items-center``; Tw.``justify-center``
                         ]
                         Children [

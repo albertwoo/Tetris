@@ -34,7 +34,7 @@ let render =
                     div </> [
                         Classes [
                             Tw.flex; Tw.``flex-row``; Tw.``justify-center``; Tw.``items-center``
-                            Tw.``mt-04``; Tw.``mb-02``; Tw.``opacity-50``
+                            Tw.``mb-02``; Tw.``opacity-50``
                         ]
                         Children [
                             if not state.IsViewMode then

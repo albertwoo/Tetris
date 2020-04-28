@@ -6,6 +6,7 @@
     <Compile Include="Common.fs" />
     <Compile Include="Http.fs" />
     <Compile Include="Controls\Common.fs" />
+    <Compile Include="Controls\Loader.fs" />
     <Compile Include="Controls\Button.fs" />
     <Compile Include="Controls\List.fs" />
     <Compile Include="Controls\GithubBand.fs" />

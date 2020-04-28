@@ -24,6 +24,7 @@ module RobotChecker =
                 let robotCheckerContainer: IRefHook<Browser.Types.Element option> = Hooks.useRef None
 
                 let timeoutRef = Hooks.useRef 0.
+                let isLoadingChecker = Hooks.useState false
 
                 let check x =
                     robotCherkerX.update(Some x)
@@ -36,9 +37,11 @@ module RobotChecker =
                         ()
 
                 let rec getChecker () =
+                    isLoadingChecker.update true
                     Http.get "/api/robot/checker"
                     |> Http.handleJsonAsync
                         (fun data ->
+                            isLoadingChecker.update false
                             robotChecker.update(Some data)
                             let timeoutInMs = (data.ExpireDate - DateTime.Now).TotalMilliseconds
                             timeoutRef.current <-
@@ -59,38 +62,41 @@ module RobotChecker =
                     ,[||])
 
                 div [] [
-                    div </> [
-                        Classes [ Tw.relative ]
-                        OnClick (fun e ->
-                            let t = e.target :?> Browser.Types.Element
-                            let rect = t.getBoundingClientRect()
-                            check(e.clientX - rect.left - (float robotCheckerWidth / 2.))
-                        )
-                        Ref (fun x -> robotCheckerContainer.current <- Some x)
-                        Children [
-                            match robotChecker.current with
-                            | None -> ()
-                            | Some checker ->
-                                img [
-                                    Src checker.Base64ImageSource
-                                ]
-                                match robotCherkerX.current with
+                    if isLoadingChecker.current then
+                        Loader.line()
+                    else
+                        div </> [
+                            Classes [ Tw.relative ]
+                            OnClick (fun e ->
+                                let t = e.target :?> Browser.Types.Element
+                                let rect = t.getBoundingClientRect()
+                                check(e.clientX - rect.left - (float robotCheckerWidth / 2.))
+                            )
+                            Ref (fun x -> robotCheckerContainer.current <- Some x)
+                            Children [
+                                match robotChecker.current with
                                 | None -> ()
-                                | Some x ->
-                                    div </> [
-                                        Classes [ Tw.``bg-brand``; Tw.``h-full``; Tw.``opacity-25``; Tw.``pointer-events-none`` ]
-                                        Style [
-                                            Position PositionOptions.Absolute
-                                            Left x
-                                            Top 0
-                                            Width robotCheckerWidth
-                                        ]
+                                | Some checker ->
+                                    img [
+                                        Src checker.Base64ImageSource
                                     ]
+                                    match robotCherkerX.current with
+                                    | None -> ()
+                                    | Some x ->
+                                        div </> [
+                                            Classes [ Tw.``bg-brand``; Tw.``h-full``; Tw.``opacity-25``; Tw.``pointer-events-none`` ]
+                                            Style [
+                                                Position PositionOptions.Absolute
+                                                Left x
+                                                Top 0
+                                                Width robotCheckerWidth
+                                            ]
+                                        ]
+                            ]
                         ]
-                    ]
-                    p </> [
-                        Classes [ Tw.``text-center``; Tw.``text-xs``; Tw.``opacity-50``; Tw.``text-warning`` ]
-                        Text "请在相应位置点击方块"
-                    ]
+                        p </> [
+                            Classes [ Tw.``text-center``; Tw.``text-xs``; Tw.``opacity-50``; Tw.``text-warning`` ]
+                            Text "请在相应位置点击方块"
+                        ]
                 ]
         )

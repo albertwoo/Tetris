@@ -24,7 +24,7 @@ module Button =
         button </> [
             yield! attrs
             Classes [
-                Tw.``text-xl``; Tw.``text-center``; Tw.``py-02``; Tw.``px-08``
+                Tw.``text-base``; Tw.``text-center``; Tw.``py-02``; Tw.``px-08``
                 Tw.``rounded-full``; Tw.``shadow-lg``; Tw.``bg-red-600``; Tw.``text-white``
                 Tw.``border-red-600``; Tw.``border-2``; Tw.``font-bold``
                 Tw.``hover:shadow-xl``; Tw.``hover:border-white``
@@ -37,7 +37,7 @@ module Button =
         button </> [
             yield! attrs
             Classes [
-                Tw.``text-xl``; Tw.``text-center``; Tw.``py-02``; Tw.``px-08``
+                Tw.``text-base``; Tw.``text-center``; Tw.``py-02``; Tw.``px-08``
                 Tw.``rounded-full``; Tw.``shadow-lg``; Tw.``bg-brand``; Tw.``text-white``
                 Tw.``border-brand``; Tw.``border-2``; Tw.``font-bold``
                 Tw.``hover:shadow-xl``; Tw.``hover:border-white``

@@ -115,6 +115,9 @@ let render state dispatch =
                         ]
                     ]
                     match state.GameBoard with
+                    | Deferred.Loading | Deferred.Reloading _ -> Loader.line()
+                    | _ -> ()
+                    match state.GameBoard with
                     | DeferredValue gameboard -> rankView gameboard state dispatch
                     | _ -> ()
                 ]

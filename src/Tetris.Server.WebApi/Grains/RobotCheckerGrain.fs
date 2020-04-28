@@ -15,15 +15,15 @@ type RobotCheckerGrain() =
 
     let width = 560.f
     let height = 100.f
-    let scale = 10.f
-    let expireDate = DateTime.Now.AddSeconds(15.)
+    let scale = 15.f
+    let expireDate = DateTime.Now.AddSeconds(5.)
     let expected = System.Random().Next(0, int(width - (3.f * scale))) |> float32
 
     interface IRobotCheckerGrain with
         member _.Check value =
             task {
                 if DateTime.Now > expireDate then return false
-                else return (width * value - expected) < 10.f
+                else return (width * value - expected) < 5.f
             }
 
         member _.GetCheckerImage () =
@@ -36,8 +36,7 @@ type RobotCheckerGrain() =
                         .Draw(pen, RectangleF(expected, h, scale, scale))
                         .Draw(pen, RectangleF(expected, h + scale, scale, scale))
                         .Draw(pen, RectangleF(expected, h + 2.f * scale, scale, scale))
-                        .Draw(pen, RectangleF(expected, h + 3.f * scale, scale, scale))
-                        .Draw(pen, RectangleF(expected + scale, h + 3.f * scale, scale, scale))
+                        .Draw(pen, RectangleF(expected + scale, h + 2.f * scale, scale, scale))
                     |> ignore
                 )
                 return image.ToBase64String(Formats.Png.PngFormat.Instance)
