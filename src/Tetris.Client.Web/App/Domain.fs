@@ -1,5 +1,6 @@
 namespace rec Tetris.Client.Web.App
 
+open System
 open Tetris.Client.Web
 open Tetris.Server.WebApi.Dtos.Game
 
@@ -9,7 +10,8 @@ type State =
       GameBoard: Deferred<GameBoard>
       SelectedRankInfo: RecordBriefInfo option
       Plaground: PlaygroundState
-      IsUploading: bool }
+      IsUploading: bool
+      LastCachedTime: DateTime }
 
 
 type Msg =

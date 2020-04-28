@@ -1,5 +1,6 @@
 module Tetris.Client.Web.App.States
 
+open System
 open Elmish
 open Fable.SimpleHttp
 open Tetris.Server.WebApi.Dtos
@@ -7,11 +8,16 @@ open Tetris.Client.Web
 
 
 let init () =
-    { ErrorInfo = None
-      GameBoard = Deferred.NotStartYet
-      SelectedRankInfo = None
-      Plaground = PlaygroundState.Closed
-      IsUploading = false }
+    let state =
+        Utils.getCachedPlayingState() 
+        |> Option.defaultValue
+            { ErrorInfo = None
+              GameBoard = Deferred.NotStartYet
+              SelectedRankInfo = None
+              Plaground =  PlaygroundState.Closed
+              IsUploading = false
+              LastCachedTime = DateTime.Now }
+    state
     , Cmd.batch [
         Cmd.ofMsg (GetGameBoard AsyncOperation.Start)
         Cmd.ofSub(fun dispatch ->
@@ -23,6 +29,11 @@ let init () =
             )
             |> ignore
         )
+        match state.Plaground with
+        | PlaygroundState.Playing _ ->
+            Cmd.ofMsg (Playground.Tick |> PlaygroundMsg)
+        | _ ->
+            ()
       ]
 
 
@@ -103,6 +114,7 @@ let update msg state =
                 | _ -> PlaygroundState.Closed }
         , Cmd.none
     | ClosePlay ->
+        Utils.setCachedPlayingState None
         { state with Plaground = PlaygroundState.Closed }
         , Cmd.none
 
@@ -113,6 +125,12 @@ let update msg state =
             { state with Plaground = PlaygroundState.Replaying (Deferred.Loaded newS) }
             , Cmd.map PlaygroundMsg newCmd
         | PlaygroundState.Playing s -> 
+            let state =
+                if (DateTime.Now - state.LastCachedTime).TotalSeconds > 10. then
+                    Utils.setCachedPlayingState (Some state)
+                    { state with LastCachedTime = DateTime.Now }
+                else
+                    state
             let newS, newCmd = Playground.States.update msg' s
             { state with Plaground = PlaygroundState.Playing newS }
             , Cmd.map PlaygroundMsg newCmd

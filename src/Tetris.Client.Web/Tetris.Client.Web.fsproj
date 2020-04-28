@@ -17,6 +17,7 @@
     <Compile Include="Playground\TetrisView.fs" />
     <Compile Include="Playground\Views.fs" />
     <Compile Include="App\Domain.fs" />
+    <Compile Include="App\Utils.fs" />
     <Compile Include="App\States.fs" />
     <Compile Include="App\HeaderView.fs" />
     <Compile Include="App\RankView.fs" />
