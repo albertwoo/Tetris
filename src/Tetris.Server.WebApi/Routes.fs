@@ -44,7 +44,10 @@ let all: HttpHandler =
                         task {
                             let factory = ctx.GetService<IGrainFactory>()
                             let gamebord = factory.GetGrain<IGameBoardGrain>(int64 Constants.GameZone1)
-                            let ip = string ctx.Request.HttpContext.Connection.RemoteIpAddress
+                            let ip = 
+                                if ctx.Request.Headers.ContainsKey("X-Forwarded-For") 
+                                then ctx.Request.Headers.["X-Forwarded-For"].Item(0)
+                                else string ctx.Request.HttpContext.Connection.RemoteIpAddress
                             do! gamebord.Ping ip
                             return! text "pong" nxt ctx
                         }
