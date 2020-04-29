@@ -6,7 +6,7 @@ open Fun.Result
 open Tetris.Core
 
 
-let private defaultPlayground = Utils.createDefaultPlayground (18, 30)
+let private createPlayground() = Utils.createDefaultPlayground (18, 30)
 
 let private convertToTetrisEvent newEvents =
     newEvents 
@@ -15,7 +15,7 @@ let private convertToTetrisEvent newEvents =
 
 let init() =
     { Events = []
-      Playground = defaultPlayground 
+      Playground = createPlayground()
       StartTime = None
       IsReplaying = false
       IsViewMode = true }
@@ -27,7 +27,7 @@ let update msg state =
     | Start ->
         { state with
             Events = []
-            Playground = defaultPlayground
+            Playground = createPlayground()
             StartTime = Some DateTime.Now }
         , Cmd.batch [
             Cmd.ofMsg (Utils.generateRamdomBlock(state.Playground.Size.Width / 2 - 2) |> Event.NewBlock |> NewEvent)
@@ -90,7 +90,7 @@ let update msg state =
                 if isFinished then state.Playground
                 else
                     let playground =
-                        if index = 0 then defaultPlayground
+                        if index = 0 then createPlayground()
                         else state.Playground
                     state.Events 
                     |> List.map (fun x -> x.Event) 
