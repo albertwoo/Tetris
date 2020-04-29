@@ -38,10 +38,10 @@ let render playground =
         ]
         Classes [ Tw.``mb-02`` ]
         Children [
-            let grid = Grid.value playground.SquaresGrid
-            for y in [0..grid.Length-1] do
-                for x in [0..grid.[y].Length-1] do
-                    match grid.[y].[x] with
+            let grid = playground.SquaresGrid.value
+            for y in [0..Seq.length grid - 1] do
+                for x in [0..(grid |> Seq.item y |> Seq.length) - 1] do
+                    match grid |> Seq.item y |> Seq.item x with
                     | Used -> 
                         square ("remain", { X = x; Y = y }, [
                             Classes [ Tw.``bg-gray``; Tw.``opacity-25`` ]
@@ -106,10 +106,10 @@ let renderCanvas =
                 drawBlock playground.PredictionBlock "rgba(18,123,25, 0.4)" context
                 drawBlock playground.MovingBlock "#127b19" context
 
-                let grid = Grid.value playground.SquaresGrid
-                for y in [0..grid.Length-1] do
-                    for x in [0..grid.[y].Length-1] do
-                        match grid.[y].[x] with
+                let grid = playground.SquaresGrid.value
+                for y in [0..Seq.length grid - 1] do
+                    for x in [0..(grid |> Seq.item y |> Seq.length) - 1] do
+                        match grid |> Seq.item y |> Seq.item x with
                         | Used -> drawSquare "rgba(250,250,250,0.2)" context x y
                         | NotUsed -> ()
             

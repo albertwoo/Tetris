@@ -45,23 +45,28 @@ type Point =
     | Used // In the future we can add payload for color etc.
     | NotUsed
 
-type Grid = 
-    private Grid of Point[][]
+
+// Make the grid only mutable in Tetris.Core to prevent changes by accident 
+type Grid = private Grid of Point[][]
     with
-    static member create width height = 
+    static member create (width, height) = 
         Grid [| 
             for _ in 1..height ->
                 [| for _ in 1..width -> NotUsed |] 
         |]
-    static member value = function
-        | Grid x -> x
-    static member item(x, y) = function
+
+    member this.value = match this with Grid x -> x |> Seq.map Seq.ofArray
+
+    member this.item (x, y) =
+        match this with
         | Grid g ->
             try g.[y].[x] |> Some
             with _ -> None
-    static member item (s: Square) = 
-        Grid.item(s.X, s.Y)
-    static member set square value = function
+
+    member this.item (s: Square) = this.item(s.X, s.Y)
+
+    member internal this.set (square, value) =
+        match this with
         | Grid g ->
             try g.[square.Y].[square.X] <- value
             with _ -> ()

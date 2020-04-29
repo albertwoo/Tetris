@@ -15,11 +15,10 @@ let play playground event =
                 | None -> []
                 | Some movingBlock ->
                     [
-                        match Projection.updateBlock movingBlock operation with
+                        match Projection.operateBlock movingBlock operation with
                         | CollidedWithSquares playground.SquaresGrid ->
                             match operation with
-                            | Operation.MoveDown
-                            | Operation.RotateClockWise -> 
+                            | Operation.MoveDown -> 
                                 generateRamdomBlock(playground.Size.Width / 2 - 2) 
                                 |> Event.NewBlock
                             | _ -> 
@@ -37,7 +36,7 @@ let moveToEnd playground operation =
         match operation with
         | Operation.MoveDown | Operation.MoveLeft | Operation.MoveRight ->
             let rec loop block evts =
-                match Projection.updateBlock block operation with
+                match Projection.operateBlock block operation with
                 | CollidedWithSquares playground.SquaresGrid -> 
                     evts
                 | newBlock ->

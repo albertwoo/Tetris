@@ -1,6 +1,5 @@
 ﻿module Tetris.Core.Utils
 
-open System
 
 let rotate block =
     match block.CenterSquare with
@@ -14,7 +13,6 @@ let rotate block =
                         X = center.X - (s.Y - center.Y)
                         Y = center.Y + (s.X - center.X) }
                 ) }
-
 
 let moveL square = { square with X = square.X - 1 }
 let moveR square = { square with X = square.X + 1 }
@@ -31,13 +29,6 @@ let getBlockSquares block =
     | None -> block.Squares
     | Some s -> s::block.Squares
 
-let isCollidedWith block squares2 =
-    block
-    |> getBlockSquares
-    |> Seq.exists (fun s -> squares2 |> Seq.contains s)
-
-let boolToOption = function true -> Some() | false -> None
-
 
 let createLeftBorder size = [ for y in 0..size.Height -> { X = -1; Y = y } ]
 let createRightBorder size = [ for y in 0..size.Height -> { X = size.Width; Y = y } ]
@@ -48,12 +39,14 @@ let createBottomBorder size = [ for x in 0..size.Width-1 -> { X = x; Y = size.He
 let (|CollidedWithSquares|_|) (grid: Grid) block =
     getBlockSquares block
     |> Seq.exists (fun s ->
-        match Grid.item s grid with
+        match grid.item s with
         | Some Used -> true
         | Some NotUsed -> false
         | None -> true
     )
-    |> boolToOption
+    |> function 
+        | true -> Some() 
+        | false -> None
 
 
 let createDefaultPlayground (width, height) =
@@ -65,7 +58,7 @@ let createDefaultPlayground (width, height) =
         BottomBorder = createBottomBorder size
         MovingBlock = None
         PredictionBlock = None
-        SquaresGrid = Grid.create width height
+        SquaresGrid = Grid.create(width, height)
     }
 
 
@@ -97,8 +90,20 @@ let predefinedBlocks =
         """
 
         """
+        xo
+        xo
+        oc
+        """
+
+        """
         ocx
         xoo
+        """
+
+        """
+        xox
+        ooo
+        xox
         """
     ]
     |> List.map (fun str ->
@@ -129,6 +134,6 @@ let generateRamdomBlock moveRight =
 
     predefinedBlocks
     |> List.item (
-        System.Random().Next(0, predefinedBlocks.Length - 1)
+        System.Random().Next(0, predefinedBlocks.Length)
     )
     |> move

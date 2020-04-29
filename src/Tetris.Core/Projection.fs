@@ -5,7 +5,7 @@ open System
 open Utils
 
 
-let updateBlock block operation =
+let operateBlock block operation =
     match operation with
     | Operation.RotateClockWise -> rotate block
     | Operation.MoveLeft        -> move moveL block 
@@ -18,13 +18,13 @@ let updateMovingBlock playground event =
     | Event.NewBlock block, _ -> Some block
     | Event.NewOperation _, None -> None
     | Event.NewOperation operation, Some block ->
-        match updateBlock block operation with
+        match operateBlock block operation with
         | CollidedWithSquares playground.SquaresGrid -> Some block
         | updatedBlock -> Some updatedBlock
 
 
 let rec updatePredictionBlock playground block =
-    match updateBlock block Operation.MoveDown with
+    match operateBlock block Operation.MoveDown with
     | CollidedWithSquares playground.SquaresGrid -> block
     | updatedBlock -> updatePredictionBlock playground updatedBlock
 
@@ -32,16 +32,17 @@ let rec updatePredictionBlock playground block =
 let private updateGrid playground event =
     let updateSquaresGrid block (grid: Grid) =
         getBlockSquares block
-        |> List.iter (fun square -> Grid.set square Used grid)
+        |> List.iter (fun square -> grid.set(square, Used))
         grid
 
     match playground.MovingBlock, event with
     | Some movingBlock, Event.NewBlock _ ->
         let grid =
-            match updateBlock movingBlock Operation.MoveDown with
+            match operateBlock movingBlock Operation.MoveDown with
             | CollidedWithSquares playground.SquaresGrid -> updateSquaresGrid movingBlock playground.SquaresGrid
             | _ -> playground.SquaresGrid
-            |> Grid.value
+            |> function Grid x -> x
+
         let mutable count = 0
         for i in [0..grid.Length - 1] do
             let row = grid.[i]

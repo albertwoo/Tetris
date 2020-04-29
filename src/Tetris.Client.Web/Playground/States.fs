@@ -41,7 +41,7 @@ let update msg state =
           else 
             Cmd.ofSub (fun dispatch ->
                 let timeout =
-                    match 1000 / Math.Max(state.Playground.Score / 500, 1) with
+                    match 800 / Math.Max(state.Playground.Score / 500, 1) with
                     | LessEqual 50 -> 50
                     | x -> x
                 Browser.Dom.window.setTimeout(
@@ -70,7 +70,7 @@ let update msg state =
             let newOperations = Behavior.moveToEnd state.Playground operation
             let movingBlock =
                 state.Playground.MovingBlock 
-                |> Option.map (fun block -> List.fold Projection.updateBlock block newOperations)
+                |> Option.map (fun block -> List.fold Projection.operateBlock block newOperations)
             let predictionBlock =
                 movingBlock
                 |> Option.map (Projection.updatePredictionBlock state.Playground)
