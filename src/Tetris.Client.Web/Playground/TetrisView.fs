@@ -38,10 +38,16 @@ let render playground =
         ]
         Classes [ Tw.``mb-02`` ]
         Children [
-            for s in playground.RemainSquares do
-                square ("remain", s, [
-                    Classes [ Tw.``bg-gray``; Tw.``opacity-25`` ]
-                ])
+            let grid = Grid.value playground.SquaresGrid
+            for y in [0..grid.Length-1] do
+                for x in [0..grid.[y].Length-1] do
+                    match grid.[y].[x] with
+                    | Used -> 
+                        square ("remain", { X = x; Y = y }, [
+                            Classes [ Tw.``bg-gray``; Tw.``opacity-25`` ]
+                        ])
+                    | NotUsed ->
+                        ()
 
             for s in playground.MovingBlock |> Option.map Utils.getBlockSquares |> Option.defaultValue [] do
                 square ("moving", s, [
@@ -64,8 +70,8 @@ let render playground =
 let private squareScale = 18
 let private squareBorder = 1
                 
-let private drawSquare color (context: Browser.Types.CanvasRenderingContext2D) square =
-    let x, y = squareScale * square.X, squareScale * square.Y
+let private drawSquare color (context: Browser.Types.CanvasRenderingContext2D) x y =
+    let x, y = squareScale * x, squareScale * y
     context.fillStyle <- !^"rgba(0, 0, 0, 0)"
     context.fillRect(float x, float y, float squareScale, float squareScale)
     context.fillStyle <- !^color
@@ -78,8 +84,8 @@ let private drawSquare color (context: Browser.Types.CanvasRenderingContext2D) s
 let private drawBlock block color targetContext =
     match block with
     | Some mb ->
-        mb.Squares |> List.iter (drawSquare color targetContext)
-        mb.CenterSquare |> Option.iter (drawSquare color targetContext)
+        mb.Squares |> List.iter (fun s -> drawSquare color targetContext s.X s.Y)
+        mb.CenterSquare |> Option.iter (fun s -> drawSquare color targetContext s.X s.Y)
     | _ -> 
         ()
 
@@ -99,9 +105,16 @@ let renderCanvas =
             
                 drawBlock playground.PredictionBlock "rgba(18,123,25, 0.4)" context
                 drawBlock playground.MovingBlock "#127b19" context
-                playground.RemainSquares |> List.iter (drawSquare "rgba(250,250,250,0.2)" context)
+
+                let grid = Grid.value playground.SquaresGrid
+                for y in [0..grid.Length-1] do
+                    for x in [0..grid.[y].Length-1] do
+                        match grid.[y].[x] with
+                        | Used -> drawSquare "rgba(250,250,250,0.2)" context x y
+                        | NotUsed -> ()
             
-                playground.BottomBorder |> Seq.iter (drawSquare "rgba(250,250,250,0.1)" context)
+                playground.BottomBorder 
+                |> Seq.iter (fun s -> drawSquare "rgba(250,250,250,0.1)" context s.X s.Y)
 
         Hooks.useEffect(draw, [||])
 

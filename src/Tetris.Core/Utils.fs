@@ -45,22 +45,14 @@ let createBottomBorder size = [ for x in 0..size.Width-1 -> { X = x; Y = size.He
     
 
 // FSharp active pattern
-let (|CollidedWithBlocks|_|) blocks block = blocks |> List.collect getBlockSquares |> isCollidedWith block |> boolToOption
-let (|CollidedWithSquares|_|) squares block = squares |> isCollidedWith block |> boolToOption
-
-let (|CollidedWithBorderLeft|_|) size block =
-    createLeftBorder size
-    |> isCollidedWith block
-    |> boolToOption
-
-let (|CollidedWithBorderRight|_|) size block =
-    createRightBorder size
-    |> isCollidedWith block
-    |> boolToOption
-
-let (|CollidedWithBorderBottom|_|) size block =
-    createBottomBorder size
-    |> isCollidedWith block
+let (|CollidedWithSquares|_|) (grid: Grid) block =
+    getBlockSquares block
+    |> Seq.exists (fun s ->
+        match Grid.item s grid with
+        | Some Used -> true
+        | Some NotUsed -> false
+        | None -> true
+    )
     |> boolToOption
 
 
@@ -70,12 +62,10 @@ let createDefaultPlayground (width, height) =
         IsGameOver = false
         Score = 0
         Size = size
-        LeftBorder = createLeftBorder size
-        RightBorder = createRightBorder size
         BottomBorder = createBottomBorder size
         MovingBlock = None
         PredictionBlock = None
-        RemainSquares = []
+        SquaresGrid = Grid.create width height
     }
 
 
