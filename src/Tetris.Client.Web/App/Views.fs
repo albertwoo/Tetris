@@ -32,8 +32,8 @@ let render state dispatch =
                     | PlaygroundState.Replaying _
                     | PlaygroundState.Playing _ ->
                         PlaygroundView.render state dispatch
-                    | PlaygroundState.Submiting p when not state.IsUploading ->
-                        SubmitRecordView.render (p, dispatch)
+                    | PlaygroundState.Submiting p ->
+                        SubmitRecordView.render (state, p, dispatch)
                     | _ ->
                         HeaderView.view
                         RankView.render state dispatch

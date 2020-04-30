@@ -76,19 +76,23 @@ let all: HttpHandler =
                     >=> fun nxt ctx ->
                         task {
                             let! payload = ctx.BindJsonAsync<NewRecord>()
-                            let factory = ctx.GetService<IGrainFactory>()
-                            let player = factory.GetGrain<IPlayerGrain>(payload.PlayerName)
-                            let newRecord =
-                                { Id = 0
-                                  PlayerName = payload.PlayerName
-                                  GameEvents = payload.GameEvents
-                                  Score = payload.Score
-                                  RecordDate = DateTime.Now
-                                  TimeCostInMs = payload.TimeCostInMs }
-                            let! id = player.AddRecord(payload.PlayerPassword, newRecord)
-                            match id with
-                            | Ok id   -> return! HttpStatusCodeHandlers.Successful.CREATED id nxt ctx
-                            | Error e -> return! HttpStatusCodeHandlers.RequestErrors.BAD_REQUEST e nxt ctx
+
+                            if String.IsNullOrEmpty payload.PlayerName then
+                                return! HttpStatusCodeHandlers.RequestErrors.BAD_REQUEST "Player name cannot be empty" nxt ctx
+                            else
+                                let factory = ctx.GetService<IGrainFactory>()
+                                let player = factory.GetGrain<IPlayerGrain>(payload.PlayerName)
+                                let newRecord =
+                                    { Id = 0
+                                      PlayerName = payload.PlayerName
+                                      GameEvents = payload.GameEvents
+                                      Score = payload.Score
+                                      RecordDate = DateTime.Now
+                                      TimeCostInMs = payload.TimeCostInMs }
+                                let! id = player.AddRecord(payload.PlayerPassword, newRecord)
+                                match id with
+                                | Ok id   -> return! HttpStatusCodeHandlers.Successful.CREATED id nxt ctx
+                                | Error e -> return! HttpStatusCodeHandlers.RequestErrors.BAD_REQUEST e nxt ctx
                         }
 
             GET     >=> routeCif "/player/%s/record/%i"

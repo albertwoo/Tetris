@@ -101,10 +101,15 @@ let predefinedBlocks =
         """
 
         """
-        xox
-        ooo
-        xox
+        xco
+        oox
         """
+
+        //"""
+        //xox
+        //ooo
+        //xox
+        //"""
     ]
     |> List.map (fun str ->
         let squares =

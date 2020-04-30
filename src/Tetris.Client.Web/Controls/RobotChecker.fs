@@ -49,7 +49,13 @@ module RobotChecker =
                                     (fun () -> getChecker()
                                     ,int timeoutInMs)
                         )
-                        (fun x -> Browser.Dom.console.error x)
+                        (fun x ->
+                            Browser.Dom.console.error x
+                            timeoutRef.current <-
+                                Browser.Dom.window.setTimeout
+                                    (fun () -> getChecker()
+                                    ,int 2000)
+                        )
                     |> Async.StartImmediate
 
                 Hooks.useEffectDisposable 

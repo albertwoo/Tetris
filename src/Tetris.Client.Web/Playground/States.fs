@@ -84,6 +84,7 @@ let update msg state =
 
     | ReplayEvent index ->
         let isFinished = index + 1 >= state.Events.Length
+        let length = 20
         { state with
             IsReplaying = not isFinished
             Playground =
@@ -94,8 +95,11 @@ let update msg state =
                         else state.Playground
                     state.Events 
                     |> List.map (fun x -> x.Event) 
-                    |> Seq.item index 
-                    |> Projection.updatePlayground playground }
+                    |> Seq.skip index
+                    |> fun s -> 
+                        if Seq.length s < length then s
+                        else Seq.take length s
+                    |> Seq.fold Projection.updatePlayground playground }
         , if isFinished then Cmd.none
           else
             Cmd.OfAsync.result(
@@ -105,6 +109,6 @@ let update msg state =
                             | LessEqual 1 -> 1
                             | x -> x
                         )
-                    return ReplayEvent (index + 1)
+                    return ReplayEvent (index + length)
                 }
             )

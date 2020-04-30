@@ -15,7 +15,7 @@ let init () =
               GameBoard = Deferred.NotStartYet
               SelectedRankInfo = None
               Plaground =  PlaygroundState.Closed
-              IsUploading = false
+              UploadingState = Deferred.NotStartYet
               LastCachedTime = DateTime.Now }
     state
     , Cmd.batch [
@@ -101,7 +101,9 @@ let update msg state =
     | StartPlay -> 
         let newS, newC = Playground.States.init()
         let newS = { newS with IsViewMode = false }
-        { state with Plaground = PlaygroundState.Playing newS }
+        { state with 
+            Plaground = PlaygroundState.Playing newS
+            UploadingState = Deferred.NotStartYet }
         , Cmd.batch [
             Cmd.map PlaygroundMsg newC
             Cmd.ofMsg (Playground.Start |> PlaygroundMsg)
@@ -137,18 +139,23 @@ let update msg state =
         | _ ->
             state, Cmd.none
 
-    | UploadRecord (checker, record) ->
-        { state with IsUploading = true }
+    | UploadRecord (checker, record, AsyncOperation.Start) ->
+        { state with UploadingState = Deferred.Loading }
         , Http.postJson "/api/player/record" record
           |> Http.headers [
                 Header(RobotCheckerIdKey, checker.Id.ToString())
                 Header(RobotCheckerValueKey, checker.Value.ToString())
           ]
-          |> Http.handleAsync (fun _ -> UploadedRecord) (Some >> OnError)
+          |> Http.handleAsync 
+            (fun _ -> UploadRecord (checker, record, AsyncOperation.Finished()))
+            (fun e -> UploadRecord (checker, record, AsyncOperation.Failed e))
           |> Cmd.OfAsync.result
-    | UploadedRecord ->
-        { state with IsUploading = false }
+    | UploadRecord (_, _, AsyncOperation.Finished ()) ->
+        { state with UploadingState = Deferred.Loaded() }
         , Cmd.batch [
             Cmd.ofMsg ClosePlay
             Cmd.ofMsg (GetGameBoard AsyncOperation.Start)
           ]
+    | UploadRecord (_, _, AsyncOperation.Failed e) ->
+        { state with UploadingState = Deferred.LoadFailed e }
+        , Cmd.ofMsg (OnError (Some e))

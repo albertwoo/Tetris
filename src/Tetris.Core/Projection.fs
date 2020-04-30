@@ -43,14 +43,20 @@ let private updateGrid playground event =
             | _ -> playground.SquaresGrid
             |> function Grid x -> x
 
+        let targetYs = 
+            getBlockSquares movingBlock 
+            |> Seq.groupBy (fun s -> s.Y) 
+            |> Seq.map fst 
+            |> Seq.sort
+
         let mutable count = 0
-        for i in [0..grid.Length - 1] do
-            let row = grid.[i]
+        for y in targetYs do
+            let row = grid.[y]
             let shouldEliminate = row |> Seq.filter (function Used -> true | _ -> false) |> Seq.length |> (=) playground.Size.Width
             if shouldEliminate then
                 count <- count + 1
-                for x in [i..(-1)..1] do
-                    grid.[x] <- grid.[x-1]
+                for y' in [y..(-1)..1] do
+                    grid.[y'] <- grid.[y'-1]
                 grid.[0] <- [| for x in [1..playground.Size.Width] -> NotUsed |]
         count
     | _ ->
