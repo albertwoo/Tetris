@@ -41,8 +41,8 @@ let update msg state =
           else 
             Cmd.ofSub (fun dispatch ->
                 let timeout =
-                    match 800 / Math.Max(state.Playground.Score / 250, 1) with
-                    | LessEqual 25 -> 25
+                    match 1000 / Math.Max(state.Playground.Score / 500, 1) with
+                    | LessEqual 100 -> 100
                     | x -> x
                 Browser.Dom.window.setTimeout(
                     fun _ ->
