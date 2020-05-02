@@ -54,42 +54,27 @@ let render =
                 ]
 
             let submitForm =
-                div [] [
-                    match state.UploadingState with
-                    | Deferred.NotStartYet ->
-                        lightForm [
-                            LightFormProp.InitForm form.current
-                            LightFormProp.OnFormChanged form.update
-                            LightFormProp.Validators validators
-                            LightFormProp.CreateFields (fun field ->
-                                [
-                                    field "Name" (Form.input [
-                                        InputProp.Label "Nick Name"
-                                        InputProp.InputAttrs [
-                                            Classes inputClasses
-                                        ]
-                                    ])
-                                    field "Password" (Form.input [
-                                        InputProp.Label "Password"
-                                        InputProp.ConvertTo InputValue.Password
-                                        InputProp.InputAttrs [
-                                            Classes inputClasses
-                                        ]
-                                    ])
+                lightForm [
+                    LightFormProp.InitForm form.current
+                    LightFormProp.OnFormChanged form.update
+                    LightFormProp.Validators validators
+                    LightFormProp.CreateFields (fun field ->
+                        [
+                            field "Name" (Form.input [
+                                InputProp.Label "Nick Name"
+                                InputProp.InputAttrs [
+                                    Classes inputClasses
                                 ]
-                            )
+                            ])
+                            field "Password" (Form.input [
+                                InputProp.Label "Password"
+                                InputProp.ConvertTo InputValue.Password
+                                InputProp.InputAttrs [
+                                    Classes inputClasses
+                                ]
+                            ])
                         ]
-                    | Deferred.Loading | Deferred.Reloading _ ->
-                        Loader.line()
-                    | Deferred.LoadFailed e | Deferred.ReloadFailed (_, e) ->
-                        errorView e ignore
-                    | Deferred.Loaded _ ->
-                        ()
-                    match state.UploadingState with
-                    | Deferred.NotStartYet | Deferred.LoadFailed _ | Deferred.ReloadFailed _ ->
-                        RobotChecker.render {| onCheck = Some >> robotCheckerValue.update |}
-                    | _ ->
-                        ()
+                    )
                 ]
 
             let buttons =
@@ -145,7 +130,22 @@ let render =
                         Classes [ Tw.``bg-gray-darkest``; Tw.rounded; Tw.``shadow-lg`` ]
                         Children [
                             score
-                            submitForm
+
+                            div [] [
+                                match state.UploadingState with
+                                | Deferred.NotStartYet | Deferred.LoadFailed _ | Deferred.ReloadFailed _ ->
+                                    submitForm
+                                | Deferred.Loading | Deferred.Reloading _ ->
+                                    Loader.line()
+                                | Deferred.Loaded _ ->
+                                    ()
+                                match state.UploadingState with
+                                | Deferred.NotStartYet | Deferred.LoadFailed _ | Deferred.ReloadFailed _ ->
+                                    RobotChecker.render {| onCheck = Some >> robotCheckerValue.update |}
+                                | _ ->
+                                    ()
+                            ]
+
                             buttons
                         ]
                     ]

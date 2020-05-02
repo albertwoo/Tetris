@@ -1,26 +1,15 @@
 ﻿module Tetris.Client.Web.Playground.Views
 
+open System
 open Fable.React
 open Fable.React.Props
 open Tetris.Core
 open Tetris.Client.Web.Controls
 
 
-let private playButtn attrs =
-    button </> [
-        Classes [ 
-            Tw.``px-02``; Tw.``py-02``; Tw.``m-04``; Tw.``text-white``
-            Tw.``hover:bg-brand``; Tw.``focus:outline-none``
-            Tw.``rounded-full``; Tw.``w-12``; Tw.``h-12``
-        ]
-        yield! attrs
-    ]
-
-
 let render =
     FunctionComponent.Of(
         fun (state, dispatch) ->
-            let move =  Event.NewOperation >> NewEvent >> dispatch
             let containerId = Hooks.useState (sprintf "tetris-playground-%d" (System.Random().Next()))
             Hooks.useDeviceInput state dispatch containerId.current
             div </> [
@@ -38,22 +27,10 @@ let render =
                         ]
                         Children [
                             if not state.IsViewMode then
-                                playButtn [
-                                    Classes [ Icons.``icon-keyboard_arrow_left``; Tw.``text-2xl`` ]
-                                    OnClick (fun e -> e.preventDefault(); Operation.MoveLeft |> move)
-                                ]
-                                playButtn [
-                                    Classes [ Icons.``icon-keyboard_arrow_down``; Tw.``text-2xl`` ]
-                                    OnClick (fun e -> e.preventDefault(); Operation.MoveDown |> move)
-                                ]
-                                playButtn [
-                                    Classes [ Icons.``icon-rotate-right``; Tw.``text-sm`` ]
-                                    OnClick (fun e -> e.preventDefault(); Operation.RotateClockWise |> move)
-                                ]
-                                playButtn [
-                                    Classes [ Icons.``icon-keyboard_arrow_right``; Tw.``text-2xl`` ]
-                                    OnClick (fun e -> e.preventDefault(); Operation.MoveRight |> move)
-                                ]
+                                PlayButton.render (dispatch, Operation.MoveLeft)
+                                PlayButton.render (dispatch, Operation.MoveDown)
+                                PlayButton.render (dispatch, Operation.RotateClockWise)
+                                PlayButton.render (dispatch, Operation.MoveRight)
                         ]
                     ]
                 ]
