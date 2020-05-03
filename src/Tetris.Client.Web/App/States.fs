@@ -15,12 +15,11 @@ let init () =
               GameBoard = Deferred.NotStartYet
               SelectedRankInfo = None
               Plaground =  PlaygroundState.Closed
-              UploadingState = Deferred.NotStartYet
-              LastCachedTime = DateTime.Now }
+              UploadingState = Deferred.NotStartYet }
     state
     , Cmd.batch [
         Cmd.ofMsg (GetGameBoard AsyncOperation.Start)
-        Cmd.ofSub(fun dispatch ->
+        Cmd.ofSub (fun dispatch ->
             Browser.Dom.window.setInterval(
                 fun _ -> 
                     dispatch PingServer
@@ -28,6 +27,11 @@ let init () =
                 , 10000
             )
             |> ignore
+        )
+        Cmd.ofSub (fun dispatch ->
+            Browser.Dom.document.addEventListener
+                ("visibilitychange"
+                ,fun _ -> dispatch OnWindowHide)
         )
         match state.Plaground with
         | PlaygroundState.Playing _ ->
@@ -127,12 +131,6 @@ let update msg state =
             { state with Plaground = PlaygroundState.Replaying (Deferred.Loaded newS) }
             , Cmd.map PlaygroundMsg newCmd
         | PlaygroundState.Playing s -> 
-            let state =
-                if (DateTime.Now - state.LastCachedTime).TotalSeconds > 10. then
-                    Utils.setCachedPlayingState (Some state)
-                    { state with LastCachedTime = DateTime.Now }
-                else
-                    state
             let newS, newCmd = Playground.States.update msg' s
             { state with Plaground = PlaygroundState.Playing newS }
             , Cmd.map PlaygroundMsg newCmd
@@ -159,3 +157,11 @@ let update msg state =
     | UploadRecord (_, _, AsyncOperation.Failed e) ->
         { state with UploadingState = Deferred.LoadFailed e }
         , Cmd.ofMsg (OnError (Some e))
+
+    | OnWindowHide ->
+        match state.Plaground with
+        | PlaygroundState.Playing _ ->
+            Utils.setCachedPlayingState (Some state)
+        | _ ->
+            ()
+        state, Cmd.none

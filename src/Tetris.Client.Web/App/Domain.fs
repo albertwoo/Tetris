@@ -10,8 +10,7 @@ type State =
       GameBoard: Deferred<GameBoard>
       SelectedRankInfo: RecordBriefInfo option
       Plaground: PlaygroundState
-      UploadingState: Deferred<unit>
-      LastCachedTime: DateTime }
+      UploadingState: Deferred<unit> }
 
 
 type Msg =
@@ -34,6 +33,8 @@ type Msg =
     | UploadRecord of Tetris.Client.Web.Controls.RobotCheckerValue * NewRecord * AsyncOperation<unit>
 
     | PlaygroundMsg of Playground.Msg
+
+    | OnWindowHide
 
 
 [<RequireQualifiedAccess>]
