@@ -4,11 +4,23 @@ open System
 open Fable.Core.JsInterop
 open Fable.React
 open Fable.React.Props
+open Fun.Result
 open Tetris.Core
 open Tetris.Client.Web.Controls
 
 
-let private scalePx x = sprintf "%dpx" (x * 18)
+let private squareScale = 
+    Browser.Dom.console.error Browser.Dom.window.innerWidth
+    match Browser.Dom.window.innerWidth with
+    | LessEqual 320. -> 12
+    | BetweenEqual 320. 375. -> 15
+    | BetweenEqual 375. 410. -> 16
+    | BetweenEqual 410. 450. -> 17
+    | _ -> 18
+    
+let private squareBorder = 1
+
+let private scalePx x = sprintf "%dpx" (x * squareScale)
 
 
 let private square =
@@ -66,9 +78,6 @@ let render playground =
         ]
     ]
 
-
-let private squareScale = 18
-let private squareBorder = 1
                 
 let private drawSquare color (context: Browser.Types.CanvasRenderingContext2D) x y =
     let x, y = squareScale * x, squareScale * y
@@ -103,7 +112,7 @@ let renderCanvas =
                 let screenWidth, screenHeight = columns * squareScale, rows * squareScale
                 context.clearRect(0., 0., float screenWidth, float screenHeight)
             
-                drawBlock playground.PredictionBlock "rgba(18,123,25, 0.4)" context
+                drawBlock playground.PredictionBlock "rgba(18,123,25, 0.25)" context
                 drawBlock playground.MovingBlock "#127b19" context
 
                 let grid = playground.SquaresGrid.value
