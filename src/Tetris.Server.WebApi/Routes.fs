@@ -82,14 +82,13 @@ let all: HttpHandler =
                             else
                                 let factory = ctx.GetService<IGrainFactory>()
                                 let player = factory.GetGrain<IPlayerGrain>(payload.PlayerName)
-                                let newRecord =
+                                let newRecord: Record =
                                     { Id = 0
                                       PlayerName = payload.PlayerName
-                                      GameEvents = payload.GameEvents
                                       Score = payload.Score
                                       RecordDate = DateTime.Now
                                       TimeCostInMs = payload.TimeCostInMs }
-                                let! id = player.AddRecord(payload.PlayerPassword, newRecord)
+                                let! id = player.AddRecord(payload.PlayerPassword, newRecord, payload.GameEvents)
                                 match id with
                                 | Ok id   -> return! HttpStatusCodeHandlers.Successful.CREATED id nxt ctx
                                 | Error e -> return! HttpStatusCodeHandlers.RequestErrors.BAD_REQUEST e nxt ctx
@@ -111,9 +110,9 @@ let all: HttpHandler =
                         task {
                             let factory = ctx.GetService<IGrainFactory>()
                             let player = factory.GetGrain<IPlayerGrain>(playerName)
-                            let! record = player.GetRecord(recordId)
+                            let! record = player.GetRecordEvents(recordId)
                             match record with
-                            | Some x -> return! json x.GameEvents nxt ctx
+                            | Some x -> return! text x nxt ctx
                             | None   -> return! HttpStatusCodeHandlers.RequestErrors.NOT_FOUND "" nxt ctx
                         })
 

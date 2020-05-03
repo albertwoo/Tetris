@@ -1,5 +1,6 @@
 ﻿namespace Server.Grans
 
+open System.IO
 open Orleans
 open Orleans.Runtime
 open FSharp.Control.Tasks
@@ -26,6 +27,8 @@ type PlayerGrain
     // Save records history for future usage
     let db = new LiteDatabase(configuration.GetConnectionString(Constants.AppDbConnectionName), FSharpBsonMapper())
 
+    let tetrisEventsPath = sprintf "$/tetris/record/events/%d"
+
     member _.SafeState 
         with get() =
             if box state.State |> isNull then PlayerState.defaultValue
@@ -42,12 +45,20 @@ type PlayerGrain
                     this.SafeState <- { this.SafeState with Password = password }
             }
 
-        member _.AddRecord (password, record) =
+        member _.AddRecord (password, record, tetrisEventsStr) =
             task {
                 do! (this :> IPlayerGrain).InitCredential(password)
                 if this.SafeState.Password = password then
                     let records = db.GetCollection<Record>()
                     let id = records.Insert { record with PlayerName = this.GetPrimaryKeyString() }
+                    
+                    let fileStore = db.FileStorage
+                    use stream = new MemoryStream()
+                    use writer = new StreamWriter(stream)
+                    do! writer.WriteAsync(tetrisEventsStr)
+                    do! writer.FlushAsync()
+                    stream.Position <- 0L
+                    fileStore.Upload(id.AsString, tetrisEventsPath id.AsInt32, stream) |> ignore
 
                     let gameBoard = grainFactory.GetGrain<IGameBoardGrain>(int64 Constants.GameZone1)
                     do! gameBoard.AddRecord { record with Id = id.AsInt32 }
@@ -65,5 +76,19 @@ type PlayerGrain
                 return 
                     if box record |> isNull then None
                     else Some record
+            }
+
+        member _.GetRecordEvents (recordId) = 
+            task {
+                let fileStore = db.FileStorage
+                let info = fileStore.FindById(string recordId)
+                if isNull info then return None
+                else
+                    use stream = new MemoryStream()
+                    use reader = new StreamReader(stream)
+                    info.CopyTo(stream)
+                    stream.Position <- 0L
+                    let! result = reader.ReadToEndAsync()
+                    return Some result
             }
        

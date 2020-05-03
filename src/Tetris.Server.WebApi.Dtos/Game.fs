@@ -7,7 +7,7 @@ open Tetris.Core
 type NewRecord =
     { PlayerName: string
       PlayerPassword: string
-      GameEvents: TetrisEvent list
+      GameEvents: string
       Score: int
       TimeCostInMs: int }
 

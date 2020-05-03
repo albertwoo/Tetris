@@ -8,6 +8,7 @@ open Fun.LightForm.Validators
 open Fun.LightForm.FormView
 open Tetris.Server.WebApi.Dtos.Game
 open Tetris.Client.Web.Controls
+open Tetris.Client.Web.Http
 
 
 let private validators =
@@ -102,7 +103,7 @@ let render =
                                                 checkerValue,
                                                 { PlayerName = value.Name
                                                   PlayerPassword = value.Password
-                                                  GameEvents = playground.Events
+                                                  GameEvents = toJson playground.Events
                                                   Score = playground.Playground.Score
                                                   TimeCostInMs = (DateTime.Now - startTime).TotalMilliseconds |> int },
                                                 AsyncOperation.Start

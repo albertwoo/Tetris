@@ -16,8 +16,9 @@ type IGameBoardGrain =
 type IPlayerGrain =
     inherit IGrainWithStringKey
     abstract member InitCredential: Password -> Task<unit>
-    abstract member AddRecord: Password * Record -> Task<Result<RecordId, AddRecordError>>
+    abstract member AddRecord: Password * Record * TetrisEventStr -> Task<Result<RecordId, AddRecordError>>
     abstract member GetRecord: RecordId -> Task<Record option>
+    abstract member GetRecordEvents: RecordId -> Task<TetrisEventStr option>
 
 
 [<RequireQualifiedAccess>]
@@ -50,13 +51,12 @@ type PlayerState =
 type Password = string
 type RecordId = int
 type IP = string
-
+type TetrisEventStr = string
 
 [<CLIMutable>]
 type Record =
     { Id: int
       PlayerName: string
-      GameEvents: TetrisEvent list
       Score: int
       TimeCostInMs: int
       RecordDate: DateTime }
