@@ -1,6 +1,5 @@
 ﻿namespace Tetris.Client.Web.Playground
 
-open System
 open Fable.React
 open Fable.React.Props
 open Tetris.Core
@@ -12,24 +11,28 @@ module PlayButton =
         FunctionComponent.Of(
             fun (dispatch, operation) ->
                 let move =  Event.NewOperation >> NewEvent >> dispatch
-                let clickStart = Hooks.useRef None
+                let movedByLongPress = Hooks.useRef false
+                let longPressTimeRef = Hooks.useRef None
 
-                let start () = 
-                    if clickStart.current.IsNone then
-                        clickStart.current <- (Some DateTime.Now)
+                let start () =
+                    if longPressTimeRef.current.IsNone then
+                        longPressTimeRef.current <- 
+                            Browser.Dom.window.setTimeout
+                                (fun _ ->
+                                    Msg.MoveToEnd operation |> dispatch
+                                    movedByLongPress.current <- true
+                                ,200)
+                            |> Some
 
                 let endClick () =
-                    match clickStart.current with
-                    | Some time ->
-                        let diff = (DateTime.Now - time).TotalMilliseconds
-                        if diff > 150. then
-                            Msg.MoveToEnd operation |> dispatch
-                            clickStart.current <- None
-                        else 
-                            move operation
-                    | _ ->
-                        ()
-                    clickStart.current <- None
+                    match longPressTimeRef.current with
+                    | Some ref -> Browser.Dom.window.clearTimeout ref
+                    | None -> ()
+                    
+                    if not movedByLongPress.current then move operation
+
+                    longPressTimeRef.current <- None
+                    movedByLongPress.current <- false
 
                 button </> [
                     Classes [ 
