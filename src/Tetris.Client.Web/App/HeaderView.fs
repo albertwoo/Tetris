@@ -27,8 +27,8 @@ let view =
                 ]
             ]
             p </> [
-                Text "本游戏支持:手势滑动，键盘，按钮来操作，以及长按或快速滑动"
-                Classes [ Tw.``text-center``; Tw.``text-warning``; Tw.``text-xs``; Tw.``opacity-75`` ]
+                Text "本游戏支持：手势滑动，键盘(上下左右)，按钮来操作，以及长按或快速滑动"
+                Classes [ Tw.``text-center``; Tw.``text-warning``; Tw.``text-xs``; Tw.``opacity-75``; Tw.``px-02`` ]
             ]
         ]
     ]
