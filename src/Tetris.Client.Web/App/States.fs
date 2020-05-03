@@ -98,6 +98,22 @@ let update msg state =
     | StartReplay -> 
         state
         , Cmd.ofMsg (GetRecordDetail AsyncOperation.Start)
+    | PausePlay ->
+        let state =
+            { state with
+                Plaground =
+                    match state.Plaground with
+                    | PlaygroundState.Playing s -> PlaygroundState.Paused s
+                    | x -> x }
+        Utils.setCachedPlayingState (Some state)
+        state, Cmd.none
+    | ReStartPlay ->
+        match state.Plaground with
+        | PlaygroundState.Paused s ->
+            { state with Plaground = PlaygroundState.Playing s }
+            , Cmd.ofMsg (Playground.Tick |> PlaygroundMsg)
+        | _ ->
+            state, Cmd.none
     | StopReplay ->
         { state with Plaground = PlaygroundState.Closed }
         , Cmd.none

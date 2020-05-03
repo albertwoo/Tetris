@@ -20,7 +20,7 @@ let render state dispatch =
                         ]
                         Children [
                             match state.Plaground with
-                            | PlaygroundState.Playing p | PlaygroundState.Replaying (DeferredValue p) ->
+                            | PlaygroundState.Playing p | PlaygroundState.Replaying (DeferredValue p) | PlaygroundState.Paused p ->
                                 div </> [
                                     Text (sprintf "#%d" p.Playground.Score)
                                     Classes [ Tw.``text-3xl``; Tw.``font-bold``; Tw.``opacity-50``; Tw.``text-white``; Tw.``mr-04`` ]
@@ -30,11 +30,28 @@ let render state dispatch =
                             match state.Plaground with
                             | PlaygroundState.Playing _ ->
                                 button </> [
+                                    OnClick (fun e -> e.preventDefault(); PausePlay |> dispatch)
+                                    Classes [ 
+                                        Icons.``icon-lock``; Tw.``text-white``; Tw.``opacity-50``; Tw.``w-10``; Tw.``h-10``
+                                        Tw.``rounded-full``; Tw.border; Tw.``border-brand``; Tw.``outline-none``; Tw.``mx-01``; Tw.``focus:outline-none``
+                                        Tw.``hover:bg-brand``; Tw.``hover:opacity-100``; Tw.``focus:bg-brand``; Tw.``focus:opacity-100``
+                                    ]
+                                ]
+                                button </> [
                                     OnClick (fun e -> e.preventDefault(); StopPlay |> dispatch)
                                     Classes [ 
                                         Icons.``icon-close``; Tw.``text-white``; Tw.``opacity-50``; Tw.``w-10``; Tw.``h-10``
-                                        Tw.``rounded-full``; Tw.border; Tw.``outline-none``
+                                        Tw.``rounded-full``; Tw.border; Tw.``border-red-600``; Tw.``outline-none``; Tw.``focus:outline-none``
                                         Tw.``hover:bg-red-600``; Tw.``hover:opacity-100``; Tw.``focus:bg-red-600``; Tw.``focus:opacity-100``
+                                    ]
+                                ]
+                            | PlaygroundState.Paused _ ->
+                                button </> [
+                                    OnClick (fun e -> e.preventDefault(); ReStartPlay |> dispatch)
+                                    Classes [ 
+                                        Icons.``icon-play-circle``; Tw.``text-white``; Tw.``opacity-75``; Tw.``w-10``; Tw.``h-10``
+                                        Tw.``rounded-full``; Tw.``outline-none``; Tw.``bg-brand``
+                                        Tw.``hover:opacity-100``; Tw.``focus:opacity-100``; Tw.``focus:outline-none``
                                     ]
                                 ]
                             | _ ->
@@ -50,7 +67,8 @@ let render state dispatch =
 
                     match state.Plaground with
                     | PlaygroundState.Replaying (DeferredValue s)
-                    | PlaygroundState.Playing s ->
+                    | PlaygroundState.Playing s
+                    | PlaygroundState.Paused s ->
                         Playground.Views.render (s, PlaygroundMsg >> dispatch)
                     | _ -> ()
 

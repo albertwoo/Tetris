@@ -30,11 +30,11 @@ let render state dispatch =
                 Children [
                     match state.Plaground with
                     | PlaygroundState.Replaying _
-                    | PlaygroundState.Playing _ ->
+                    | PlaygroundState.Playing _ | PlaygroundState.Paused _ ->
                         PlaygroundView.render state dispatch
                     | PlaygroundState.Submiting p ->
                         SubmitRecordView.render (state, p, dispatch)
-                    | _ ->
+                    | PlaygroundState.Closed ->
                         HeaderView.view
                         RankView.render state dispatch
                         playButton dispatch

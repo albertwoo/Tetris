@@ -27,6 +27,8 @@ type Msg =
     | StopReplay
 
     | StartPlay
+    | PausePlay
+    | ReStartPlay
     | StopPlay
     | ClosePlay
 
@@ -41,5 +43,6 @@ type Msg =
 type PlaygroundState =
     | Replaying of Deferred<Playground.State>
     | Playing of Playground.State
+    | Paused of Playground.State
     | Submiting of Playground.State
     | Closed
