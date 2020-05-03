@@ -18,7 +18,10 @@ let private rankView (gameboard: GameBoard) state dispatch =
                         Tw.``my-02``; Tw.``py-01``; Tw.relative; Tw.``text-gray-lighter``
                         Tw.``hover:bg-brand-dark``; Tw.``cursor-pointer``
                     ]
-                    OnClick (fun _ -> Some info |> SelectRankInfo |> dispatch)
+                    OnClick (fun _ -> 
+                        Some info |> SelectRankInfo |> dispatch
+                        StartReplay |> dispatch
+                    )
                 ]
                 ListRowProp.Cell [
                     (
