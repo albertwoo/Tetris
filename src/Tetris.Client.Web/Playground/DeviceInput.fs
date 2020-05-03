@@ -14,6 +14,7 @@ type IHooks with
 
         let move = NewOperation >> Msg.NewEvent >> dispatch
         let keyDownTime = Hooks.useRef None
+        let movedByLongPressKey = Hooks.useRef false
 
         let tryMoving (x, y) =
             match touchMove.current with
@@ -74,16 +75,16 @@ type IHooks with
                         keyDownTime.current <- (Some DateTime.Now)
 
                     let move op =
-                        match keyDownTime.current with
-                        | None -> move op
-                        | Some time ->
+                        match movedByLongPressKey.current, keyDownTime.current with
+                        | false, Some time ->
                             let diff = (DateTime.Now - time).TotalMilliseconds
-                            Browser.Dom.console.error diff
-                            if diff > 150. then 
+                            if diff > 50. then 
                                 Msg.MoveToEnd op |> dispatch
-                                keyDownTime.current <- None
+                                movedByLongPressKey.current <- true
                             else 
                                 move op
+                        | _ ->
+                            ()
 
                     if e.keyCode = 37.   then move Operation.MoveLeft
                     elif e.keyCode = 38. then move Operation.RotateClockWise
@@ -91,8 +92,9 @@ type IHooks with
                     elif e.keyCode = 40. then move Operation.MoveDown
                     else ()
 
-                let onKeyUp (e: Browser.Types.Event) =
+                let onKeyUp (_: Browser.Types.Event) =
                     keyDownTime.current <- None
+                    movedByLongPressKey.current <- false
 
                 let container = Browser.Dom.document.getElementById containerId
                 if not state.IsViewMode then

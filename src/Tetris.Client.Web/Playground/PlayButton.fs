@@ -14,6 +14,23 @@ module PlayButton =
                 let move =  Event.NewOperation >> NewEvent >> dispatch
                 let clickStart = Hooks.useRef None
 
+                let start () = 
+                    if clickStart.current.IsNone then
+                        clickStart.current <- (Some DateTime.Now)
+
+                let endClick () =
+                    match clickStart.current with
+                    | Some time ->
+                        let diff = (DateTime.Now - time).TotalMilliseconds
+                        if diff > 150. then
+                            Msg.MoveToEnd operation |> dispatch
+                            clickStart.current <- None
+                        else 
+                            move operation
+                    | _ ->
+                        ()
+                    clickStart.current <- None
+
                 button </> [
                     Classes [ 
                         Tw.``px-02``; Tw.``py-02``; Tw.``m-04``; Tw.``text-white``
@@ -25,24 +42,9 @@ module PlayButton =
                         | Operation.RotateClockWise -> Icons.``icon-rotate-right``
                         | Operation.MoveRight -> Icons.``icon-keyboard_arrow_right``; Tw.``text-2xl``
                     ]
-                    OnMouseDown (fun e ->
-                        e.preventDefault()
-                        if clickStart.current.IsNone then
-                            clickStart.current <- (Some DateTime.Now)
-                    )
-                    OnMouseUp (fun e ->
-                        e.preventDefault()
-                        match clickStart.current with
-                        | Some time ->
-                            let diff = (DateTime.Now - time).TotalMilliseconds
-                            if diff > 150. then
-                                Msg.MoveToEnd operation |> dispatch
-                                clickStart.current <- None
-                            else 
-                                move operation
-                        | _ ->
-                            ()
-                        clickStart.current <- None
-                    )
+                    OnTouchStart (fun e -> e.preventDefault(); start())
+                    OnTouchEnd (fun e -> e.preventDefault(); endClick())
+                    OnMouseDown (fun e -> e.preventDefault(); start())
+                    OnMouseUp (fun e -> e.preventDefault(); endClick())
                 ]
         )
