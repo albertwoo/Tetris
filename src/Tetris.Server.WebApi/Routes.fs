@@ -1,9 +1,11 @@
 module Server.Routes
 
 open System
+open System.IO
 open Giraffe
 open FSharp.Control.Tasks
 open Orleans
+open Fun.Result
 
 open Tetris.Server.WebApi.Common
 open Tetris.Server.WebApi.Grain.Interfaces
@@ -31,6 +33,36 @@ let robotCheckHeader: HttpHandler =
                         return! HttpStatusCodeHandlers.RequestErrors.FORBIDDEN FobitErrorMsg nxt ctx
             else
                 return! HttpStatusCodeHandlers.RequestErrors.FORBIDDEN FobitErrorMsg nxt ctx
+        }
+
+
+let translationHanlder lang: HttpHandler =
+    fun nxt ctx ->
+        task {
+            let lines = File.ReadAllLines("Translation.lang")
+            let index = 
+                lines
+                |> Seq.tryHead
+                |> Option.bind (fun head ->
+                    head.Split ','
+                    |> Seq.tryFindIndex (fun x -> x.Equals(lang, StringComparison.OrdinalIgnoreCase))
+                )
+            match index with
+            | None -> return! RequestErrors.NOT_FOUND "" nxt ctx
+            | Some index ->
+                let translations =
+                    lines
+                    |> Seq.skip 1
+                    |> Seq.choose (fun line ->
+                        let columns = line.Split ','
+                        option {
+                            let! key = columns |> Seq.tryItem 0
+                            let! text = columns |> Seq.tryItem index
+                            return key, text
+                        }
+                    )
+                    |> Map.ofSeq
+                return! json translations nxt ctx
         }
 
 
@@ -127,5 +159,7 @@ let all: HttpHandler =
                             let data = { Id = id; Base64ImageSource = base64; ExpireDate = expireDate }
                             return! json data nxt ctx
                         }
+
+            GET     >=> routeCif "/translations/%s" (fun lang -> publicResponseCaching (60 * 60 * 24 * 30) None >=> translationHanlder lang)
         ])
     ]

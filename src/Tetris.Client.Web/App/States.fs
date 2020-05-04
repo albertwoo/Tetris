@@ -1,8 +1,9 @@
 module Tetris.Client.Web.App.States
 
-open System
 open Elmish
 open Fable.SimpleHttp
+open Fun.Result
+
 open Tetris.Server.WebApi.Dtos
 open Tetris.Client.Web
 
@@ -11,13 +12,20 @@ let init () =
     let state =
         Utils.getCachedPlayingState() 
         |> Option.defaultValue
-            { ErrorInfo = None
+            { Context = ClientContext.defaultValue
+              ErrorInfo = None
               GameBoard = Deferred.NotStartYet
               SelectedRankInfo = None
               Plaground =  PlaygroundState.Closed
               UploadingState = Deferred.NotStartYet }
+    let lang =
+        match Browser.Dom.window.location.hash with
+        | SafeString s when s.Contains("lang=EN") -> Lang.EN
+        | _ -> Lang.CN
     state
     , Cmd.batch [
+        if state.Context.Translations.IsEmpty || state.Context.Lang <> lang then
+            Cmd.ofMsg (GetTranslations (lang, AsyncOperation.Start))
         Cmd.ofMsg (GetGameBoard AsyncOperation.Start)
         Cmd.ofSub (fun dispatch ->
             Browser.Dom.window.setInterval(
@@ -44,6 +52,22 @@ let init () =
 let update msg state =
     match msg with
     | OnError e -> { state with ErrorInfo = e }, Cmd.none
+
+    | GetTranslations (lang, AsyncOperation.Start) ->
+        state
+        , Http.get (sprintf "/api/translations/%A" lang)
+          |> Http.handleAsyncOperation (fun x -> GetTranslations(lang, x))
+          |> Cmd.OfAsync.result
+    | GetTranslations (lang, AsyncOperation.Finished data) ->
+        let context =
+            { state.Context with
+                Lang = lang
+                Translations = data }
+        let state = { state with Context = context }
+        Utils.setCachedPlayingState state
+        state, Cmd.none
+    | GetTranslations (_, AsyncOperation.Failed e) ->
+        state, Cmd.none
 
     | PingServer ->
         state
@@ -105,7 +129,7 @@ let update msg state =
                     match state.Plaground with
                     | PlaygroundState.Playing s -> PlaygroundState.Paused s
                     | x -> x }
-        Utils.setCachedPlayingState (Some state)
+        Utils.setCachedPlayingState state
         state, Cmd.none
     | ReStartPlay ->
         match state.Plaground with
@@ -136,7 +160,7 @@ let update msg state =
                 | _ -> PlaygroundState.Closed }
         , Cmd.none
     | ClosePlay ->
-        Utils.setCachedPlayingState None
+        Utils.setCachedPlayingState { state with Plaground = PlaygroundState.Closed }
         { state with Plaground = PlaygroundState.Closed }
         , Cmd.none
 
@@ -175,9 +199,5 @@ let update msg state =
         , Cmd.ofMsg (OnError (Some e))
 
     | OnWindowHide ->
-        match state.Plaground with
-        | PlaygroundState.Playing _ ->
-            Utils.setCachedPlayingState (Some state)
-        | _ ->
-            ()
+        Utils.setCachedPlayingState state
         state, Cmd.none

@@ -93,11 +93,12 @@ let private rankView (gameboard: GameBoard) state dispatch =
 
 
 let render state dispatch =
+    let tranStr = state.Context.Translate >> str
     div </> [
         Classes [ Tw.``py-04`` ]
         Children [
             h2 </> [
-                Text "#排行榜（TOP 10）"
+                Text (state.Context.Translate "App.Rank.Title")
                 Classes [ Tw.``text-center``; Tw.``text-2xl``; Tw.``font-bold``; Tw.``text-gray-lighter``; Tw.``opacity-25`` ]
             ]
             div </> [
@@ -112,9 +113,9 @@ let render state dispatch =
                         ListRowProp.Cell [
                             (None, emptyView)
                             (Some 0.2, emptyView)
-                            (Some 1.0, str "分数")
-                            (Some 1.0, str "⏱时间")
-                            (Some 1.0, str "昵称")
+                            (Some 1.0, tranStr "App.Rank.Score")
+                            (Some 1.0, tranStr "App.Rank.Time")
+                            (Some 1.0, tranStr "App.Rank.Name")
                         ]
                     ]
                     match state.GameBoard with

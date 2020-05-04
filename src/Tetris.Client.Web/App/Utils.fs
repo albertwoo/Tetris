@@ -15,9 +15,5 @@ let getCachedPlayingState() =
         return! fromJson<State> str |> Result.toOption
     }
 
-let setCachedPlayingState (state: State option) =
-    match state with
-    | Some state ->
-        Browser.Dom.window.localStorage.setItem(CachePlayingStateKey, toJson state)
-    | None ->
-        Browser.Dom.window.localStorage.removeItem(CachePlayingStateKey)
+let setCachedPlayingState (state: State) =
+    Browser.Dom.window.localStorage.setItem(CachePlayingStateKey, toJson state)

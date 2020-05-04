@@ -81,13 +81,13 @@ let render state dispatch =
                             match state.Plaground with
                             | PlaygroundState.Replaying _ ->
                                 Button.danger [
-                                    Text "关闭"
+                                    Text (state.Context.Translate "App.Close")
                                     OnClick (fun _ -> StopReplay |> dispatch)
                                 ]
                                 match state.Plaground with
                                 | PlaygroundState.Replaying (DeferredValue p) when not p.IsReplaying ->
                                     Button.primary [
-                                        Text "重播"
+                                        Text (state.Context.Translate "App.Replay")
                                         OnClick (fun _ -> Playground.ReplayEvent 0 |> PlaygroundMsg |> dispatch)
                                         Classes [ Tw.``ml-04`` ]
                                     ]

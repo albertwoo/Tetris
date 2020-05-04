@@ -17,7 +17,7 @@ type RobotCheckerValue =
 module RobotChecker =
     let render =
         FunctionComponent.Of (
-            fun (props: {| onCheck: RobotCheckerValue -> unit |}) ->
+            fun (props: {| label: string; onCheck: RobotCheckerValue option -> unit |}) ->
                 let robotCheckerWidth = 20
                 let robotChecker: IStateHook<RobotChecker option> = Hooks.useState None
                 let robotCherkerX: IStateHook<float option> = Hooks.useState None
@@ -30,9 +30,10 @@ module RobotChecker =
                     robotCherkerX.update(Some x)
                     match robotChecker.current, robotCheckerContainer.current with
                     | Some checker, Some ref ->
-                        props.onCheck
-                            { Id = checker.Id
-                              Value = x / ref.clientWidth }
+                        { Id = checker.Id
+                          Value = x / ref.clientWidth }
+                        |> Some
+                        |> props.onCheck
                     | _ ->
                         ()
 
@@ -43,6 +44,7 @@ module RobotChecker =
                         (fun data ->
                             isLoadingChecker.update false
                             robotChecker.update(Some data)
+                            props.onCheck None
                             let timeoutInMs = (data.ExpireDate - DateTime.Now).TotalMilliseconds
                             timeoutRef.current <-
                                 Browser.Dom.window.setTimeout
@@ -68,41 +70,40 @@ module RobotChecker =
                     ,[||])
 
                 div [] [
+                    div </> [
+                        Classes [ Tw.relative ]
+                        OnClick (fun e ->
+                            let t = e.target :?> Browser.Types.Element
+                            let rect = t.getBoundingClientRect()
+                            check(e.clientX - rect.left - (float robotCheckerWidth / 2.))
+                        )
+                        Ref (fun x -> robotCheckerContainer.current <- Some x)
+                        Children [
+                            match robotChecker.current with
+                            | None -> ()
+                            | Some checker ->
+                                img [
+                                    Src checker.Base64ImageSource
+                                ]
+                                match robotCherkerX.current with
+                                | None -> ()
+                                | Some x ->
+                                    div </> [
+                                        Classes [ Tw.``bg-brand``; Tw.``h-full``; Tw.``opacity-25``; Tw.``pointer-events-none`` ]
+                                        Style [
+                                            Position PositionOptions.Absolute
+                                            Left x
+                                            Top 0
+                                            Width robotCheckerWidth
+                                        ]
+                                    ]
+                        ]
+                    ]
                     if isLoadingChecker.current then
                         Loader.line()
-                    else
-                        div </> [
-                            Classes [ Tw.relative ]
-                            OnClick (fun e ->
-                                let t = e.target :?> Browser.Types.Element
-                                let rect = t.getBoundingClientRect()
-                                check(e.clientX - rect.left - (float robotCheckerWidth / 2.))
-                            )
-                            Ref (fun x -> robotCheckerContainer.current <- Some x)
-                            Children [
-                                match robotChecker.current with
-                                | None -> ()
-                                | Some checker ->
-                                    img [
-                                        Src checker.Base64ImageSource
-                                    ]
-                                    match robotCherkerX.current with
-                                    | None -> ()
-                                    | Some x ->
-                                        div </> [
-                                            Classes [ Tw.``bg-brand``; Tw.``h-full``; Tw.``opacity-25``; Tw.``pointer-events-none`` ]
-                                            Style [
-                                                Position PositionOptions.Absolute
-                                                Left x
-                                                Top 0
-                                                Width robotCheckerWidth
-                                            ]
-                                        ]
-                            ]
-                        ]
-                        p </> [
-                            Classes [ Tw.``text-center``; Tw.``text-xs``; Tw.``opacity-50``; Tw.``text-warning`` ]
-                            Text "请击中方块以继续操作"
-                        ]
+                    p </> [
+                        Classes [ Tw.``text-center``; Tw.``text-xs``; Tw.``opacity-50``; Tw.``text-warning`` ]
+                        Text props.label
+                    ]
                 ]
         )

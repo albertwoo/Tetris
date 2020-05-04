@@ -1,5 +1,6 @@
 ﻿module Tetris.Client.Web.App.OnlineInfoView
 
+open System
 open Fable.React
 open Tetris.Client.Web.Controls
 
@@ -14,13 +15,14 @@ let render (state: State) =
         Text (
             match state.GameBoard with
             | DeferredValue gameboard -> 
-                sprintf "%d正在玩/最高分%d" 
-                        gameboard.OnlineCount 
-                        (
-                            match gameboard.TopRanks with
-                            | [] -> 0
-                            | h::_ -> h.Score
-                        )
+                String.Format
+                    (state.Context.Translate "App.OnlineInfo"
+                    ,gameboard.OnlineCount 
+                    ,(
+                        match gameboard.TopRanks with
+                        | [] -> 0
+                        | h::_ -> h.Score
+                    ))
             | _ -> "..."
         )
     ]

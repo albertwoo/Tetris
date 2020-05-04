@@ -10,7 +10,6 @@ open Tetris.Client.Web.Controls
 
 
 let private squareScale = 
-    Browser.Dom.console.error Browser.Dom.window.innerWidth
     match Browser.Dom.window.innerWidth with
     | LessEqual 320. -> 12
     | BetweenEqual 320. 375. -> 15

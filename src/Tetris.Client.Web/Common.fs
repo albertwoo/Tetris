@@ -15,6 +15,13 @@ type ClientError =
     | UnknowExn of exn
     | DtoParseError of string
 
+type ClientContext =
+    { Lang: Lang
+      Translations: Map<string, string> }
+
+and [<RequireQualifiedAccess>] Lang =
+    | EN
+    | CN
 
 [<RequireQualifiedAccess>]
 type Deferred<'T> =
@@ -39,3 +46,14 @@ module Helpers =
         | Deferred.Reloading x
         | Deferred.ReloadFailed (x, _) -> Some x
         | _ -> None
+
+
+    type ClientContext with
+        member this.Translate key = 
+            this.Translations 
+            |> Map.tryFind key
+            |> Option.defaultValue key
+        
+        static member defaultValue =
+            { Lang = Lang.CN
+              Translations = Map.empty }

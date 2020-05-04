@@ -1,17 +1,17 @@
 Label,CN,EN
-App.Close,关闭,Close
+App.Title,俄罗斯方块,Tetris
 App.Guide,本游戏支持：手势滑动，键盘(上下左右)，按钮来操作，以及长按或快速滑动,This little game supports: gesture/keyboard (left/up/right/down) and button click; long press and quick move"
-App.OnlineInfo,{0}正在玩/最高分{1},Online:{0}/Highest score:{1}
-App.Rank.Name,昵称,Name
+App.Rank.Title,#排行榜（前 10）,#RANK (TOP 10)
 App.Rank.Score,分数,Score
 App.Rank.Time,⏱耗时,⏱Time spent
-App.Rank.Title,#排行榜（前 10）,#RANK (TOP 10)
+App.Rank.Name,昵称,Name
+App.OnlineInfo,{0}正在玩/最高分{1},Online:{0}/Highest score:{1}
+App.Close,关闭,Close
 App.Replay,重播,Replay
 App.StartPlay,开始游戏,Start Play
-App.SubmitRecord.Discard,不保存,Discard
+App.SubmitRecord.Required,这是必填字段,This field is required
 App.SubmitRecord.Name,昵称,Nick Name
 App.SubmitRecord.Password,密码,Password
-App.SubmitRecord.Required,这是必填字段,This field is required
-App.SubmitRecord.RobotChecker,请击中方块以验证提交,Please click on the tetris block to validate submitting
 App.SubmitRecord.Submit,提交,Submit
-App.Title,俄罗斯方块,Tetris
+App.SubmitRecord.Discard,不保存,Discard
+App.SubmitRecord.RobotChecker,请击中方块以验证提交,Please click on the tetris block to validate submitting

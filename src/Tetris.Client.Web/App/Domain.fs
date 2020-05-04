@@ -1,12 +1,12 @@
 namespace rec Tetris.Client.Web.App
 
-open System
 open Tetris.Client.Web
 open Tetris.Server.WebApi.Dtos.Game
 
 
 type State =
-    { ErrorInfo: ClientError option
+    { Context: ClientContext 
+      ErrorInfo: ClientError option
       GameBoard: Deferred<GameBoard>
       SelectedRankInfo: RecordBriefInfo option
       Plaground: PlaygroundState
@@ -16,6 +16,8 @@ type State =
 type Msg =
     | OnError of ClientError option
     
+    | GetTranslations of Lang * AsyncOperation<Map<string, string>>
+
     | PingServer
     | Pong
     
@@ -32,7 +34,7 @@ type Msg =
     | StopPlay
     | ClosePlay
 
-    | UploadRecord of Tetris.Client.Web.Controls.RobotCheckerValue * NewRecord * AsyncOperation<unit>
+    | UploadRecord of Controls.RobotCheckerValue * NewRecord * AsyncOperation<unit>
 
     | PlaygroundMsg of Playground.Msg
 

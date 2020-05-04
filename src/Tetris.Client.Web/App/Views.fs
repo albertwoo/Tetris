@@ -5,14 +5,27 @@ open Fable.React.Props
 open Tetris.Client.Web.Controls
 
 
-let private playButton dispatch =
+let private playButton (state: State, dispatch) =
     div </> [
         Classes [ Tw.flex; Tw.``flex-col``; Tw.``items-center``; Tw.``py-04``; Tw.``mt-04`` ]
         Children [
-            Button.primary [
-                Text "开始游戏"
-                OnClick (fun _ -> StartPlay |> dispatch)
-            ]
+            match state.Plaground with
+            | PlaygroundState.Closed ->
+                Button.primary [
+                    Text (state.Context.Translate "App.StartPlay")
+                    OnClick (fun _ -> StartPlay |> dispatch)
+                ]
+            | PlaygroundState.Paused _ ->
+                button </> [
+                    OnClick (fun e -> e.preventDefault(); ReStartPlay |> dispatch)
+                    Classes [ 
+                        Icons.``icon-play-circle``; Tw.``text-white``; Tw.``opacity-75``; Tw.``w-10``; Tw.``h-10``
+                        Tw.``rounded-full``; Tw.``outline-none``; Tw.``bg-brand``
+                        Tw.``hover:opacity-100``; Tw.``focus:opacity-100``; Tw.``focus:outline-none``
+                    ]
+                ]
+            | _ ->
+                ()
         ]
     ]
 
@@ -30,14 +43,14 @@ let render state dispatch =
                 Children [
                     match state.Plaground with
                     | PlaygroundState.Replaying _
-                    | PlaygroundState.Playing _ | PlaygroundState.Paused _ ->
+                    | PlaygroundState.Playing _ ->
                         PlaygroundView.render state dispatch
                     | PlaygroundState.Submiting p ->
                         SubmitRecordView.render (state, p, dispatch)
-                    | PlaygroundState.Closed ->
-                        HeaderView.view
+                    | PlaygroundState.Closed  | PlaygroundState.Paused _ ->
+                        HeaderView.render (state.Context, dispatch)
                         RankView.render state dispatch
-                        playButton dispatch
+                        playButton (state, dispatch)
                 ]
             ]
 

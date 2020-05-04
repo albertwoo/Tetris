@@ -11,10 +11,10 @@ open Tetris.Client.Web.Controls
 open Tetris.Client.Web.Http
 
 
-let private validators =
+let private validators tran =
     Map.empty
-    |> addValidators "Name" [ required "Required" ]
-    |> addValidators "Password" [ required "Required" ]
+    |> addValidators "Name" [ required (tran "App.SubmitRecord.Required") ]
+    |> addValidators "Password" [ required (tran "App.SubmitRecord.Required") ]
 
 let private inputClasses =
     [ 
@@ -31,11 +31,12 @@ type PlayerInfo =
 let render =
     FunctionComponent.Of(
         fun (state, playground: Tetris.Client.Web.Playground.State, dispatch) ->
+            let tran = state.Context.Translate
             let form = 
                 Hooks.useStateLazy (fun () -> 
                     { Name = ""; Password = "" }
                     |> generateFormByValue 
-                    |> updateFormWithValidators validators
+                    |> updateFormWithValidators (validators tran)
                 )
 
             let robotCheckerValue = Hooks.useState None
@@ -58,17 +59,17 @@ let render =
                 lightForm [
                     LightFormProp.InitForm form.current
                     LightFormProp.OnFormChanged form.update
-                    LightFormProp.Validators validators
+                    LightFormProp.Validators (validators tran)
                     LightFormProp.CreateFields (fun field ->
                         [
                             field "Name" (Form.input [
-                                InputProp.Label "Nick Name"
+                                InputProp.Label (tran "App.SubmitRecord.Name")
                                 InputProp.InputAttrs [
                                     Classes inputClasses
                                 ]
                             ])
                             field "Password" (Form.input [
-                                InputProp.Label "Password"
+                                InputProp.Label  (tran "App.SubmitRecord.Password")
                                 InputProp.ConvertTo InputValue.Password
                                 InputProp.InputAttrs [
                                     Classes inputClasses
@@ -79,6 +80,10 @@ let render =
                 ]
 
             let buttons =
+                let canSave =
+                    match getFormErrors form.current, robotCheckerValue.current, state.UploadingState with
+                    | [], Some _, (Deferred.NotStartYet | Deferred.LoadFailed _) -> true
+                    | _ -> false
                 div </> [
                     Classes [ 
                         Tw.flex; Tw.``justify-center``; Tw.``items-center``
@@ -86,38 +91,40 @@ let render =
                     ]
                     Children [
                         Button.danger [
-                            Text "不保存"
+                            Text (tran "App.SubmitRecord.Discard")
                             OnClick (fun _ -> ClosePlay |> dispatch)
                         ]
-                        match getFormErrors form.current, robotCheckerValue.current, state.UploadingState with
-                        | [], Some checkerValue, (Deferred.NotStartYet | Deferred.LoadFailed _) ->
-                            Button.primary [
-                                Text "提交"
-                                Classes [ Tw.``ml-04`` ]
-                                OnClick (fun _ ->
-                                    match tryGenerateValueByForm<PlayerInfo> form.current with
-                                    | Ok value ->
-                                        match playground.StartTime, playground.Events with
-                                        | Some startTime, _::_ ->
-                                            (
-                                                checkerValue,
-                                                { PlayerName = value.Name
-                                                  PlayerPassword = value.Password
-                                                  GameEvents = toJson playground.Events
-                                                  Score = playground.Playground.Score
-                                                  TimeCostInMs = (DateTime.Now - startTime).TotalMilliseconds |> int },
-                                                AsyncOperation.Start
-                                            )
-                                            |> UploadRecord
-                                            |> dispatch
-                                        | _ ->
-                                            dispatch ClosePlay
-                                    | Error e -> 
-                                        ClientError.DtoParseError (string e) |> Some |> Msg.OnError |> dispatch
-                                )
+                        
+                        Button.primary [
+                            Text (tran "App.SubmitRecord.Submit")
+                            Classes [ Tw.``ml-04`` ]
+                            Styles [
+                                if not canSave then Cursor "not-allowed"; Opacity "0.25"
                             ]
-                        | _ ->
-                            ()
+                            OnClick (fun _ ->
+                                match canSave, robotCheckerValue.current, tryGenerateValueByForm<PlayerInfo> form.current with
+                                | true, Some checkerValue, Ok value ->
+                                    match playground.StartTime, playground.Events with
+                                    | Some startTime, _::_ ->
+                                        (
+                                            checkerValue,
+                                            { PlayerName = value.Name
+                                              PlayerPassword = value.Password
+                                              GameEvents = toJson playground.Events
+                                              Score = playground.Playground.Score
+                                              TimeCostInMs = (DateTime.Now - startTime).TotalMilliseconds |> int },
+                                            AsyncOperation.Start
+                                        )
+                                        |> UploadRecord
+                                        |> dispatch
+                                    | _ ->
+                                        dispatch ClosePlay
+                                | _, _, Error e -> 
+                                    ClientError.DtoParseError (string e) |> Some |> Msg.OnError |> dispatch
+                                | _ ->
+                                    ()
+                            )
+                        ]
                     ]
                 ]
 
@@ -128,7 +135,7 @@ let render =
                 Children [
                     div </> [
                         Styles [ Width 400 ]
-                        Classes [ Tw.``bg-gray-darkest``; Tw.rounded; Tw.``shadow-lg`` ]
+                        Classes [ Tw.``bg-gray-darkest``; Tw.``rounded-lg``; Tw.``shadow-lg`` ]
                         Children [
                             score
 
@@ -142,7 +149,9 @@ let render =
                                     ()
                                 match state.UploadingState with
                                 | Deferred.NotStartYet | Deferred.LoadFailed _ | Deferred.ReloadFailed _ ->
-                                    RobotChecker.render {| onCheck = Some >> robotCheckerValue.update |}
+                                    RobotChecker.render 
+                                        {| label = tran "App.SubmitRecord.RobotChecker"
+                                           onCheck = robotCheckerValue.update |}
                                 | _ ->
                                     ()
                             ]
