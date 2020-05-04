@@ -21,7 +21,8 @@ let init () =
     let lang =
         match Browser.Dom.window.location.hash with
         | SafeString s when s.Contains("lang=EN") -> Lang.EN
-        | _ -> Lang.CN
+        | SafeString s when s.Contains("lang=CN") -> Lang.CN
+        | _ -> state.Context.Lang
     state
     , Cmd.batch [
         if state.Context.Translations.IsEmpty || state.Context.Lang <> lang then
