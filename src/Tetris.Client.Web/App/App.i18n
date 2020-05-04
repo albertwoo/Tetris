@@ -1,6 +1,6 @@
 Label,CN,EN
 App.Title,俄罗斯方块,Tetris
-App.Guide,本游戏支持：手势滑动，键盘(上下左右)，按钮来操作，以及长按或快速滑动,This little game supports: gesture/keyboard (left/up/right/down) and button click; long press and quick move"
+App.Guide,本游戏支持：手势滑动，键盘(上下左右)，按钮来操作，以及长按或快速滑动,This little game supports: gesture/keyboard (left/up/right/down) and button click; long press and quick move
 App.Rank.Title,#排行榜（前 10）,#RANK (TOP 10)
 App.Rank.Score,分数,Score
 App.Rank.Time,⏱耗时,⏱Time spent
