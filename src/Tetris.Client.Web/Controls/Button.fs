@@ -37,10 +37,10 @@ module Button =
                 Tw.``opacity-75``; Tw.``hover:opacity-100``
                 match variant with
                 | ButtonVariant.Primary ->
-                    Tw.``bg-red-600``;
-                    Tw.``border-red-600``
-                | ButtonVariant.Danger ->
                     Tw.``bg-brand``
                     Tw.``border-brand``
+                | ButtonVariant.Danger ->
+                    Tw.``bg-red-600``;
+                    Tw.``border-red-600``
             ]
         ]
