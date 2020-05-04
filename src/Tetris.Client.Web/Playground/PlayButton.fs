@@ -1,18 +1,17 @@
 ﻿namespace Tetris.Client.Web.Playground
 
-open Fable.React
-open Fable.React.Props
+open Feliz
 open Tetris.Core
 open Tetris.Client.Web.Controls
 
 
 module PlayButton =
     let render =
-        FunctionComponent.Of(
+        React.functionComponent(
             fun (dispatch, operation) ->
                 let move =  Event.NewOperation >> NewEvent >> dispatch
-                let movedByLongPress = Hooks.useRef false
-                let longPressTimeRef = Hooks.useRef None
+                let movedByLongPress = React.useRef false
+                let longPressTimeRef = React.useRef None
 
                 let start () =
                     if longPressTimeRef.current.IsNone then
@@ -34,8 +33,8 @@ module PlayButton =
                     longPressTimeRef.current <- None
                     movedByLongPress.current <- false
 
-                button </> [
-                    Classes [ 
+                Html.button [
+                    prop.classes [ 
                         Tw.``px-02``; Tw.``py-02``; Tw.``m-04``; Tw.``text-white``
                         Tw.``hover:bg-brand``; Tw.``focus:outline-none``
                         Tw.``rounded-full``; Tw.``w-12``; Tw.``h-12``
@@ -45,9 +44,9 @@ module PlayButton =
                         | Operation.RotateClockWise -> Icons.``icon-rotate-right``
                         | Operation.MoveRight -> Icons.``icon-keyboard_arrow_right``; Tw.``text-2xl``
                     ]
-                    OnTouchStart (fun e -> e.preventDefault(); start())
-                    OnTouchEnd (fun e -> e.preventDefault(); endClick())
-                    OnMouseDown (fun e -> e.preventDefault(); start())
-                    OnMouseUp (fun e -> e.preventDefault(); endClick())
+                    prop.onTouchStart (fun e -> e.preventDefault(); start())
+                    prop.onTouchEnd (fun e -> e.preventDefault(); endClick())
+                    prop.onMouseDown (fun e -> e.preventDefault(); start())
+                    prop.onMouseUp (fun e -> e.preventDefault(); endClick())
                 ]
         )

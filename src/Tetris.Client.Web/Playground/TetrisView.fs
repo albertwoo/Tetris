@@ -2,8 +2,7 @@
 
 open System
 open Fable.Core.JsInterop
-open Fable.React
-open Fable.React.Props
+open Feliz
 open Fun.Result
 open Tetris.Core
 open Tetris.Client.Web.Controls
@@ -19,60 +18,59 @@ let private squareScale =
     
 let private squareBorder = 1
 
-let private scalePx x = sprintf "%dpx" (x * squareScale)
+let private scalePx x = x * squareScale
 
 
 let private square =
-    FunctionComponent.Of 
-        (fun (_, s: Square, attrs) ->
-            div </> [
-                Style [
-                    Position PositionOptions.Absolute
-                    Left (s.X |> scalePx)
-                    Top (s.Y |> scalePx)
-                    BorderWidth "1px"
-                    Width (scalePx 1)
-                    Height (scalePx 1)
+    React.memo
+        (fun (k, s, _) -> sprintf "tetris-square-%s-%d-%d" k s.X s.Y
+        ,fun (_, s: Square, attrs) ->
+            Html.div [
+                prop.style [
+                    style.position.absolute
+                    style.left (s.X |> scalePx)
+                    style.top (s.Y |> scalePx)
+                    style.borderWidth 1
+                    style.width (scalePx 1)
+                    style.height (scalePx 1)
                 ]
                 yield! attrs
-            ]
-        ,memoizeWith = (fun (k1, s1, _) (k2, s2, _) -> s1 = s2 && k1 = k2)
-        ,withKey = (fun (k, s, _) -> sprintf "tetris-square-%s-%d-%d" k s.X s.Y))
+            ])
 
 
 let render playground =
-    div </> [
-        Style [
-            Width (playground.Size.Width |> scalePx)
-            Height (playground.Size.Height |> scalePx)
-            Position PositionOptions.Relative
+    Html.div [
+        prop.style [
+            style.width (playground.Size.Width |> scalePx)
+            style.height (playground.Size.Height |> scalePx)
+            style.position.relative
         ]
-        Classes [ Tw.``mb-02`` ]
-        Children [
+        prop.classes [ Tw.``mb-02`` ]
+        prop.children [
             let grid = playground.SquaresGrid.value
             for y in [0..Seq.length grid - 1] do
                 for x in [0..(grid |> Seq.item y |> Seq.length) - 1] do
                     match grid |> Seq.item y |> Seq.item x with
                     | Used -> 
                         square ("remain", { X = x; Y = y }, [
-                            Classes [ Tw.``bg-gray``; Tw.``opacity-25`` ]
+                            prop.classes [ Tw.``bg-gray``; Tw.``opacity-25`` ]
                         ])
                     | NotUsed ->
                         ()
 
             for s in playground.MovingBlock |> Option.map Utils.getBlockSquares |> Option.defaultValue [] do
                 square ("moving", s, [
-                    Classes [ Tw.``bg-brand`` ]
+                    prop.classes [ Tw.``bg-brand`` ]
                 ])
 
             for s in playground.PredictionBlock |> Option.map Utils.getBlockSquares |> Option.defaultValue [] do
                 square ("prediction", s, [
-                    Classes [ Tw.``bg-brand``; Tw.``opacity-25`` ]
+                    prop.classes [ Tw.``bg-brand``; Tw.``opacity-25`` ]
                 ])
 
             for s in playground.BottomBorder do
                 square ("border", s, [
-                    Classes [ Tw.``bg-gray``; Tw.``opacity-50`` ]
+                    prop.classes [ Tw.``bg-gray``; Tw.``opacity-50`` ]
                 ])
         ]
     ]
@@ -99,9 +97,9 @@ let private drawBlock block color targetContext =
 
 
 let renderCanvas =
-    FunctionComponent.Of (fun (playground: Playground) ->
-        let context: IRefHook<Browser.Types.CanvasRenderingContext2D option> = Hooks.useRef None
-        let canvasId = Hooks.useState (Random().Next(0, 10000))
+    React.functionComponent (fun (playground: Playground) ->
+        let context = React.useRef<Browser.Types.CanvasRenderingContext2D option> None
+        let canvasId, _ = React.useState (Random().Next(0, 10000))
         
         let draw () =
             match context.current with
@@ -124,18 +122,18 @@ let renderCanvas =
                 playground.BottomBorder 
                 |> Seq.iter (fun s -> drawSquare "rgba(250,250,250,0.1)" context s.X s.Y)
 
-        Hooks.useEffect(draw, [||])
+        React.useEffectOnce draw
 
         draw()
 
-        canvas </> [
-            Key (sprintf "tetris-playground-canvas-%d" canvasId.current)
-            Ref (fun x -> 
+        Html.canvas [
+            prop.key (sprintf "tetris-playground-canvas-%d" canvasId)
+            prop.ref (fun x -> 
                 let canva = x :?> Browser.Types.HTMLCanvasElement
                 if canva |> isNull |> not then 
                     context.current <- Some(canva.getContext_2d())
             )
-            HTMLAttr.Width (sprintf "%d" (playground.Size.Width * squareScale) |> box)
-            HTMLAttr.Height (sprintf "%d" ((playground.Size.Height + 1) * squareScale) |> box)
+            prop.width (playground.Size.Width * squareScale)
+            prop.height ((playground.Size.Height + 1) * squareScale)
         ]
     )

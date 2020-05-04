@@ -1,8 +1,7 @@
 [<AutoOpen>]
 module Tetris.Client.Web.Controls.Common
 
-open Fable.React
-open Fable.React.Props
+open Feliz
 open Zanaptak.TypedCssClasses
 
 
@@ -14,12 +13,12 @@ type Icons = CssClasses<IconsCssPath, Naming.Verbatim>
 
 
 let errorView (e: ClientError) close =
-    div </> [
-        Classes [ 
+    Html.div [
+        prop.classes [ 
             Tw.``bg-red-600``; Tw.``text-xs``; Tw.``py-01``; Tw.``text-center``
             Tw.``text-white``; Tw.``opacity-75``
             Tw.``fixed``; Tw.``bottom-0``; Tw.``right-0``; Tw.``left-0``
         ]
-        Text (string e)
-        OnClick (fun _ -> close None)
+        prop.text (string e)
+        prop.onClick (fun _ -> close None)
     ]

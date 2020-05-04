@@ -1,24 +1,23 @@
 ﻿module Tetris.Client.Web.App.Views
 
-open Fable.React
-open Fable.React.Props
+open Feliz
 open Tetris.Client.Web.Controls
 
 
 let private playButton (state: State, dispatch) =
-    div </> [
-        Classes [ Tw.flex; Tw.``flex-col``; Tw.``items-center``; Tw.``py-04``; Tw.``mt-04`` ]
-        Children [
+    Html.div [
+        prop.classes [ Tw.flex; Tw.``flex-col``; Tw.``items-center``; Tw.``py-04``; Tw.``mt-04`` ]
+        prop.children [
             match state.Plaground with
             | PlaygroundState.Closed ->
-                Button.primary [
-                    Text (state.Context.Translate "App.StartPlay")
-                    OnClick (fun _ -> StartPlay |> dispatch)
+                Button.render [
+                    ButtonProp.Text (state.Context.Translate "App.StartPlay")
+                    ButtonProp.OnClick (fun _ -> StartPlay |> dispatch)
                 ]
             | PlaygroundState.Paused _ ->
-                button </> [
-                    OnClick (fun e -> e.preventDefault(); ReStartPlay |> dispatch)
-                    Classes [ 
+                Html.button [
+                    prop.onClick (fun e -> e.preventDefault(); ReStartPlay |> dispatch)
+                    prop.classes [ 
                         Icons.``icon-play-circle``; Tw.``text-white``; Tw.``opacity-75``; Tw.``w-10``; Tw.``h-10``
                         Tw.``rounded-full``; Tw.``outline-none``; Tw.``bg-brand``
                         Tw.``hover:opacity-100``; Tw.``focus:opacity-100``; Tw.``focus:outline-none``
@@ -31,16 +30,26 @@ let private playButton (state: State, dispatch) =
 
 
 let render state dispatch =
-    div </> [
-        Classes [ Tw.``h-full``; Tw.``font-sans`` ]
-        Children [
+    Html.div [
+        prop.classes [
+            Tw.``h-full``; Tw.``font-sans``
+            match state.Plaground with
+            | PlaygroundState.Closed -> Tw.``py-08``
+            | _ -> ()
+        ]
+        prop.children [
             OnlineInfoView.render state
             GithubBand.view
 
-            div </> [
-                Classes [ Tw.``h-full``; Tw.``w-full``; Tw.``mx-auto``; Tw.flex; Tw.``flex-col``; Tw.``justify-center`` ]
-                Styles [ MaxWidth 720 ]
-                Children [
+            Html.div [
+                prop.classes [
+                    Tw.``h-full``; Tw.``w-full``; Tw.``mx-auto``; Tw.flex; Tw.``flex-col``; Tw.``justify-center``
+                    match state.Plaground with
+                    | PlaygroundState.Closed -> Tw.``overflow-auto``
+                    | _ -> ()
+                ]
+                prop.style [ style.maxWidth 720 ]
+                prop.children [
                     match state.Plaground with
                     | PlaygroundState.Replaying _
                     | PlaygroundState.Playing _ ->

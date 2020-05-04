@@ -1,31 +1,30 @@
 ﻿module Tetris.Client.Web.Playground.Views
 
-open System
-open Fable.React
-open Fable.React.Props
+open Feliz
 open Tetris.Core
 open Tetris.Client.Web.Controls
+open Tetris.Client.Web.Playground
 
 
 let render =
-    FunctionComponent.Of(
+    React.functionComponent(
         fun (state, dispatch) ->
-            let containerId = Hooks.useState (sprintf "tetris-playground-%d" (System.Random().Next()))
-            Hooks.useDeviceInput state dispatch containerId.current
-            div </> [
-                Classes [ Tw.flex; Tw.``flex-col``; Tw.``items-center`` ]
-                Children [
-                    div </> [
-                        Id containerId.current
-                        //Children [ TetrisView.render state.Playground ]
-                        Children [ TetrisView.renderCanvas state.Playground ]
+            let containerId, _ = React.useState (sprintf "tetris-playground-%d" (System.Random().Next()))
+            React.useDeviceInput state dispatch containerId
+            Html.div [
+                prop.classes [ Tw.flex; Tw.``flex-col``; Tw.``items-center`` ]
+                prop.children [
+                    Html.div [
+                        prop.id containerId
+                        //prop.children [ TetrisView.render state.Playground ]
+                        prop.children [ TetrisView.renderCanvas state.Playground ]
                     ]
-                    div </> [
-                        Classes [
+                    Html.div [
+                        prop.classes [
                             Tw.flex; Tw.``flex-row``; Tw.``justify-center``; Tw.``items-center``
                             Tw.``mb-02``; Tw.``opacity-50``
                         ]
-                        Children [
+                        prop.children [
                             if not state.IsViewMode then
                                 PlayButton.render (dispatch, Operation.MoveLeft)
                                 PlayButton.render (dispatch, Operation.MoveDown)

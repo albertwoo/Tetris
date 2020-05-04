@@ -5,8 +5,8 @@ open Thoth.Json
 open Fun.Result
 
 
-let inline fromJson<'T> str = Decode.Auto.fromString<'T>(str, isCamelCase = false)
-let inline toJson obj = Encode.Auto.toString(4, obj, isCamelCase = false)
+let inline fromJson<'T> str = Decode.Auto.fromString<'T>(str)
+let inline toJson obj = Encode.Auto.toString(4, obj)
 
 
 let inline requestJson url method data =

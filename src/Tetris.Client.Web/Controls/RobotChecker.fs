@@ -1,8 +1,7 @@
 ﻿namespace Tetris.Client.Web.Controls
 
 open System
-open Fable.React
-open Fable.React.Props
+open Feliz
 open Tetris.Client.Web
 open Tetris.Client.Web.Controls
 open Tetris.Server.WebApi.Dtos
@@ -16,19 +15,19 @@ type RobotCheckerValue =
 [<RequireQualifiedAccess>]
 module RobotChecker =
     let render =
-        FunctionComponent.Of (
+        React.functionComponent (
             fun (props: {| label: string; onCheck: RobotCheckerValue option -> unit |}) ->
                 let robotCheckerWidth = 20
-                let robotChecker: IStateHook<RobotChecker option> = Hooks.useState None
-                let robotCherkerX: IStateHook<float option> = Hooks.useState None
-                let robotCheckerContainer: IRefHook<Browser.Types.Element option> = Hooks.useRef None
+                let robotChecker, setRobotChecker = React.useState<RobotChecker option> None
+                let robotCherkerX, setRobotCherkerX = React.useState<float option> None
+                let robotCheckerContainer = React.useRef<Browser.Types.Element option> None
 
-                let timeoutRef = Hooks.useRef 0.
-                let isLoadingChecker = Hooks.useState false
+                let timeoutRef = React.useRef 0.
+                let isLoadingChecker, setIsLoadingChecker = React.useState false
 
                 let check x =
-                    robotCherkerX.update(Some x)
-                    match robotChecker.current, robotCheckerContainer.current with
+                    setRobotCherkerX(Some x)
+                    match robotChecker, robotCheckerContainer.current with
                     | Some checker, Some ref ->
                         { Id = checker.Id
                           Value = x / ref.clientWidth }
@@ -38,12 +37,12 @@ module RobotChecker =
                         ()
 
                 let rec getChecker () =
-                    isLoadingChecker.update true
+                    setIsLoadingChecker true
                     Http.get "/api/robot/checker"
                     |> Http.handleJsonAsync
                         (fun data ->
-                            isLoadingChecker.update false
-                            robotChecker.update(Some data)
+                            setIsLoadingChecker false
+                            setRobotChecker(Some data)
                             props.onCheck None
                             let timeoutInMs = (data.ExpireDate - DateTime.Now).TotalMilliseconds
                             timeoutRef.current <-
@@ -60,50 +59,49 @@ module RobotChecker =
                         )
                     |> Async.StartImmediate
 
-                Hooks.useEffectDisposable 
-                    (fun () ->
-                        getChecker()
-                        { new IDisposable with
-                            member _.Dispose() =
-                                Browser.Dom.window.clearTimeout timeoutRef.current
-                        }
-                    ,[||])
+                React.useEffectOnce (fun () ->
+                    getChecker()
+                    { new IDisposable with
+                        member _.Dispose() =
+                            Browser.Dom.window.clearTimeout timeoutRef.current
+                    }
+                )
 
-                div [] [
-                    div </> [
-                        Classes [ Tw.relative ]
-                        OnClick (fun e ->
+                Html.div [
+                    Html.div [
+                        prop.classes [ Tw.relative ]
+                        prop.onClick (fun e ->
                             let t = e.target :?> Browser.Types.Element
                             let rect = t.getBoundingClientRect()
                             check(e.clientX - rect.left - (float robotCheckerWidth / 2.))
                         )
-                        Ref (fun x -> robotCheckerContainer.current <- Some x)
-                        Children [
-                            match robotChecker.current with
+                        prop.ref (fun x -> robotCheckerContainer.current <- Some x)
+                        prop.children [
+                            match robotChecker with
                             | None -> ()
                             | Some checker ->
-                                img [
-                                    Src checker.Base64ImageSource
+                                Html.img [
+                                    prop.src checker.Base64ImageSource
                                 ]
-                                match robotCherkerX.current with
+                                match robotCherkerX with
                                 | None -> ()
                                 | Some x ->
-                                    div </> [
-                                        Classes [ Tw.``bg-brand``; Tw.``h-full``; Tw.``opacity-25``; Tw.``pointer-events-none`` ]
-                                        Style [
-                                            Position PositionOptions.Absolute
-                                            Left x
-                                            Top 0
-                                            Width robotCheckerWidth
+                                    Html.div [
+                                        prop.classes [ Tw.``bg-brand``; Tw.``h-full``; Tw.``opacity-25``; Tw.``pointer-events-none`` ]
+                                        prop.style [
+                                            style.position.absolute
+                                            style.left (int x)
+                                            style.top 0
+                                            style.width robotCheckerWidth
                                         ]
                                     ]
                         ]
                     ]
-                    if isLoadingChecker.current then
+                    if isLoadingChecker then
                         Loader.line()
-                    p </> [
-                        Classes [ Tw.``text-center``; Tw.``text-xs``; Tw.``opacity-50``; Tw.``text-warning`` ]
-                        Text props.label
+                    Html.p [
+                        prop.classes [ Tw.``text-center``; Tw.``text-xs``; Tw.``opacity-50``; Tw.``text-warning`` ]
+                        prop.text props.label
                     ]
                 ]
         )

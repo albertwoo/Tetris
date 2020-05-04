@@ -2,19 +2,19 @@
 module Tetris.Client.Web.Playground.Hooks
 
 open System
-open Fable.React
+open Feliz
 open Tetris.Core
 
 
-type IHooks with
-    member _.useDeviceInput state dispatch containerId =
-        let touchStart: IRefHook<(float * float) option> = Hooks.useRef None
-        let touchStartTime: IRefHook<DateTime option> = Hooks.useRef None
-        let touchMove: IRefHook<(float * float) option> = Hooks.useRef None
+type React with
+    static member useDeviceInput state dispatch containerId =
+        let touchStart = React.useRef<(float * float) option> None
+        let touchStartTime = React.useRef<DateTime option> None
+        let touchMove = React.useRef<(float * float) option> None
 
         let move = NewOperation >> Msg.NewEvent >> dispatch
-        let keyDownTime = Hooks.useRef None
-        let movedByLongPressKey = Hooks.useRef false
+        let keyDownTime = React.useRef None
+        let movedByLongPressKey = React.useRef false
 
         let tryMoving (x, y) =
             match touchMove.current with
@@ -51,65 +51,64 @@ type IHooks with
             | _ ->
                 ()
 
-        Hooks.useEffectDisposable 
-            (fun () ->
-                let onTouchStart (e: Browser.Types.Event) =
-                    let e = e :?> Browser.Types.TouchEvent
-                    touchStart.current <- Some (e.changedTouches.[0].clientX, e.changedTouches.[0].clientY)
-                    touchStartTime.current <- Some DateTime.Now
-                    touchMove.current <- Some (e.changedTouches.[0].clientX, e.changedTouches.[0].clientY)
-                let onTouchMove (e: Browser.Types.Event) =
-                    let e = e :?> Browser.Types.TouchEvent
-                    tryMoving (e.changedTouches.[0].clientX, e.changedTouches.[0].clientY)
-                let onTouchEnd (e: Browser.Types.Event) =
-                    let e = e :?> Browser.Types.TouchEvent
-                    tryFinallyMove(e.changedTouches.[0].clientX, e.changedTouches.[0].clientY)
-                    touchStart.current <- None
-                    touchStartTime.current <- None
-                    touchMove.current <- None
+        React.useEffectOnce (fun () ->
+            let onTouchStart (e: Browser.Types.Event) =
+                let e = e :?> Browser.Types.TouchEvent
+                touchStart.current <- Some (e.changedTouches.[0].clientX, e.changedTouches.[0].clientY)
+                touchStartTime.current <- Some DateTime.Now
+                touchMove.current <- Some (e.changedTouches.[0].clientX, e.changedTouches.[0].clientY)
+            let onTouchMove (e: Browser.Types.Event) =
+                let e = e :?> Browser.Types.TouchEvent
+                tryMoving (e.changedTouches.[0].clientX, e.changedTouches.[0].clientY)
+            let onTouchEnd (e: Browser.Types.Event) =
+                let e = e :?> Browser.Types.TouchEvent
+                tryFinallyMove(e.changedTouches.[0].clientX, e.changedTouches.[0].clientY)
+                touchStart.current <- None
+                touchStartTime.current <- None
+                touchMove.current <- None
 
-                let onKeyDown (e: Browser.Types.Event) =
-                    let e = e :?> Browser.Types.KeyboardEvent
+            let onKeyDown (e: Browser.Types.Event) =
+                let e = e :?> Browser.Types.KeyboardEvent
 
-                    if keyDownTime.current.IsNone then
-                        keyDownTime.current <- (Some DateTime.Now)
+                if keyDownTime.current.IsNone then
+                    keyDownTime.current <- (Some DateTime.Now)
 
-                    let move op =
-                        match movedByLongPressKey.current, keyDownTime.current with
-                        | false, Some time ->
-                            let diff = (DateTime.Now - time).TotalMilliseconds
-                            if diff > 50. then 
-                                Msg.MoveToEnd op |> dispatch
-                                movedByLongPressKey.current <- true
-                            else 
-                                move op
-                        | _ ->
-                            ()
+                let move op =
+                    match movedByLongPressKey.current, keyDownTime.current with
+                    | false, Some time ->
+                        let diff = (DateTime.Now - time).TotalMilliseconds
+                        if diff > 50. then 
+                            Msg.MoveToEnd op |> dispatch
+                            movedByLongPressKey.current <- true
+                        else 
+                            move op
+                    | _ ->
+                        ()
 
-                    if e.keyCode = 37.   then move Operation.MoveLeft
-                    elif e.keyCode = 38. then move Operation.RotateClockWise
-                    elif e.keyCode = 39. then move Operation.MoveRight
-                    elif e.keyCode = 40. then move Operation.MoveDown
-                    else ()
+                if e.keyCode = 37.   then move Operation.MoveLeft
+                elif e.keyCode = 38. then move Operation.RotateClockWise
+                elif e.keyCode = 39. then move Operation.MoveRight
+                elif e.keyCode = 40. then move Operation.MoveDown
+                else ()
 
-                let onKeyUp (_: Browser.Types.Event) =
-                    keyDownTime.current <- None
-                    movedByLongPressKey.current <- false
+            let onKeyUp (_: Browser.Types.Event) =
+                keyDownTime.current <- None
+                movedByLongPressKey.current <- false
 
-                let container = Browser.Dom.document.getElementById containerId
-                if not state.IsViewMode then
-                    container.addEventListener("touchstart", onTouchStart)
-                    container.addEventListener("touchmove", onTouchMove)
-                    container.addEventListener("touchend", onTouchEnd)
-                    Browser.Dom.window.addEventListener("keydown", onKeyDown)
-                    Browser.Dom.window.addEventListener("keyup", onKeyUp)
+            let container = Browser.Dom.document.getElementById containerId
+            if not state.IsViewMode then
+                container.addEventListener("touchstart", onTouchStart)
+                container.addEventListener("touchmove", onTouchMove)
+                container.addEventListener("touchend", onTouchEnd)
+                Browser.Dom.window.addEventListener("keydown", onKeyDown)
+                Browser.Dom.window.addEventListener("keyup", onKeyUp)
 
-                { new IDisposable with
-                    member _.Dispose() =
-                        container.removeEventListener("touchstart", onTouchStart)
-                        container.removeEventListener("touchmove", onTouchMove)
-                        container.removeEventListener("touchend", onTouchEnd)
-                        Browser.Dom.window.removeEventListener("keydown", onKeyDown)
-                        Browser.Dom.window.removeEventListener("keyup", onKeyUp)
-                }
-            ,[||])
+            { new IDisposable with
+                member _.Dispose() =
+                    container.removeEventListener("touchstart", onTouchStart)
+                    container.removeEventListener("touchmove", onTouchMove)
+                    container.removeEventListener("touchend", onTouchEnd)
+                    Browser.Dom.window.removeEventListener("keydown", onKeyDown)
+                    Browser.Dom.window.removeEventListener("keyup", onKeyUp)
+            }
+        )

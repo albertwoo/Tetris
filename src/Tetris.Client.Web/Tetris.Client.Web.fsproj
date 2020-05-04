@@ -32,10 +32,11 @@
     <PackageReference Include="Fable.Elmish" Version="3.0.6" />
     <PackageReference Include="Fable.Elmish.HMR" Version="4.0.1" />
     <PackageReference Include="Fable.Elmish.React" Version="3.0.1" />
-    <PackageReference Include="Fable.Elmish.Debugger" Version="3.1.0" />
-    <PackageReference Include="Fable.React" Version="5.3.6" />
+    <PackageReference Include="Fable.Elmish.Debugger" Version="3.2.0" />
+    <PackageReference Include="Fable.React" Version="6.2.0" />
     <PackageReference Include="Fable.SimpleHttp" Version="3.0.0" />
-    <PackageReference Include="Fun.LightForm.Fable" Version="1.0.4" />
+    <PackageReference Include="Feliz" Version="0.82.0" />
+    <PackageReference Include="Fun.LightForm.Fable" Version="1.0.5" />
     <PackageReference Include="Fun.ReactSpring" Version="1.0.0-beta5" />
     <PackageReference Include="Fun.Result" Version="1.0.1" />
     <PackageReference Include="Zanaptak.TypedCssClasses" Version="0.2.0" />

@@ -2,7 +2,7 @@
 
 open System
 open Fable.React
-open Fable.React.Props
+open Feliz
 open Fun.LightForm
 open Fun.LightForm.Validators
 open Fun.LightForm.FormView
@@ -29,25 +29,30 @@ type PlayerInfo =
 
 
 let render =
-    FunctionComponent.Of(
+    React.functionComponent(
         fun (state, playground: Tetris.Client.Web.Playground.State, dispatch) ->
             let tran = state.Context.Translate
-            let form = 
-                Hooks.useStateLazy (fun () -> 
+            let form, updateForm = 
+                React.useState (
                     { Name = ""; Password = "" }
                     |> generateFormByValue 
                     |> updateFormWithValidators (validators tran)
                 )
 
-            let robotCheckerValue = Hooks.useState None
+            let robotCheckerValue, setRobotCheckerValue = React.useState None
+            
+            let canSave =
+                match getFormErrors form, robotCheckerValue, state.UploadingState with
+                | [], Some _, (Deferred.NotStartYet | Deferred.LoadFailed _) -> true
+                | _ -> false
 
             let score =
-                div </> [
-                    Classes [ Tw.flex; Tw.``flex-col``; Tw.``justify-center``; Tw.``items-center`` ]
-                    Children [
-                        p </> [
-                            Text (sprintf "#%d"  playground.Playground.Score)
-                            Classes [ 
+                Html.div [
+                    prop.classes [ Tw.flex; Tw.``flex-col``; Tw.``justify-center``; Tw.``items-center`` ]
+                    prop.children [
+                        Html.p [
+                            prop.text (sprintf "#%d"  playground.Playground.Score)
+                            prop.classes [ 
                                 Tw.``text-2xl``; Tw.``opacity-75``; Tw.``mt-04``; Tw.``mb-02``
                                 Tw.``text-white``; Tw.``font-bold``
                             ]
@@ -57,8 +62,8 @@ let render =
 
             let submitForm =
                 lightForm [
-                    LightFormProp.InitForm form.current
-                    LightFormProp.OnFormChanged form.update
+                    LightFormProp.InitForm form
+                    LightFormProp.OnFormChanged updateForm
                     LightFormProp.Validators (validators tran)
                     LightFormProp.CreateFields (fun field ->
                         [
@@ -80,29 +85,28 @@ let render =
                 ]
 
             let buttons =
-                let canSave =
-                    match getFormErrors form.current, robotCheckerValue.current, state.UploadingState with
-                    | [], Some _, (Deferred.NotStartYet | Deferred.LoadFailed _) -> true
-                    | _ -> false
-                div </> [
-                    Classes [ 
+                Html.div [
+                    prop.classes [ 
                         Tw.flex; Tw.``justify-center``; Tw.``items-center``
                         Tw.``my-04``
                     ]
-                    Children [
-                        Button.danger [
-                            Text (tran "App.SubmitRecord.Discard")
-                            OnClick (fun _ -> ClosePlay |> dispatch)
+                    prop.children [
+                        Button.render [
+                            ButtonProp.Text (tran "App.SubmitRecord.Discard")
+                            ButtonProp.OnClick (fun _ -> ClosePlay |> dispatch)
+                            ButtonProp.Variant ButtonVariant.Danger
                         ]
                         
-                        Button.primary [
-                            Text (tran "App.SubmitRecord.Submit")
-                            Classes [ Tw.``ml-04`` ]
-                            Styles [
-                                if not canSave then Cursor "not-allowed"; Opacity "0.25"
+                        Button.render [
+                            ButtonProp.Text (tran "App.SubmitRecord.Submit")
+                            ButtonProp.Classes [ Tw.``ml-04`` ]
+                            ButtonProp.ButtonAttrs [
+                                prop.style [
+                                    if not canSave then style.cursor.notAllowed; style.opacity 0.25
+                                ]
                             ]
-                            OnClick (fun _ ->
-                                match canSave, robotCheckerValue.current, tryGenerateValueByForm<PlayerInfo> form.current with
+                            ButtonProp.OnClick (fun _ ->
+                                match canSave, robotCheckerValue, tryGenerateValueByForm<PlayerInfo> form with
                                 | true, Some checkerValue, Ok value ->
                                     match playground.StartTime, playground.Events with
                                     | Some startTime, _::_ ->
@@ -128,18 +132,18 @@ let render =
                     ]
                 ]
 
-            div </> [
-                Classes [ 
+            Html.div [
+                prop.classes [ 
                     Tw.``h-full``; Tw.flex; Tw.``flex-col``; Tw.``justify-center``; Tw.``items-center``
                 ]
-                Children [
-                    div </> [
-                        Styles [ Width 400 ]
-                        Classes [ Tw.``bg-gray-darkest``; Tw.``rounded-lg``; Tw.``shadow-lg`` ]
-                        Children [
+                prop.children [
+                    Html.div [
+                        prop.style [ style.width 300 ]
+                        prop.classes [ Tw.``bg-gray-darkest``; Tw.``rounded-lg``; Tw.``shadow-lg`` ]
+                        prop.children [
                             score
 
-                            div [] [
+                            Html.div [
                                 match state.UploadingState with
                                 | Deferred.NotStartYet | Deferred.LoadFailed _ | Deferred.ReloadFailed _ ->
                                     submitForm
@@ -151,7 +155,7 @@ let render =
                                 | Deferred.NotStartYet | Deferred.LoadFailed _ | Deferred.ReloadFailed _ ->
                                     RobotChecker.render 
                                         {| label = tran "App.SubmitRecord.RobotChecker"
-                                           onCheck = robotCheckerValue.update |}
+                                           onCheck = setRobotCheckerValue |}
                                 | _ ->
                                     ()
                             ]

@@ -1,28 +1,29 @@
 ﻿[<RequireQualifiedAccess>]
 module Tetris.Client.Web.Controls.GithubBand
 
-open Fable.React
-open Fable.React.Props
+open Feliz
 open Tetris.Client.Web.Controls
 
 
 let view =
-    div </> [
-        Classes [ Tw.``fixed``; Tw.``top-0``; Tw.``right-0`` ]
-        Children [
-            a </> [
-                Text "GITHUB"
-                Classes [ 
+    Html.div [
+        prop.classes [ Tw.``fixed``; Tw.``top-0``; Tw.``right-0`` ]
+        prop.children [
+            Html.a [
+                prop.text "GITHUB"
+                prop.classes [ 
                     Tw.``bg-github-color``; Tw.uppercase; Tw.``text-gray-lighter``
                     Tw.``text-center``; Tw.``py-01``; Tw.``text-xs``; Tw.``shadow-lg``
                     Tw.block; Tw.``hover:bg-brand``
                 ]
-                Style [ 
-                    Transform "rotate(60deg)"
-                    Width "200px"
-                    Margin "22px -70px 0 0"
+                prop.style [ 
+                    style.transform [
+                        transform.rotate 60
+                    ]
+                    style.width 200
+                    style.margin (22, -70, 0, 0)
                 ]
-                Href "https://github.com/albertwoo/tetris"
+                prop.href "https://github.com/albertwoo/tetris"
             ]
         ]
     ]
