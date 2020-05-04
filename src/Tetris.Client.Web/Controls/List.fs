@@ -37,7 +37,11 @@ module List =
                                 if s.IsSome then
                                     Html.span [
                                         prop.classes [ Tw.``text-center`` ]
-                                        prop.style [ style.flexGrow s.Value ]
+                                        prop.style [ 
+                                            style.flexGrow s.Value
+                                            style.flexBasis 1
+                                            style.flexShrink 0
+                                        ]
                                         prop.children [ child ]
                                     ]
                                 else
