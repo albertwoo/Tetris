@@ -8,8 +8,8 @@ open Tetris.Client.Web.Controls
 module PlayButton =
     let render =
         React.functionComponent(
-            fun (dispatch, operation) ->
-                let move =  Event.NewOperation >> NewEvent >> dispatch
+            fun (props: {| dispatch: Msg -> unit; operation: Operation |}) ->
+                let move =  Event.NewOperation >> NewEvent >> props.dispatch
                 let movedByLongPress = React.useRef false
                 let longPressTimeRef = React.useRef None
 
@@ -18,7 +18,7 @@ module PlayButton =
                         longPressTimeRef.current <- 
                             Browser.Dom.window.setTimeout
                                 (fun _ ->
-                                    Msg.MoveToEnd operation |> dispatch
+                                    Msg.MoveToEnd props.operation |> props.dispatch
                                     movedByLongPress.current <- true
                                 ,200)
                             |> Some
@@ -28,7 +28,7 @@ module PlayButton =
                     | Some ref -> Browser.Dom.window.clearTimeout ref
                     | None -> ()
                     
-                    if not movedByLongPress.current then move operation
+                    if not movedByLongPress.current then move props.operation
 
                     longPressTimeRef.current <- None
                     movedByLongPress.current <- false
@@ -38,7 +38,7 @@ module PlayButton =
                         Tw.``px-02``; Tw.``py-02``; Tw.``m-04``; Tw.``text-white``
                         Tw.``hover:bg-brand``; Tw.``focus:outline-none``
                         Tw.``rounded-full``; Tw.``w-12``; Tw.``h-12``
-                        match operation with
+                        match props.operation with
                         | Operation.MoveLeft -> Icons.``icon-keyboard_arrow_left``; Tw.``text-2xl``
                         | Operation.MoveDown -> Icons.``icon-keyboard_arrow_down``; Tw.``text-2xl``
                         | Operation.RotateClockWise -> Icons.``icon-rotate-right``

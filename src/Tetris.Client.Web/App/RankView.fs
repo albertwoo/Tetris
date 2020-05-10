@@ -20,7 +20,7 @@ let private rankView (gameboard: GameBoard) state dispatch =
                 ]
                 ListRowProp.OnClick (fun _ -> 
                     Some info |> SelectRankInfo |> dispatch
-                    StartReplay |> dispatch
+                    PlayMsg.StartReplay |> ControlPlayground |> dispatch
                 )
                 ListRowProp.Cell [
                     (
@@ -55,7 +55,7 @@ let private rankView (gameboard: GameBoard) state dispatch =
                             prop.onClick (fun e ->
                                 e.stopPropagation()
                                 Some info |> SelectRankInfo |> dispatch
-                                StartReplay |> dispatch
+                                PlayMsg.StartReplay |> ControlPlayground |> dispatch
                             )
                         ]
                     )

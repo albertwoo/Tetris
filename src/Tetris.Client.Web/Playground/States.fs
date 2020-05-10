@@ -35,23 +35,24 @@ let update msg state =
           ]
 
     | Tick ->
-        state
-        , if state.Playground.IsGameOver || state.IsReplaying 
-          then Cmd.none
-          else 
-            Cmd.ofSub (fun dispatch ->
-                let timeout =
-                    match 1000 / Math.Max(state.Playground.Score / 600, 1) with
-                    | LessEqual 100 -> 100
-                    | x -> x
-                Browser.Dom.window.setTimeout(
-                    fun _ ->
-                        Operation.MoveDown |> Event.NewOperation |> NewEvent |> dispatch
-                        Tick |> dispatch
-                    , timeout
+        let cmd = 
+            if state.Playground.IsGameOver || state.IsReplaying then 
+                Cmd.none
+            else 
+                Cmd.ofSub (fun dispatch ->
+                    let timeout =
+                        match 1000 / Math.Max(state.Playground.Score / 600, 1) with
+                        | LessEqual 100 -> 100
+                        | x -> x
+                    Browser.Dom.window.setTimeout(
+                        fun _ ->
+                            Operation.MoveDown |> Event.NewOperation |> NewEvent |> dispatch
+                            Tick |> dispatch
+                        , timeout
+                    )
+                    |> ignore
                 )
-                |> ignore
-            )
+        state, cmd 
 
     | NewEvent event ->
         if state.IsReplaying || state.Playground.IsGameOver 
@@ -67,48 +68,39 @@ let update msg state =
         if state.IsReplaying || state.Playground.IsGameOver 
         then state, Cmd.none
         else
-            let newOperations = Behavior.moveToEnd state.Playground operation
-            let movingBlock =
-                state.Playground.MovingBlock 
-                |> Option.map (fun block -> List.fold Projection.operateBlock block newOperations)
-            let predictionBlock =
-                movingBlock
-                |> Option.map (Projection.updatePredictionBlock state.Playground)
+            let newEvents = Behavior.moveToEnd state.Playground operation |> List.map Event.NewOperation
+            let newPlayground = newEvents |> List.fold Projection.updatePlayground state.Playground
             { state with
-                Events = state.Events@(newOperations |> List.map Event.NewOperation |> convertToTetrisEvent)
-                Playground = 
-                    { state.Playground with 
-                        MovingBlock = movingBlock
-                        PredictionBlock = predictionBlock } }
+                Events = state.Events@(convertToTetrisEvent newEvents)
+                Playground = newPlayground }
             , Cmd.none
 
     | ReplayEvent index ->
         let isFinished = index + 1 >= state.Events.Length
         let length = 20
-        { state with
-            IsReplaying = not isFinished
-            Playground =
-                if isFinished then state.Playground
-                else
-                    let playground =
-                        if index = 0 then createPlayground()
-                        else state.Playground
-                    state.Events 
-                    |> List.map (fun x -> x.Event) 
-                    |> Seq.skip index
-                    |> fun s -> 
-                        if Seq.length s < length then s
-                        else Seq.take length s
-                    |> Seq.fold Projection.updatePlayground playground }
-        , if isFinished then Cmd.none
-          else
-            Cmd.OfAsync.result(
-                async {
+        let newPlayground =
+            if isFinished then state.Playground
+            else
+                let playground =
+                    if index = 0 then createPlayground()
+                    else state.Playground
+                state.Events 
+                |> List.map (fun x -> x.Event) 
+                |> Seq.skip index
+                |> Seq.truncate length
+                |> Seq.fold Projection.updatePlayground playground 
+        let cmd =
+            if isFinished then Cmd.none
+            else
+                Cmd.OfAsync.result(async {
                     do! Async.Sleep (
                             match 20 / Math.Max(state.Events.Length / 500, 1) with
                             | LessEqual 1 -> 1
                             | x -> x
                         )
                     return ReplayEvent (index + length)
-                }
-            )
+                })
+        { state with
+            IsReplaying = not isFinished
+            Playground = newPlayground }
+        , cmd

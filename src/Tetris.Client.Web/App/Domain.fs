@@ -17,25 +17,16 @@ type Msg =
     | OnError of ClientError option
     
     | GetTranslations of Lang * AsyncOperation<Map<string, string>>
+    | GetGameBoard of AsyncOperation<GameBoard>
+    | GetRecordDetail of AsyncOperation<RecordEvents>
+    | UploadRecord of Controls.RobotCheckerValue * NewRecord * AsyncOperation<unit>
 
     | PingServer
     | Pong
     
-    | GetGameBoard of AsyncOperation<GameBoard>
     | SelectRankInfo of RecordBriefInfo option
 
-    | StartReplay
-    | GetRecordDetail of AsyncOperation<RecordEvents>
-    | StopReplay
-
-    | StartPlay
-    | PausePlay
-    | ReStartPlay
-    | StopPlay
-    | ClosePlay
-
-    | UploadRecord of Controls.RobotCheckerValue * NewRecord * AsyncOperation<unit>
-
+    | ControlPlayground of PlayMsg
     | PlaygroundMsg of Playground.Msg
 
     | OnWindowHide
@@ -48,3 +39,15 @@ type PlaygroundState =
     | Paused of Playground.State
     | Submiting of Playground.State
     | Closed
+
+
+[<RequireQualifiedAccess>]
+type PlayMsg =
+    | StartReplay
+    | StopReplay
+
+    | StartPlay
+    | PausePlay
+    | ReStartPlay
+    | StopPlay
+    | ClosePlay

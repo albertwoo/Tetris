@@ -29,7 +29,7 @@ let render state dispatch =
                             match state.Plaground with
                             | PlaygroundState.Playing _ ->
                                 Html.button [
-                                    prop.onClick (fun e -> e.preventDefault(); PausePlay |> dispatch)
+                                    prop.onClick (fun e -> e.preventDefault(); PlayMsg.PausePlay |> ControlPlayground |> dispatch)
                                     prop.classes [ 
                                         Icons.``icon-lock``; Tw.``text-white``; Tw.``opacity-50``; Tw.``w-10``; Tw.``h-10``
                                         Tw.``rounded-full``; Tw.border; Tw.``border-brand``; Tw.``outline-none``; Tw.``mx-01``; Tw.``focus:outline-none``
@@ -37,7 +37,7 @@ let render state dispatch =
                                     ]
                                 ]
                                 Html.button [
-                                    prop.onClick (fun e -> e.preventDefault(); StopPlay |> dispatch)
+                                    prop.onClick (fun e -> e.preventDefault(); PlayMsg.StopPlay |> ControlPlayground |> dispatch)
                                     prop.classes [ 
                                         Icons.``icon-close``; Tw.``text-white``; Tw.``opacity-50``; Tw.``w-10``; Tw.``h-10``
                                         Tw.``rounded-full``; Tw.border; Tw.``border-red-600``; Tw.``outline-none``; Tw.``focus:outline-none``
@@ -46,7 +46,7 @@ let render state dispatch =
                                 ]
                             | PlaygroundState.Paused _ ->
                                 Html.button [
-                                    prop.onClick (fun e -> e.preventDefault(); ReStartPlay |> dispatch)
+                                    prop.onClick (fun e -> e.preventDefault(); PlayMsg.ReStartPlay |> ControlPlayground |> dispatch)
                                     prop.classes [ 
                                         Icons.``icon-play-circle``; Tw.``text-white``; Tw.``opacity-75``; Tw.``w-10``; Tw.``h-10``
                                         Tw.``rounded-full``; Tw.``outline-none``; Tw.``bg-brand``
@@ -68,7 +68,7 @@ let render state dispatch =
                     | PlaygroundState.Replaying (DeferredValue s)
                     | PlaygroundState.Playing s
                     | PlaygroundState.Paused s ->
-                        Playground.Views.render (s, PlaygroundMsg >> dispatch)
+                        Playground.Views.render {| state = s; dispatch = PlaygroundMsg >> dispatch |}
                     | _ -> ()
 
                     Html.div [
@@ -81,7 +81,7 @@ let render state dispatch =
                             | PlaygroundState.Replaying _ ->
                                 Button.render [
                                     ButtonProp.Text (state.Context.Translate "App.Close")
-                                    ButtonProp.OnClick (fun _ -> StopReplay |> dispatch)
+                                    ButtonProp.OnClick (fun _ -> PlayMsg.StopReplay |> ControlPlayground |> dispatch)
                                     ButtonProp.Variant ButtonVariant.Danger
                                 ]
                                 match state.Plaground with

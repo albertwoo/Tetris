@@ -19,6 +19,8 @@
     <Compile Include="Playground\Views.fs" />
     <Compile Include="App\Domain.fs" />
     <Compile Include="App\Utils.fs" />
+    <Compile Include="App\Handlers.fs" />
+    <Compile Include="App\HandlePlayMsg.fs" />
     <Compile Include="App\States.fs" />
     <Compile Include="App\HeaderView.fs" />
     <Compile Include="App\RankView.fs" />

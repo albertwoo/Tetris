@@ -12,11 +12,11 @@ let private playButton (state: State, dispatch) =
             | PlaygroundState.Closed ->
                 Button.render [
                     ButtonProp.Text (state.Context.Translate "App.StartPlay")
-                    ButtonProp.OnClick (fun _ -> StartPlay |> dispatch)
+                    ButtonProp.OnClick (fun _ -> PlayMsg.StartPlay |> ControlPlayground |> dispatch)
                 ]
             | PlaygroundState.Paused _ ->
                 Html.button [
-                    prop.onClick (fun e -> e.preventDefault(); ReStartPlay |> dispatch)
+                    prop.onClick (fun e -> e.preventDefault(); PlayMsg.ReStartPlay |> ControlPlayground |> dispatch)
                     prop.classes [ 
                         Icons.``icon-play-circle``; Tw.``text-white``; Tw.``opacity-75``; Tw.``w-10``; Tw.``h-10``
                         Tw.``rounded-full``; Tw.``outline-none``; Tw.``bg-brand``
@@ -55,7 +55,7 @@ let render state dispatch =
                     | PlaygroundState.Playing _ ->
                         PlaygroundView.render state dispatch
                     | PlaygroundState.Submiting p ->
-                        SubmitRecordView.render (state, p, dispatch)
+                        SubmitRecordView.render {| state = state; playground = p; dispatch = dispatch |}
                     | PlaygroundState.Closed  | PlaygroundState.Paused _ ->
                         HeaderView.render (state.Context, dispatch)
                         RankView.render state dispatch

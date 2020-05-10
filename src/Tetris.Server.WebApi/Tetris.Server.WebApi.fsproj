@@ -11,8 +11,12 @@
     <Compile Include="Grains\GameBoardGrain.fs" />
     <Compile Include="Grains\PlayerGrain.fs" />
     <Compile Include="Grains\RobotCheckerGrain.fs" />
+    <Compile Include="Handlers\Translations.fs" />
+    <Compile Include="Handlers\RobotChecker.fs" />
+    <Compile Include="Handlers\GameBoard.fs" />
+    <Compile Include="Handlers\Player.fs" />
     <Compile Include="Routes.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="Startup.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fun.Result" Version="1.0.2-beta1" />

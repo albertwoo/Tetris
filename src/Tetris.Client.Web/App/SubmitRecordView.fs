@@ -30,8 +30,8 @@ type PlayerInfo =
 
 let render =
     React.functionComponent(
-        fun (state, playground: Tetris.Client.Web.Playground.State, dispatch) ->
-            let tran = state.Context.Translate
+        fun (props: {| state: State; playground: Tetris.Client.Web.Playground.State; dispatch: Msg -> unit |}) ->
+            let tran = props.state.Context.Translate
             let form, updateForm = 
                 React.useState (
                     { Name = ""; Password = "" }
@@ -42,7 +42,7 @@ let render =
             let robotCheckerValue, setRobotCheckerValue = React.useState None
             
             let canSave =
-                match getFormErrors form, robotCheckerValue, state.UploadingState with
+                match getFormErrors form, robotCheckerValue, props.state.UploadingState with
                 | [], Some _, (Deferred.NotStartYet | Deferred.LoadFailed _) -> true
                 | _ -> false
 
@@ -51,7 +51,7 @@ let render =
                     prop.classes [ Tw.flex; Tw.``flex-col``; Tw.``justify-center``; Tw.``items-center`` ]
                     prop.children [
                         Html.p [
-                            prop.text (sprintf "#%d"  playground.Playground.Score)
+                            prop.text (sprintf "#%d" props.playground.Playground.Score)
                             prop.classes [ 
                                 Tw.``text-2xl``; Tw.``opacity-75``; Tw.``mt-04``; Tw.``mb-02``
                                 Tw.``text-white``; Tw.``font-bold``
@@ -93,7 +93,7 @@ let render =
                     prop.children [
                         Button.render [
                             ButtonProp.Text (tran "App.SubmitRecord.Discard")
-                            ButtonProp.OnClick (fun _ -> ClosePlay |> dispatch)
+                            ButtonProp.OnClick (fun _ -> PlayMsg.ClosePlay |> ControlPlayground |> props.dispatch)
                             ButtonProp.Variant ButtonVariant.Danger
                         ]
                         
@@ -108,23 +108,23 @@ let render =
                             ButtonProp.OnClick (fun _ ->
                                 match canSave, robotCheckerValue, tryGenerateValueByForm<PlayerInfo> form with
                                 | true, Some checkerValue, Ok value ->
-                                    match playground.StartTime, playground.Events with
+                                    match props.playground.StartTime, props.playground.Events with
                                     | Some startTime, _::_ ->
                                         (
                                             checkerValue,
                                             { PlayerName = value.Name
                                               PlayerPassword = value.Password
-                                              GameEvents = toJson playground.Events
-                                              Score = playground.Playground.Score
+                                              GameEvents = toJson props.playground.Events
+                                              Score = props.playground.Playground.Score
                                               TimeCostInMs = (DateTime.Now - startTime).TotalMilliseconds |> int },
                                             AsyncOperation.Start
                                         )
                                         |> UploadRecord
-                                        |> dispatch
+                                        |> props.dispatch
                                     | _ ->
-                                        dispatch ClosePlay
+                                        PlayMsg.ClosePlay |> ControlPlayground |> props.dispatch
                                 | _, _, Error e -> 
-                                    ClientError.DtoParseError (string e) |> Some |> Msg.OnError |> dispatch
+                                    ClientError.DtoParseError (string e) |> Some |> Msg.OnError |> props.dispatch
                                 | _ ->
                                     ()
                             )
@@ -144,14 +144,14 @@ let render =
                             score
 
                             Html.div [
-                                match state.UploadingState with
+                                match props.state.UploadingState with
                                 | Deferred.NotStartYet | Deferred.LoadFailed _ | Deferred.ReloadFailed _ ->
                                     submitForm
                                 | Deferred.Loading | Deferred.Reloading _ ->
                                     Loader.line()
                                 | Deferred.Loaded _ ->
                                     ()
-                                match state.UploadingState with
+                                match props.state.UploadingState with
                                 | Deferred.NotStartYet | Deferred.LoadFailed _ | Deferred.ReloadFailed _ ->
                                     RobotChecker.render 
                                         {| label = tran "App.SubmitRecord.RobotChecker"
