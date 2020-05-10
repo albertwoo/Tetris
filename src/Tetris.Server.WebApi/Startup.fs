@@ -1,4 +1,4 @@
-module Server.Startup
+module Tetris.Server.Startup
 
 open System
 open System.IO

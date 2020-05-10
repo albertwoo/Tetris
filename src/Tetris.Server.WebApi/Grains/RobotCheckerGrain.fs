@@ -16,14 +16,16 @@ type RobotCheckerGrain() =
     let width = 560.f
     let height = 100.f
     let scale = 15.f
-    let expireDate = DateTime.Now.AddSeconds(5.)
+    let expireDate = DateTime.Now.AddSeconds(15.)
     let expected = System.Random().Next(0, int(width - (3.f * scale))) |> float32
 
     interface IRobotCheckerGrain with
         member _.Check value =
             task {
-                if DateTime.Now > expireDate then return false
-                else return (width * value - expected) < 5.f
+                return
+                    if DateTime.Now > expireDate then ValidateResult.Expired
+                    elif (width * value - expected) > 5.f then ValidateResult.InvalidValue
+                    else ValidateResult.Valid
             }
 
         member _.GetCheckerImage () =

@@ -1,4 +1,4 @@
-﻿module Tetris.Server.Handlers.Player
+﻿module Tetris.Server.HttpHandlers.Player
 
 open System
 open Giraffe

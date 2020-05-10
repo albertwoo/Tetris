@@ -1,4 +1,4 @@
-﻿namespace Server.Grans
+﻿namespace Tetris.Server.Grans
 
 open System.IO
 open Orleans

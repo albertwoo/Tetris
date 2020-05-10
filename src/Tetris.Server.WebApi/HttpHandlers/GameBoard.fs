@@ -1,4 +1,4 @@
-﻿module Tetris.Server.Handlers.GameBoard
+﻿module Tetris.Server.HttpHandlers.GameBoard
 
 open Giraffe
 open FSharp.Control.Tasks

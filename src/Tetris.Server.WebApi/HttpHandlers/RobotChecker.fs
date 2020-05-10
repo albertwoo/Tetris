@@ -1,4 +1,4 @@
-﻿module Tetris.Server.Handlers.RobotChecker
+﻿module Tetris.Server.HttpHandlers.RobotChecker
 
 open System
 open Giraffe
@@ -25,7 +25,7 @@ let getChecker: HttpHandler =
 let checkHeader: HttpHandler =
     fun nxt ctx ->
         task {
-            let fobit = RequestErrors.FORBIDDEN "Robot check failed" nxt ctx
+            let forbit x = RequestErrors.FORBIDDEN (sprintf "Robot check failed %s" x) nxt ctx
             
             if ctx.Request.Headers.ContainsKey RobotCheckerIdKey &&
                ctx.Request.Headers.ContainsKey RobotCheckerValueKey
@@ -37,10 +37,11 @@ let checkHeader: HttpHandler =
                         let factory = ctx.GetService<IGrainFactory>()
                         let robotChecker = factory.GetGrain<IRobotCheckerGrain>(id)
                         let! result = robotChecker.Check value
-                        if result then return! nxt ctx
-                        else return! fobit
+                        match result with
+                        | ValidateResult.Valid -> return! nxt ctx
+                        | x -> return! forbit (string x)
                     | _ ->
-                        return! fobit
+                        return! forbit ""
             else
-                return! fobit
+                return! forbit ""
         }

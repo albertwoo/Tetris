@@ -3,7 +3,6 @@
 open System
 open System.Threading.Tasks
 open Orleans
-open Tetris.Core
 
 
 type IGameBoardGrain =

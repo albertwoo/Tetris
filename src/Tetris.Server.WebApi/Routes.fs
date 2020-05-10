@@ -1,7 +1,7 @@
-module Server.Routes
+module Tetris.Server.Routes
 
 open Giraffe
-open Tetris.Server.Handlers
+open Tetris.Server.HttpHandlers
 
 
 let cacheOneMonth = publicResponseCaching (60 * 60 * 24 * 30) None

@@ -51,7 +51,6 @@ module RobotChecker =
                                     ,int timeoutInMs)
                         )
                         (fun x ->
-                            Browser.Dom.console.error x
                             timeoutRef.current <-
                                 Browser.Dom.window.setTimeout
                                     (fun () -> getChecker()

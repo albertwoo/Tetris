@@ -11,10 +11,10 @@
     <Compile Include="Grains\GameBoardGrain.fs" />
     <Compile Include="Grains\PlayerGrain.fs" />
     <Compile Include="Grains\RobotCheckerGrain.fs" />
-    <Compile Include="Handlers\Translations.fs" />
-    <Compile Include="Handlers\RobotChecker.fs" />
-    <Compile Include="Handlers\GameBoard.fs" />
-    <Compile Include="Handlers\Player.fs" />
+    <Compile Include="HttpHandlers\Translations.fs" />
+    <Compile Include="HttpHandlers\RobotChecker.fs" />
+    <Compile Include="HttpHandlers\GameBoard.fs" />
+    <Compile Include="HttpHandlers\Player.fs" />
     <Compile Include="Routes.fs" />
     <Compile Include="Startup.fs" />
   </ItemGroup>

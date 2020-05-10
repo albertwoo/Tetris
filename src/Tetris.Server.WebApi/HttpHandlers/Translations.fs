@@ -1,4 +1,4 @@
-﻿module Tetris.Server.Handlers.Translations
+﻿module Tetris.Server.HttpHandlers.Translations
 
 open System
 open System.IO
