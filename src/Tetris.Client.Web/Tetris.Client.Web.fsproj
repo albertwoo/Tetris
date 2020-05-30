@@ -37,10 +37,10 @@
     <PackageReference Include="Fable.Elmish.Debugger" Version="3.2.0" />
     <PackageReference Include="Fable.React" Version="6.2.0" />
     <PackageReference Include="Fable.SimpleHttp" Version="3.0.0" />
-    <PackageReference Include="Feliz" Version="0.82.0" />
+    <PackageReference Include="Feliz" Version="1.1.1" />
     <PackageReference Include="Fun.LightForm.Fable" Version="1.0.5" />
     <PackageReference Include="Fun.ReactSpring" Version="1.0.0-beta5" />
-    <PackageReference Include="Fun.Result" Version="1.0.1" />
+    <PackageReference Include="Fun.Result" Version="1.0.2-beta1" />
     <PackageReference Include="Zanaptak.TypedCssClasses" Version="0.2.0" />
   </ItemGroup>
   <ItemGroup>
@@ -48,6 +48,6 @@
     <ProjectReference Include="..\Tetris.Server.WebApi.Dtos\Tetris.Server.WebApi.Dtos.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.7.1" />
+    <PackageReference Update="FSharp.Core" Version="4.7.2" />
   </ItemGroup>
 </Project>
