@@ -23,8 +23,7 @@ let private scalePx x = x * squareScale
 
 let private square =
     React.memo
-        (fun (k, s, _) -> sprintf "tetris-square-%s-%d-%d" k s.X s.Y
-        ,fun (_, s: Square, attrs) ->
+        (fun (_, s: Square, attrs) ->
             Html.div [
                 prop.style [
                     style.position.absolute
@@ -35,7 +34,8 @@ let private square =
                     style.height (scalePx 1)
                 ]
                 yield! attrs
-            ])
+            ]
+        ,withKey = fun (k, s, _) -> sprintf "tetris-square-%s-%d-%d" k s.X s.Y)
 
 
 let render playground =

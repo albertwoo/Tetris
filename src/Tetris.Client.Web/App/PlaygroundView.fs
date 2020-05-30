@@ -68,7 +68,7 @@ let render state dispatch =
                     | PlaygroundState.Replaying (DeferredValue s)
                     | PlaygroundState.Playing s
                     | PlaygroundState.Paused s ->
-                        Playground.Views.render {| state = s; dispatch = PlaygroundMsg >> dispatch |}
+                        Playground.Views.render (s, PlaygroundMsg >> dispatch)
                     | _ -> ()
 
                     Html.div [
