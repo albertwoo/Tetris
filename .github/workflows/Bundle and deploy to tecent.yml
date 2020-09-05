@@ -21,9 +21,10 @@ jobs:
       uses: actions/setup-node@v1.4.3
       
     - name: Install dependencies
-      run: dotnet tool install fake-cli -g
-           dotnet tool install paket -g
-           npm install yarn -g
+      run: |
+        dotnet tool install fake-cli -g
+        dotnet tool install paket -g
+        npm install yarn -g
            
     - name: Bundle
       run: fake build -t Bundle
