@@ -1,4 +1,4 @@
-name: .NET Core
+name: Bundle and deploy to tecent
 
 on:
   release:
