@@ -3,9 +3,6 @@ name: Bundle and deploy to Tencent
 on:
   release:
     types: [published]
-  push:
-    branches:
-      - master
 
 jobs:
   build:
