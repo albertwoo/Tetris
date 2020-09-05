@@ -2,7 +2,7 @@ name: Bundle and deploy to tecent
 
 on:
   release:
-    types: [publish]
+    types: [published]
 
 jobs:
   build:
