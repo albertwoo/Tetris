@@ -1,4 +1,4 @@
-name: Bundle and deploy to tecent
+name: Bundle and deploy to Tencent
 
 on:
   release:
@@ -46,7 +46,7 @@ jobs:
       with:
         host: ${{ secrets.REMOTE_HOST }}
         username: ${{ secrets.REMOTE_USER }}
-        privateKey: ${{ secrets.REMOTE_PWD }}
+        password: ${{ secrets.REMOTE_PWD }}
         command: |
           echo Stop website
           sudo pkill -f 172.17.0.14:86
