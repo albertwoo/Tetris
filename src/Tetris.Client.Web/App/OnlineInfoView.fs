@@ -13,8 +13,8 @@ let render (state: State) =
             Tw.``fixed``; Tw.``top-0``; Tw.``right-0``; Tw.``left-0``
         ]
         prop.text (
-            match state.GameBoard with
-            | DeferredValue gameboard -> 
+            match state.GameBoard.Value with
+            | Some gameboard -> 
                 String.Format
                     (state.Context.Translate "App.OnlineInfo"
                     ,gameboard.OnlineCount 

@@ -1,5 +1,7 @@
 ﻿namespace global
 
+open Fun.Result
+
 
 type NeedDefine = unit
 
@@ -15,28 +17,22 @@ type ClientError =
     | UnknowExn of exn
     | DtoParseError of string
 
+
 type ClientContext =
     { Lang: Lang
       Translations: Map<string, string> }
+
 
 and [<RequireQualifiedAccess>] Lang =
     | EN
     | CN
 
-[<RequireQualifiedAccess>]
-type Deferred<'T> =
-    | NotStartYet
-    | Loading
-    | Loaded of 'T
-    | LoadFailed of ClientError
-    | Reloading of 'T
-    | ReloadFailed of 'T * ClientError
 
 [<RequireQualifiedAccess>]
-type AsyncOperation<'T> =
-    | Start
-    | Finished of 'T
-    | Failed of ClientError
+type Deferred<'T> = DeferredState<'T, ClientError>
+
+[<RequireQualifiedAccess>]
+type AsyncOperation<'T> = DeferredOperation<'T, ClientError>
 
 
 [<AutoOpen>]
@@ -46,7 +42,6 @@ module Helpers =
         | Deferred.Reloading x
         | Deferred.ReloadFailed (x, _) -> Some x
         | _ -> None
-
 
     type ClientContext with
         member this.Translate key = 

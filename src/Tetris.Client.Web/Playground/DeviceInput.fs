@@ -85,10 +85,10 @@ type React with
                     | _ ->
                         ()
 
-                if e.keyCode = 37.   then move Operation.MoveLeft
-                elif e.keyCode = 38. then move Operation.RotateClockWise
-                elif e.keyCode = 39. then move Operation.MoveRight
-                elif e.keyCode = 40. then move Operation.MoveDown
+                if e.key = "ArrowLeft"    then move Operation.MoveLeft
+                elif e.key = "ArrowUp"    then move Operation.RotateClockWise
+                elif e.key = "ArrowRight" then move Operation.MoveRight
+                elif e.key = "ArrowDown"  then move Operation.MoveDown
                 else ()
 
             let onKeyUp (_: Browser.Types.Event) =

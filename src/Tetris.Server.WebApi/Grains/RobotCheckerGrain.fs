@@ -4,9 +4,9 @@ open System
 open FSharp.Control.Tasks
 open Orleans
 open SixLabors.ImageSharp
-open SixLabors.Primitives
 open SixLabors.ImageSharp.PixelFormats
 open SixLabors.ImageSharp.Processing
+open SixLabors.ImageSharp.Drawing.Processing
 open Tetris.Server.WebApi.Grain.Interfaces
 
 
@@ -31,10 +31,10 @@ type RobotCheckerGrain() =
         member _.GetCheckerImage () =
             task {
                 use image = new Image<Rgba32>(int width, int height)
-                image.Mutate (fun ctx ->
+                image.Mutate (fun context ->
                     let pen = Pens.Solid(Color.Green, 2.f)
                     let h = height / 2.f - 2.f * scale
-                    ctx
+                    context
                         .Draw(pen, RectangleF(expected, h, scale, scale))
                         .Draw(pen, RectangleF(expected, h + scale, scale, scale))
                         .Draw(pen, RectangleF(expected, h + 2.f * scale, scale, scale))

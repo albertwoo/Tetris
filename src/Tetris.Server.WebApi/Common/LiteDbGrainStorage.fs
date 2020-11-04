@@ -37,7 +37,7 @@ type LiteDbGrainStorage (liteDbPath: string) =
                 use db = createDb()
                 let grains = getGrains db
                 let id = createGrainName grainType grainReference
-                let newValue = { Id = id; Value = toJson grainState.State }
+                let newValue = { Id = id; Value = toJson grainState.Type grainState.State }
                 if box (grains.FindById(BsonValue id)) = null then
                     grains.Insert(newValue) |> ignore
                 else

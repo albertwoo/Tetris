@@ -1,23 +1,21 @@
 ﻿module Tetris.Server.WebApi.Common.Json
 
-open Newtonsoft.Json
-open Microsoft.FSharpLu.Json
-open Microsoft.FSharpLu.Json.Compact.Strict
+open Thoth.Json.Net
 
 
-let private jsonSettings =
-    JsonSerializerSettings(
-        ContractResolver = 
-            RequireNonOptionalPropertiesContractResolver(
-                //NamingStrategy =
-                //    CamelCaseNamingStrategy(
-                //        ProcessDictionaryKeys = false,
-                //        OverrideSpecifiedNames = false
-                //    )
-            ),
-        Converters = [| CompactUnionJsonConverter(true, true) |]
-    )
+let caseStrategy = CaseStrategy.PascalCase
+
+let extraCoders = Extra.empty
 
 
-let fromJson ty str = JsonConvert.DeserializeObject(str, ty, jsonSettings)
-let toJson obj = JsonConvert.SerializeObject(obj, jsonSettings)
+let fromJson ty str = 
+    match Decode.Auto.LowLevel.fromString(str, ty, caseStrategy, extraCoders) with
+    | Ok x -> x
+    | Error e -> failwith e
+
+let toJson ty obj =
+    let encoder = Encode.Auto.LowLevel.generateEncoderCached(ty, caseStrategy, extraCoders)
+    encoder obj |> Encode.toString 4
+
+
+let giraffeSerialier = Thoth.Json.Giraffe.ThothSerializer(caseStrategy, extraCoders)

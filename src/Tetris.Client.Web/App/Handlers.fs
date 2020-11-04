@@ -31,11 +31,7 @@ let getTranslations msg state =
 let getGameBoard msg state =
     match msg with
     | AsyncOperation.Start ->
-        let gameboard =
-            match state.GameBoard with
-            | DeferredValue x -> Deferred.Reloading x
-            | _ -> Deferred.Loading
-        { state with GameBoard = gameboard }
+        { state with GameBoard = state.GameBoard.StartLoad() }
         , Http.get "/api/game/board"
           |> Http.handleAsyncOperation GetGameBoard
           |> Cmd.OfAsync.result
@@ -45,11 +41,7 @@ let getGameBoard msg state =
         , Cmd.none
 
     | AsyncOperation.Failed e ->
-        let gameboard =
-            match state.GameBoard with
-            | DeferredValue x -> Deferred.ReloadFailed (x, e)
-            | _ -> Deferred.LoadFailed e
-        { state with GameBoard = gameboard }
+        { state with GameBoard = state.GameBoard.WithError e }
         , Cmd.none
 
 
