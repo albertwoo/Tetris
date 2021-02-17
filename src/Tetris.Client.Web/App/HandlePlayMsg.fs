@@ -44,7 +44,8 @@ let play msg state =
             { state with
                 Plaground =
                     match state.Plaground with
-                    | PlaygroundState.Playing s -> PlaygroundState.Paused s
+                    | PlaygroundState.Playing s
+                    | PlaygroundState.Submiting s -> PlaygroundState.Paused s
                     | x -> x }
         Utils.setCachedPlayingState state
         state, Cmd.none

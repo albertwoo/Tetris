@@ -19,6 +19,18 @@ let render state dispatch =
                         ]
                         prop.children [
                             match state.Plaground with
+                            | PlaygroundState.Playing _ ->
+                                Html.button [
+                                    prop.onClick (fun e -> e.preventDefault(); PlayMsg.PausePlay |> ControlPlayground |> dispatch)
+                                    prop.classes [ 
+                                        Icons.``icon-lock``; Tw.``text-white``; Tw.``opacity-50``; Tw.``w-10``; Tw.``h-10``
+                                        Tw.``rounded-full``; Tw.border; Tw.``border-brand``; Tw.``outline-none``; Tw.``mr-04``; Tw.``focus:outline-none``
+                                        Tw.``hover:bg-brand``; Tw.``hover:opacity-100``; Tw.``focus:bg-brand``; Tw.``focus:opacity-100``
+                                    ]
+                                ]
+                            | _ ->
+                                ()
+                            match state.Plaground with
                             | PlaygroundState.Playing p | PlaygroundState.Replaying (DeferredValue p) | PlaygroundState.Paused p ->
                                 Html.div [
                                     prop.text (sprintf "#%d" p.Playground.Score)
@@ -28,14 +40,6 @@ let render state dispatch =
                                 ()
                             match state.Plaground with
                             | PlaygroundState.Playing _ ->
-                                Html.button [
-                                    prop.onClick (fun e -> e.preventDefault(); PlayMsg.PausePlay |> ControlPlayground |> dispatch)
-                                    prop.classes [ 
-                                        Icons.``icon-lock``; Tw.``text-white``; Tw.``opacity-50``; Tw.``w-10``; Tw.``h-10``
-                                        Tw.``rounded-full``; Tw.border; Tw.``border-brand``; Tw.``outline-none``; Tw.``mx-01``; Tw.``focus:outline-none``
-                                        Tw.``hover:bg-brand``; Tw.``hover:opacity-100``; Tw.``focus:bg-brand``; Tw.``focus:opacity-100``
-                                    ]
-                                ]
                                 Html.button [
                                     prop.onClick (fun e -> e.preventDefault(); PlayMsg.StopPlay |> ControlPlayground |> dispatch)
                                     prop.classes [ 
