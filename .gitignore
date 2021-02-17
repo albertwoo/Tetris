@@ -21,3 +21,8 @@ paket.exe
 TestResults/
 coverage.json
 /src/Server/Logs
+fablejs/
+src/Tetris.Client.Web/www/css/tailwind-generated.css
+.dist
+.parcel-cache
+.dist_prod

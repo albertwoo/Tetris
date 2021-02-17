@@ -19,18 +19,18 @@
     <Compile Include="Startup.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Fun.Result" Version="1.0.9" />
+    <PackageReference Include="Fun.Result" Version="1.1.1" />
     <PackageReference Include="Giraffe" Version="4.1.0" />
     <PackageReference Include="LiteDB" Version="4.1.4" />
     <PackageReference Include="LiteDB.FSharp" Version="2.15.1" />
-    <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="3.3.0" />
-    <PackageReference Include="Microsoft.Orleans.Server" Version="3.3.0" />
-    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator" Version="3.3.0" />
+    <PackageReference Include="Microsoft.Orleans.EventSourcing" Version="3.4.1" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="3.4.1" />
+    <PackageReference Include="Microsoft.Orleans.OrleansCodeGenerator" Version="3.4.1" />
     <PackageReference Include="OrleansDashboard" Version="3.1.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.2" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta0010" />
-    <PackageReference Include="Thoth.Json.Giraffe" Version="4.2.0" />
-    <PackageReference Update="FSharp.Core" Version="5.0.0" />
+    <PackageReference Include="Thoth.Json.Giraffe" Version="4.3.0" />
+    <PackageReference Update="FSharp.Core" Version="5.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tetris.Core\Tetris.Core.fsproj" />

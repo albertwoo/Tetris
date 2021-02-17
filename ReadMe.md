@@ -11,8 +11,6 @@ This is a free and opensource little game based on fable & react (❤)
 1. Download and install dotnet sdk 5.0: <https://dotnet.microsoft.com/download/dotnet/5.0>
 2. Download and install nodejs: https://nodejs.org/en/download/
 3. Open cmd run: `npm install yarn -g`
-4. Open cmd run: `dotnet tool install paket -g`
-5. Open cmd run: `dotnet tool install fake-cli -g`
 
 ## Icons
 
@@ -22,4 +20,4 @@ By this we can reduce font size
 
 ## Start to dev for front end
 
-`fake build -t RunClientWeb`
+`dotnet fsi build.fsx -t RunClientWeb`

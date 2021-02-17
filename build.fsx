@@ -1,26 +1,22 @@
-#r "paket:
-nuget FSharp.Core
-nuget Fake.Core.ReleaseNotes
-nuget Fake.Core.Target
-nuget Fake.DotNet.Cli
-nuget Fake.IO.FileSystem
-nuget Fake.IO.Zip //"
-#load "./.fake/build.fsx/intellisense.fsx"
-
-#if !FAKE
-#r "netstandard"
-#r "Facades/netstandard" // https://github.com/ionide/ionide-vscode-fsharp/issues/839#issuecomment-396296095
-#endif
+#r "nuget: Fake.Core.Process,5.20.0"
+#r "nuget: Fake.IO.FileSystem,5.20.0"
+#r "nuget: Fake.IO.Zip,5.20.0"
+#r "nuget: BlackFox.Fake.BuildTask,0.1.3"
 
 open System
-
 open Fake.Core
 open Fake.IO
 open Fake.IO.FileSystemOperators
 open Fake.IO.Globbing.Operators
+open BlackFox.Fake
 
 
-Target.initEnvironment ()
+fsi.CommandLineArgs
+|> Array.skip 1
+|> BuildTask.setupContextFromArgv 
+
+
+type Env = PROD | DEV
 
 
 let [<Literal>] TranslationFile = "Translation.lang"
@@ -31,7 +27,7 @@ let clientWebPath       = __SOURCE_DIRECTORY__ </> "src/Tetris.Client.Web"
 
 let deployDir           = __SOURCE_DIRECTORY__ </> "deploy"
 let publishDir          = deployDir </> "publish"
-let clientDeployPath    = clientWebPath </> "deploy"
+let distProd            = "www" </> ".dist_prod"
 
 
 [<AutoOpen>]
@@ -42,8 +38,7 @@ module Utils =
         | Some t -> t
         | _ -> failwith (tool + " was not found in path. ")
 
-
-    let runTool cmd args workingDir =
+    let run cmd args workingDir =
         let arguments = args |> String.split ' ' |> Arguments.OfArgs
         Command.RawCommand (cmd, arguments)
         |> CreateProcess.fromCommand
@@ -52,11 +47,8 @@ module Utils =
         |> Proc.run
         |> ignore
 
-
-    let node   = runTool (platformTool "node" "node.exe")
-    let yarn   = runTool (platformTool "yarn" "yarn.cmd")
-    let dotnet = runTool (platformTool "dotnet" "dotnet.exe")
-
+    let yarn   = run (platformTool "yarn" "yarn.cmd")
+    let dotnet = run (platformTool "dotnet" "dotnet.exe") 
 
     let openBrowser url =
         Command.ShellCommand url
@@ -95,110 +87,100 @@ module Utils =
         |> fun rows -> [ head; yield! rows ]
         |> File.write false targetFile
 
+        
+    // It will generate all source code for the target project in the dir and put the js under fablejs
+    let runFable dir env watch =
+        let mode = match watch with false -> "" | true -> " watch"
+        let define = match env with PROD -> "" | DEV -> " --define DEBUG"
+        dotnet (sprintf "fable%s . --outDir ./www/fablejs%s" mode define) dir
 
-Target.create "Clean" <| fun _ ->
-    [ publishDir
-      clientDeployPath ]
-    |> Shell.cleanDirs
+    let cleanGeneratedJs dir = Shell.cleanDir (dir </> "www/fablejs")
 
+    let buildTailwindCss dir =
+        printfn "Build client css"
+        yarn "tailwindcss build css/app.css -o css/tailwind-generated.css" (dir </> "www")
 
-Target.create "InstallPackages" <| fun _ ->
-    printfn "Node version:"
-    node "--version" clientWebPath
-    printfn "Npm version:"
-    yarn "--version" clientWebPath
-    yarn "install" clientWebPath
+    let serveDevJs dir =
+        Shell.cleanDir (dir </> "www/.dist")
+        yarn "parcel index.html --dist-dir .dist" (dir </> "www")
 
-
-Target.create "PrepareAssets" <| fun _ ->
-    [
-        clientWebPath
-    ]
-    |> List.iter (fun p -> Shell.copyDir clientDeployPath (p </> "public") FileFilter.allFiles)
-
-
-Target.create "Translate" <| fun _ ->
-    translateI18n "src" (publishDir </> TranslationFile)
-    Shell.copyFile (serverPath </> TranslationFile) (publishDir </> TranslationFile)
+    let runBundle dir =
+        Shell.cleanDir (dir </> distProd)
+        yarn "parcel build index.html --dist-dir .dist_prod --public-url ./ --no-source-maps --no-cache" (dir </> "www")
 
 
-Target.create "BuildClient" <| fun _ ->
-    yarn "webpack -p" clientWebPath
+let checkEnv =
+    BuildTask.create "Check environment" [] {
+        Shell.cleanDir publishDir
 
-Target.create "BuildServer" <| fun _ ->
-    dotnet "build" serverPath
-
-
-Target.create "RunClientWeb" <| fun _ ->
-    let buildTailwind() = yarn "tailwind build ../Tetris.Client.Web/public/css/tailwind-source.css -o ../Tetris.Client.Web/public/css/tailwind-generated.css -c ../Tetris.Client.Web/tailwind.config.js" clientWebPath
-    let buildTranslation() = translateI18n "src" (serverPath </> TranslationFile)
-    [
-        async {
-            use _ = 
-                ChangeWatcher.run 
-                    (fun _ -> printfn "Rebuild tailwind..."; buildTailwind()) 
-                    (!!(clientWebPath </> "public/css/tailwind-source.css")
-                     ++(clientWebPath </> "tailwind.config.js"))
-            buildTailwind()
-            use _ =
-                ChangeWatcher.run
-                    (fun _ -> printfn "Rebuild translation file"; buildTranslation())
-                    (!!("src" </> "**/*.i18n"))
-            buildTranslation()
-            yarn "webpack-dev-server" clientWebPath
-        }
-        async {
-            do! Async.Sleep 10000
-            openBrowser "http://localhost:8080"
-        } 
-    ]
-    |> Async.Parallel
-    |> Async.RunSynchronously
-    |> ignore
-
-
-Target.create "RunServer" <| fun _ ->
-    async {
-        dotnet "watch run" serverPath
+        yarn "--version" ""
+        yarn "install" (clientWebPath </> "www")
+        dotnet "tool restore" ""
     }
-    |> Async.RunSynchronously
+
+let translate =
+    BuildTask.create "Translate" [] {
+        translateI18n "src" (publishDir </> TranslationFile)
+        Shell.copyFile (serverPath </> TranslationFile) (publishDir </> TranslationFile)
+    }
+
+let preBuildClient =
+    BuildTask.create "PreBuildClient" [ checkEnv ] {
+        cleanGeneratedJs clientWebPath
+        buildTailwindCss clientWebPath
+    }
+
+let runClientWeb =
+    BuildTask.create "RunClientWeb" [ preBuildClient ] {
+        runFable clientWebPath DEV false
+        [
+            async {
+                runFable clientWebPath DEV true
+            }
+            async {
+                serveDevJs clientWebPath
+                printfn "Clean up..."
+            }
+        ]
+        |> Async.Parallel
+        |> Async.RunSynchronously
+        |> ignore
+    }
 
 
-Target.create "Test" <| fun _ ->
-    dotnet "test /p:CollectCoverage=true" __SOURCE_DIRECTORY__
+let bundleClientProd =
+    BuildTask.create "BundleClientProd" [ preBuildClient ] {
+        Shell.cleanDir (clientWebPath </> distProd)
+        runFable clientWebPath PROD false
+        runBundle clientWebPath
+    }
 
 
-Target.create "Bundle" <| fun _ ->
-    let publishArgs = sprintf "publish -c Release -o %s" publishDir
-    dotnet publishArgs serverPath
-
-    let clientDir = publishDir </> "wwwroot"
-    Shell.copyDir clientDir clientDeployPath FileFilter.allFiles
-
-    clearDeployFolder publishDir
-
-    !!(publishDir </> "**/*.*")
-    |> Zip.zip publishDir (deployDir </> DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".zip")
+let buildServer =
+    BuildTask.create "BuildServer" [ translate ] {
+        dotnet "build" serverPath
+    }
 
 
-open Fake.Core.TargetOperators
-
-"Clean"
-    ==> "InstallPackages"
-    ==> "Translate"
-    ==> "PrepareAssets"
-    ==> "BuildClient"
-    // ==> "BuildServer"
-    // ==> "Test"
-    ==> "Bundle"
-
-"Clean"
-    ==> "PrepareAssets"
-    ==> "RunClientWeb"
-
-"Clean"
-    ==> "Translate"
-    ==> "RunServer"
+let test =
+    BuildTask.create "Test" [] {
+        dotnet "test /p:CollectCoverage=true" __SOURCE_DIRECTORY__
+    }
 
 
-Target.runOrDefaultWithArguments "Build"
+let bundle =
+    BuildTask.create "Bundle" [ checkEnv; bundleClientProd; buildServer ] {
+        let publishArgs = sprintf "publish -c Release -o %s" publishDir
+        dotnet publishArgs serverPath
+
+        let clientDir = publishDir </> "www"
+        Shell.copyDir clientDir (clientWebPath </> distProd) FileFilter.allFiles
+
+        clearDeployFolder publishDir
+
+        !!(publishDir </> "**/*.*")
+        |> Zip.zip publishDir (deployDir </> DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss") + ".zip")
+    }
+
+
+BuildTask.runOrDefault bundle

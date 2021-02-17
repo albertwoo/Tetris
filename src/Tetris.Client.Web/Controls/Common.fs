@@ -5,8 +5,8 @@ open Feliz
 open Zanaptak.TypedCssClasses
 
 
-let [<Literal>] TailwindCssPath = __SOURCE_DIRECTORY__ + "/../public/css/tailwind-generated.css"
-let [<Literal>] IconsCssPath = __SOURCE_DIRECTORY__ + "/../public/icomoon/style.css"
+let [<Literal>] TailwindCssPath = __SOURCE_DIRECTORY__ + "/../www/css/tailwind-generated.css"
+let [<Literal>] IconsCssPath = __SOURCE_DIRECTORY__ + "/../www/icomoon/style.css"
 
 type Tw = CssClasses<TailwindCssPath, Naming.Verbatim>
 type Icons = CssClasses<IconsCssPath, Naming.Verbatim>

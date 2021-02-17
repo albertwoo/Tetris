@@ -32,17 +32,17 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fable.Elmish" Version="3.1.0" />
-    <PackageReference Include="Fable.Elmish.HMR" Version="4.0.1" />
+    <PackageReference Include="Fable.Elmish.HMR" Version="4.1.0" />
     <PackageReference Include="Fable.Elmish.React" Version="3.0.1" />
     <PackageReference Include="Fable.Elmish.Debugger" Version="3.2.0" />
-    <PackageReference Include="Fable.React" Version="7.0.1" />
+    <PackageReference Include="Fable.React" Version="7.2.0" />
     <PackageReference Include="Fable.SimpleHttp" Version="3.0.0" />
-    <PackageReference Include="Feliz" Version="1.16.2" />
+    <PackageReference Include="Feliz" Version="1.33.0" />
     <PackageReference Include="Fun.LightForm.Fable" Version="1.0.12" />
-    <PackageReference Include="Fun.ReactSpring" Version="1.0.0-beta5" />
-    <PackageReference Include="Fun.Result" Version="1.0.9" />
+    <PackageReference Include="Fun.ReactSpring" Version="1.0.0-beta8" />
+    <PackageReference Include="Fun.Result" Version="1.1.1" />
     <PackageReference Include="Zanaptak.TypedCssClasses" Version="0.4.0" />
-    <PackageReference Update="FSharp.Core" Version="5.0.0" />
+    <PackageReference Update="FSharp.Core" Version="5.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tetris.Core\Tetris.Core.fsproj" />

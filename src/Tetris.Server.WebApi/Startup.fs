@@ -22,7 +22,7 @@ let publicPath =
     #if DEBUG
     Path.GetFullPath "../Tetris.Client.Web/deploy"
     #else
-    "wwwroot"
+    "www"
     #endif
 
 
