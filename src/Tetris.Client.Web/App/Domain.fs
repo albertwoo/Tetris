@@ -34,7 +34,7 @@ type Msg =
 
 [<RequireQualifiedAccess>]
 type PlaygroundState =
-    | Replaying of Deferred<Playground.State>
+    | Replaying of replayState: Deferred<Playground.State> * oldState: Playground.State option
     | Playing of Playground.State
     | Paused of Playground.State
     | Submiting of Playground.State

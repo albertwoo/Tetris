@@ -51,7 +51,11 @@ let getRecord msg state =
         match state.SelectedRankInfo with
         | None -> state, Cmd.none
         | Some rank ->
-            { state with Plaground = PlaygroundState.Replaying Deferred.Loading }
+            let oldState =
+                match state.Plaground with
+                | PlaygroundState.Submiting x | PlaygroundState.Paused x | PlaygroundState.Playing x -> Some x
+                | _ -> None
+            { state with Plaground = PlaygroundState.Replaying (Deferred.Loading, oldState) }
             , Http.get (sprintf "/api/player/%s/record/%d/events" rank.PlayerName rank.Id)
               |> Http.handleAsyncOperation GetRecordDetail
               |> Cmd.OfAsync.result
@@ -59,7 +63,11 @@ let getRecord msg state =
     | AsyncOperation.Finished data ->
         let newS, newC = Playground.States.init()
         let newS = { newS with Events = data; IsViewMode = true }
-        { state with Plaground = PlaygroundState.Replaying (Deferred.Loaded newS)  }
+        let oldState =
+            match state.Plaground with
+            | PlaygroundState.Replaying (_, x) -> x
+            | _ -> None
+        { state with Plaground = PlaygroundState.Replaying (Deferred.Loaded newS, oldState)  }
         , Cmd.batch [
             Cmd.map PlaygroundMsg newC
             Cmd.ofMsg (Playground.ReplayEvent 0 |> PlaygroundMsg)

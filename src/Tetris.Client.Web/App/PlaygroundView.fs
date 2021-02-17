@@ -31,7 +31,7 @@ let render state dispatch =
                             | _ ->
                                 ()
                             match state.Plaground with
-                            | PlaygroundState.Playing p | PlaygroundState.Replaying (DeferredValue p) | PlaygroundState.Paused p ->
+                            | PlaygroundState.Playing p | PlaygroundState.Replaying (DeferredValue p, _) | PlaygroundState.Paused p ->
                                 Html.div [
                                     prop.text (sprintf "#%d" p.Playground.Score)
                                     prop.classes [ Tw.``text-3xl``; Tw.``font-bold``; Tw.``opacity-50``; Tw.``text-white``; Tw.``mr-04`` ]
@@ -63,13 +63,14 @@ let render state dispatch =
                     ]
 
                     match state.Plaground with
-                    | PlaygroundState.Replaying (Deferred.Loading | Deferred.Reloading _) ->
+                    | PlaygroundState.Replaying (Deferred.Loading, _)
+                    | PlaygroundState.Replaying (Deferred.Reloading _, _) ->
                         Loader.line()
                     | _ ->
                         ()
 
                     match state.Plaground with
-                    | PlaygroundState.Replaying (DeferredValue s)
+                    | PlaygroundState.Replaying (DeferredValue s, _)
                     | PlaygroundState.Playing s
                     | PlaygroundState.Paused s ->
                         Playground.Views.render (s, PlaygroundMsg >> dispatch)
@@ -89,7 +90,7 @@ let render state dispatch =
                                     ButtonProp.Variant ButtonVariant.Danger
                                 ]
                                 match state.Plaground with
-                                | PlaygroundState.Replaying (DeferredValue p) when not p.IsReplaying ->
+                                | PlaygroundState.Replaying (DeferredValue p, _) when not p.IsReplaying ->
                                     Button.render [
                                         ButtonProp.Text (state.Context.Translate "App.Replay")
                                         ButtonProp.OnClick (fun _ -> Playground.ReplayEvent 0 |> PlaygroundMsg |> dispatch)

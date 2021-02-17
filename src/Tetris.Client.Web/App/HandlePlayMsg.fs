@@ -11,7 +11,11 @@ let play msg state =
         , Cmd.ofMsg (GetRecordDetail AsyncOperation.Start)
 
     | PlayMsg.StopReplay ->
-        { state with Plaground = PlaygroundState.Closed }
+        { state with 
+            Plaground =
+                match state.Plaground with
+                | PlaygroundState.Replaying (_, Some x) -> PlaygroundState.Paused x
+                | _ -> PlaygroundState.Closed }
         , Cmd.none
 
 

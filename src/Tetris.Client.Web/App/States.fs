@@ -75,9 +75,9 @@ let update msg state =
 
     | PlaygroundMsg msg' ->
         match state.Plaground with
-        | PlaygroundState.Replaying (DeferredValue s) ->
+        | PlaygroundState.Replaying (DeferredValue s, oldState) ->
             let newS, newCmd = Playground.States.update msg' s
-            { state with Plaground = PlaygroundState.Replaying (Deferred.Loaded newS) }
+            { state with Plaground = PlaygroundState.Replaying (Deferred.Loaded newS, oldState) }
             , Cmd.map PlaygroundMsg newCmd
         | PlaygroundState.Playing s -> 
             let newS, newCmd = Playground.States.update msg' s
