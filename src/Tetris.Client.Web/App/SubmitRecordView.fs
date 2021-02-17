@@ -92,20 +92,20 @@ let render =
                     ]
                     prop.children [
                         Button.render [
-                            ButtonProp.Text (tran "App.SubmitRecord.Pause")
-                            ButtonProp.OnClick (fun _ -> PlayMsg.PausePlay |> ControlPlayground |> props.dispatch)
-                            ButtonProp.Variant ButtonVariant.Primary
-                        ]
-
-                        Button.render [
                             ButtonProp.Text (tran "App.SubmitRecord.Discard")
                             ButtonProp.OnClick (fun _ -> PlayMsg.ClosePlay |> ControlPlayground |> props.dispatch)
                             ButtonProp.Variant ButtonVariant.Danger
                         ]
                         
                         Button.render [
+                            ButtonProp.Text (tran "App.SubmitRecord.Pause")
+                            ButtonProp.OnClick (fun _ -> PlayMsg.PausePlay |> ControlPlayground |> props.dispatch)
+                            ButtonProp.Variant ButtonVariant.Primary
+                            ButtonProp.Classes [ Tw.``mx-02`` ]
+                        ]
+                        
+                        Button.render [
                             ButtonProp.Text (tran "App.SubmitRecord.Submit")
-                            ButtonProp.Classes [ Tw.``ml-04`` ]
                             ButtonProp.ButtonAttrs [
                                 prop.style [
                                     if not canSave then style.cursor.notAllowed; style.opacity 0.25

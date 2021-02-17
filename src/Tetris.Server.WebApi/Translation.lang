@@ -11,6 +11,7 @@ App.StartPlay,开始游戏,Start Play
 App.SubmitRecord.Discard,不保存,Discard
 App.SubmitRecord.Name,昵称,Nick Name
 App.SubmitRecord.Password,密码,Password
+App.SubmitRecord.Pause,暂停,Pause
 App.SubmitRecord.Required,这是必填字段,This field is required
 App.SubmitRecord.RobotChecker,请击中方块以验证提交,Please click on the tetris block to validate submitting
 App.SubmitRecord.Submit,提交,Submit

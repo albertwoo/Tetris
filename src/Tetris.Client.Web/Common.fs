@@ -1,5 +1,6 @@
 ﻿namespace global
 
+open System
 open Fun.Result
 
 
@@ -19,7 +20,8 @@ type ClientError =
 
 
 type ClientContext =
-    { Lang: Lang
+    { ClientId: Guid
+      Lang: Lang
       Translations: Map<string, string> }
 
 
@@ -50,5 +52,6 @@ module Helpers =
             |> Option.defaultValue key
         
         static member defaultValue =
-            { Lang = Lang.CN
+            { ClientId = Guid.NewGuid()
+              Lang = Lang.CN
               Translations = Map.empty }

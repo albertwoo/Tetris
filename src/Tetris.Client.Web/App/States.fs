@@ -26,8 +26,7 @@ let init () =
 
     let cmd =
         Cmd.batch [
-            if state.Context.Translations.IsEmpty || state.Context.Lang <> lang then
-                Cmd.ofMsg (GetTranslations (lang, AsyncOperation.Start))
+            Cmd.ofMsg (GetTranslations (lang, AsyncOperation.Start))
             Cmd.ofMsg (GetGameBoard AsyncOperation.Start)
             Cmd.ofSub (fun dispatch ->
                 Browser.Dom.window.setInterval(
@@ -59,7 +58,7 @@ let update msg state =
 
     | PingServer ->
         state
-        , Http.postJson "/api/game/ping" ""
+        , Http.postJson (sprintf "/api/game/ping/%s" (state.Context.ClientId.ToString())) ""
           |> Http.handleAsync (fun _ -> Pong) (Some >> OnError)
           |> Cmd.OfAsync.result
 

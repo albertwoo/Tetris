@@ -10,16 +10,12 @@ open Tetris.Server.WebApi.Dtos
 open Tetris.Server.WebApi.Dtos.Game
 
 
-let updateOnline: HttpHandler =
+let updateOnline clientId: HttpHandler =
     fun nxt ctx ->
         task {
             let factory = ctx.GetService<IGrainFactory>()
             let gamebord = factory.GetGrain<IGameBoardGrain>(int64 Constants.GameZone1)
-            let ip = 
-                if ctx.Request.Headers.ContainsKey("X-Forwarded-For") 
-                then ctx.Request.Headers.["X-Forwarded-For"].Item(0)
-                else string ctx.Request.HttpContext.Connection.RemoteIpAddress
-            do! gamebord.Ping ip
+            do! gamebord.Ping clientId
             return! text "pong" nxt ctx
         }
 

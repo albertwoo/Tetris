@@ -125,7 +125,7 @@ let translate =
     }
 
 let preBuildClient =
-    BuildTask.create "PreBuildClient" [ checkEnv ] {
+    BuildTask.create "PreBuildClient" [ translate; checkEnv ] {
         cleanGeneratedJs clientWebPath
         buildTailwindCss clientWebPath
     }
