@@ -11,7 +11,7 @@ let render =
             let containerId, _ = React.useState (sprintf "tetris-playground-%d" (System.Random().Next()))
             React.useDeviceInput state dispatch containerId
             Html.div [
-                prop.classes [ Tw.flex; Tw.``flex-col``; Tw.``items-center``; Tw.``h-full`` ]
+                prop.classes [ Tw.flex; Tw.``flex-col``; Tw.``items-center``; Tw.``h-full``; Tw.``w-full`` ]
                 prop.children [
                     Html.div [
                         prop.id containerId
