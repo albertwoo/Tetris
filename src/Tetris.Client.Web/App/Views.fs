@@ -43,10 +43,12 @@ let render state dispatch =
 
             Html.div [
                 prop.classes [
-                    Tw.``h-full``; Tw.``w-full``; Tw.``mx-auto``; Tw.flex; Tw.``flex-col``; Tw.``justify-center``
+                    Tw.``h-full``; Tw.``w-full``; Tw.``mx-auto``
                     match state.Plaground with
-                    | PlaygroundState.Closed -> Tw.``overflow-auto``
-                    | _ -> ()
+                    | PlaygroundState.Replaying _
+                    | PlaygroundState.Playing _ -> ()
+                    | _ ->
+                        Tw.``overflow-auto``; Tw.flex; Tw.``flex-col``; Tw.``justify-center``
                 ]
                 prop.style [ style.maxWidth 720 ]
                 prop.children [

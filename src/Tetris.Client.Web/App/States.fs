@@ -113,6 +113,6 @@ let update msg state =
             let id =
                 match state.SelectedSeason with
                 | None -> b.Seasons |> List.tryHead
-                | Some s when s.Id < maxId -> b.Seasons |> List.tryFind (fun x -> x.Id = s.Id - 1)
+                | Some s when s.Id < maxId -> b.Seasons |> List.tryFind (fun x -> x.Id = s.Id + 1)
                 | x -> x
             { state with SelectedSeason = id; Plaground = PlaygroundState.Closed }, Cmd.none

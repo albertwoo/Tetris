@@ -7,10 +7,10 @@ open Tetris.Client.Web.Controls
 
 let render state dispatch =
     Html.div [
-        prop.classes [ Tw.``py-08``; Tw.``overflow-hidden`` ]
+        prop.classes [ Tw.``py-08``; Tw.``overflow-hidden``; Tw.``h-full`` ]
         prop.children [
             Html.div [
-                prop.classes [ Tw.flex; Tw.``flex-col``; Tw.``justify-center``; Tw.``items-center`` ]
+                prop.classes [ Tw.flex; Tw.``flex-col``; Tw.``justify-center``; Tw.``items-center``; Tw.``h-full`` ]
                 prop.children [
                     Html.div [
                         prop.classes [ 

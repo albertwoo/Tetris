@@ -82,7 +82,7 @@ let private rankView (gameboard: GameBoard) state dispatch =
                     (
                         Some 10,
                         Html.span [
-                            prop.text (if info.PlayerName.Length > 10 then info.PlayerName.Substring(0, 10) else info.PlayerName)
+                            prop.text (if info.PlayerName.Length > 12 then info.PlayerName.Substring(0, 12) else info.PlayerName)
                             prop.classes [ Tw.``text-xs``; Tw.``opacity-75`` ]
                         ]
                     )
