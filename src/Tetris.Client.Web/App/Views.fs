@@ -57,9 +57,14 @@ let render state dispatch =
                     | PlaygroundState.Submiting p ->
                         SubmitRecordView.render {| state = state; playground = p; dispatch = dispatch |}
                     | PlaygroundState.Closed  | PlaygroundState.Paused _ ->
-                        HeaderView.render (state.Context, dispatch)
-                        RankView.render state dispatch
-                        playButton (state, dispatch)
+                        Html.div [
+                            prop.classes [ Tw.``overflow-y-auto`` ]
+                            prop.children [
+                                HeaderView.render (state.Context, dispatch)
+                                RankView.render state dispatch
+                                playButton (state, dispatch)
+                            ]
+                        ]
                 ]
             ]
 
