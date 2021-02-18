@@ -45,8 +45,7 @@ let private rankView (gameboard: GameBoard) state dispatch =
                         Some 2,
                         Html.div [
                             prop.classes [
-                                Tw.``text-xl``; Tw.``text-gray-lighter``; Tw.``hover:text-gray-lightest``; Tw.``pl-03``
-                                Icons.``icon-play-circle``
+                                Icons.``icon-play-circle``; Tw.``text-xl``; Tw.``text-gray-lighter``; Tw.``hover:text-gray-lightest``; Tw.``pl-03``
                                 if state.SelectedRankInfo = Some info then
                                     Tw.``opacity-75``
                                 else
