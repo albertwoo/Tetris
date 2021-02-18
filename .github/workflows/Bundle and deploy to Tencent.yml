@@ -35,12 +35,12 @@ jobs:
         password: ${{ secrets.REMOTE_PWD }}
         
     - name: Run SSH command
-      uses: garygrossgarten/github-action-ssh@v0.3.0
+      uses: appleboy/ssh-action@v0.1.4
       with:
         host: ${{ secrets.REMOTE_HOST }}
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_PWD }}
-        command: |
+        script: |
           echo Stop website
           sudo pkill -f 172.17.0.14:86
           echo Copy files
