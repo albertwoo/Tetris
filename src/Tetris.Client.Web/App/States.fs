@@ -14,6 +14,7 @@ let init () =
             { Context = ClientContext.defaultValue
               ErrorInfo = None
               GameBoard = Deferred.NotStartYet
+              SelectedSeason = None
               SelectedRankInfo = None
               Plaground =  PlaygroundState.Closed
               UploadingState = Deferred.NotStartYet }
@@ -92,3 +93,26 @@ let update msg state =
             | PlaygroundState.Replaying _ -> ()
             | _ -> Utils.setCachedPlayingState state
         state, Cmd.none
+
+    | GotoPreSeason ->
+        match state.GameBoard.Value with
+        | None -> state, Cmd.none
+        | Some b ->
+            let id =
+                match state.SelectedSeason with
+                | None -> b.Seasons |> List.tryHead
+                | Some s when s.Id > 1 -> b.Seasons |> List.tryFind (fun x -> x.Id = s.Id - 1)
+                | x -> x
+            { state with SelectedSeason = id; Plaground = PlaygroundState.Closed }, Cmd.none
+
+    | GotoPosSeason ->
+        match state.GameBoard.Value with
+        | None -> state, Cmd.none
+        | Some b ->
+            let maxId = b.Seasons |> List.maxBy (fun x -> x.Id) |> fun x -> x.Id
+            let id =
+                match state.SelectedSeason with
+                | None -> b.Seasons |> List.tryHead
+                | Some s when s.Id < maxId -> b.Seasons |> List.tryFind (fun x -> x.Id = s.Id - 1)
+                | x -> x
+            { state with SelectedSeason = id; Plaground = PlaygroundState.Closed }, Cmd.none

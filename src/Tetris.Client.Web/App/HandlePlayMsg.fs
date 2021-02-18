@@ -21,7 +21,10 @@ let play msg state =
 
     | PlayMsg.StartPlay ->
         let freshStart() =
-            let newS, newC = Playground.States.init()
+            let newS, newC =
+                state.SelectedSeason
+                |> Option.map (fun x -> x.Width, x.Height)
+                |> Playground.States.init
             newS, Cmd.batch [ newC; Cmd.ofMsg Playground.Start ]
 
         let newS, newC = 

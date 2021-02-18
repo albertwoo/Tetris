@@ -97,7 +97,7 @@ let renderCanvas =
                 let calculateScale (_: Browser.Types.Event) =
                     let scaleWidth = (int Browser.Dom.window.innerWidth - 20) / playground.Size.Width
                     let scaleHeight = (int Browser.Dom.window.innerHeight - 180) / playground.Size.Height
-                    setScale(Math.Min(30, Math.Min(scaleWidth, scaleHeight)))
+                    setScale(Math.Min(20, Math.Min(scaleWidth, scaleHeight)))
                 calculateScale(null)
                 Browser.Dom.window.addEventListener("resize", calculateScale)
                 React.createDisposable(fun () -> Browser.Dom.window.removeEventListener("resize", calculateScale)))

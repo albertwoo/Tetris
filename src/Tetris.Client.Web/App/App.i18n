@@ -5,6 +5,7 @@ App.Rank.Title,#排行榜（前 10）,#RANK (TOP 10)
 App.Rank.Score,分数,Score
 App.Rank.Time,⏱耗时,⏱Time spent
 App.Rank.Name,昵称,Name
+App.Rank.Season,赛季,Season
 App.OnlineInfo,{0}正在玩/最高分{1},Online:{0}/Highest score:{1}
 App.Close,关闭,Close
 App.Replay,重播,Replay

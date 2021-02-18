@@ -9,9 +9,10 @@ open Tetris.Client.Web.Controls
 
 
 let private rankView (gameboard: GameBoard) state dispatch =
+    let ranks = state.SelectedSeason |> Option.map (fun x -> x.Ranks) |> Option.defaultValue []
     Html.div [
-        for (i, info) in gameboard.TopRanks |> List.indexed do
-            let maxScore = gameboard.TopRanks.Head.Score
+        for (i, info) in ranks |> List.indexed do
+            let maxScore = ranks.Head.Score
             let relativeV = info.Score * 100 / maxScore
             List.row [
                 ListRowProp.ContainerClasses [
@@ -95,11 +96,38 @@ let render state dispatch =
     Html.div [
         prop.classes [ Tw.``py-04`` ]
         prop.children [
-            Html.h2 [
-                prop.text (state.Context.Translate "App.Rank.Title")
-                prop.classes [ 
-                    Tw.``text-center``; Tw.``text-2xl``; Tw.``sm:text-xl``;
-                    Tw.``font-bold``; Tw.``text-gray-lighter``; Tw.``opacity-25``
+            Html.div [
+                prop.classes [ Tw.flex; Tw.``flex-row``; Tw.``items-center``; Tw.``justify-center`` ]
+                prop.children [
+                    Html.button [
+                        prop.classes [ 
+                            Icons.``icon-keyboard_arrow_left``; Tw.``text-xl``
+                            Tw.``px-02``; Tw.``py-02``; Tw.``m-02``; Tw.``text-white``; Tw.``opacity-50``
+                            Tw.``hover:bg-brand``; Tw.``focus:outline-none``; Tw.``hover:opacity-100``
+                            Tw.``rounded-full``; Tw.``w-10``; Tw.``h-10``
+                        ]
+                        prop.onClick (fun _ -> GotoPreSeason |> dispatch)
+                    ]
+                    Html.h2 [
+                        prop.text (
+                            state.Context.Translate "App.Rank.Season" 
+                            + (state.SelectedSeason |> Option.map (fun x -> string x.Id) |> Option.defaultValue "")
+                            + "  "
+                            + state.Context.Translate "App.Rank.Title")
+                        prop.classes [ 
+                            Tw.``text-center``; Tw.``text-2xl``; Tw.``sm:text-xl``;
+                            Tw.``font-bold``; Tw.``text-gray-lighter``; Tw.``opacity-25``
+                        ]
+                    ]
+                    Html.button [
+                        prop.classes [ 
+                            Icons.``icon-keyboard_arrow_right``; Tw.``text-xl``
+                            Tw.``px-02``; Tw.``py-02``; Tw.``m-02``; Tw.``text-white``; Tw.``opacity-50``
+                            Tw.``hover:bg-brand``; Tw.``focus:outline-none``; Tw.``hover:opacity-100``
+                            Tw.``rounded-full``; Tw.``w-10``; Tw.``h-10``
+                        ]
+                        prop.onClick (fun _ -> GotoPosSeason |> dispatch)
+                    ]
                 ]
             ]
             Html.div [

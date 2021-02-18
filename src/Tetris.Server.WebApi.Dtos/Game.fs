@@ -13,7 +13,14 @@ type NewRecord =
 
 type GameBoard =
     { OnlineCount: int
-      TopRanks: RecordBriefInfo list }
+      Seasons: SeasonBriefInfo list }
+
+type SeasonBriefInfo =
+    { Id: int
+      Width: int
+      Height: int
+      StartTime: DateTime
+      Ranks: RecordBriefInfo list }
 
 type RecordBriefInfo =
     { Id: int

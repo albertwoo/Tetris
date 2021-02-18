@@ -37,7 +37,12 @@ let getGameBoard msg state =
           |> Cmd.OfAsync.result
 
     | AsyncOperation.Finished data ->
-        { state with GameBoard = Deferred.Loaded data }
+        { state with
+            GameBoard = Deferred.Loaded data
+            SelectedSeason = 
+                match state.SelectedSeason with
+                | None -> data.Seasons |> List.tryHead
+                | Some season -> data.Seasons |> List.tryFind (fun x -> x.Id = season.Id) }
         , Cmd.none
 
     | AsyncOperation.Failed e ->
@@ -61,7 +66,10 @@ let getRecord msg state =
               |> Cmd.OfAsync.result
 
     | AsyncOperation.Finished data ->
-        let newS, newC = Playground.States.init()
+        let newS, newC = 
+            state.SelectedSeason
+            |> Option.map (fun x -> x.Width, x.Height)
+            |> Playground.States.init
         let newS = { newS with Events = data; IsViewMode = true }
         let oldState =
             match state.Plaground with
@@ -81,16 +89,19 @@ let getRecord msg state =
 let uploadRecord msg state =
     match msg with
     | checker: Controls.RobotCheckerValue, record, AsyncOperation.Start ->
-        { state with UploadingState = Deferred.Loading }
-        , Http.postJson "/api/player/record" record
-          |> Http.headers [
-                Header(RobotCheckerIdKey, checker.Id.ToString())
-                Header(RobotCheckerValueKey, checker.Value.ToString())
-          ]
-          |> Http.handleAsync 
-            (fun _ -> UploadRecord (checker, record, AsyncOperation.Finished()))
-            (fun e -> UploadRecord (checker, record, AsyncOperation.Failed e))
-          |> Cmd.OfAsync.result
+        match state.SelectedSeason with
+        | None -> state, Cmd.ofMsg (OnError (Some (ClientError.GeneralError ("NoSeason", "No season selected"))))
+        | Some season ->
+            { state with UploadingState = Deferred.Loading }
+            , Http.postJson (sprintf "/api/player/season/%d/record" season.Id) record
+              |> Http.headers [
+                    Header(RobotCheckerIdKey, checker.Id.ToString())
+                    Header(RobotCheckerValueKey, checker.Value.ToString())
+              ]
+              |> Http.handleAsync 
+                (fun _ -> UploadRecord (checker, record, AsyncOperation.Finished()))
+                (fun e -> UploadRecord (checker, record, AsyncOperation.Failed e))
+              |> Cmd.OfAsync.result
 
     | _, _, AsyncOperation.Finished () ->
         { state with UploadingState = Deferred.Loaded() }

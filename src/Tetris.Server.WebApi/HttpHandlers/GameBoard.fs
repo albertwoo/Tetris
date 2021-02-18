@@ -28,14 +28,24 @@ let getGameBoardInfo: HttpHandler =
             let! state = gamebord.GetState()
             let board: GameBoard =
                 { OnlineCount = state.OnlineIPs.Count
-                  TopRanks = 
-                    state.Ranks 
-                    |> List.map (fun x -> 
-                        { Id = x.Id
-                          PlayerName = x.PlayerName
-                          Score = x.Score
-                          RecordDate = x.RecordDate; 
-                          TimeCostInMs = x.TimeCostInMs }) }
+                  Seasons = 
+                    state.Seasons
+                    |> Option.defaultValue Map.empty
+                    |> Map.toList
+                    |> List.map (fun (i, s) ->
+                        { Id = i
+                          StartTime = s.StartTime
+                          Width = s.Width
+                          Height = s.Height
+                          Ranks =
+                            s.Ranks
+                            |> List.map (fun x -> 
+                                { Id = x.Id
+                                  PlayerName = x.PlayerName
+                                  Score = x.Score
+                                  RecordDate = x.RecordDate; 
+                                  TimeCostInMs = x.TimeCostInMs }) })
+                    |> List.sortByDescending (fun x -> x.Id) }
             return! json board  nxt ctx
         }
 

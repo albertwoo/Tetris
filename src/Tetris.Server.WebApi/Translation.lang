@@ -4,6 +4,7 @@ App.Guide,本游戏支持：手势滑动，键盘(上下左右)，按钮来操�
 App.OnlineInfo,{0}正在玩/最高分{1},Online:{0}/Highest score:{1}
 App.Rank.Name,昵称,Name
 App.Rank.Score,分数,Score
+App.Rank.Season,赛季,Season
 App.Rank.Time,⏱耗时,⏱Time spent
 App.Rank.Title,#排行榜（前 10）,#RANK (TOP 10)
 App.Replay,重播,Replay

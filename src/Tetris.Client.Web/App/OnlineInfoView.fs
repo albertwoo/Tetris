@@ -6,6 +6,7 @@ open Tetris.Client.Web.Controls
 
 
 let render (state: State) =
+    let ranks = state.SelectedSeason |> Option.map (fun x -> x.Ranks) |> Option.defaultValue []
     Html.div [
         prop.classes [ 
             Tw.``bg-brand-dark``; Tw.``text-xs``; Tw.``py-01``; Tw.``text-center``
@@ -19,7 +20,7 @@ let render (state: State) =
                     (state.Context.Translate "App.OnlineInfo"
                     ,gameboard.OnlineCount 
                     ,(
-                        match gameboard.TopRanks with
+                        match ranks with
                         | [] -> 0
                         | h::_ -> h.Score
                     ))

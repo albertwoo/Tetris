@@ -8,6 +8,7 @@ type State =
     { Context: ClientContext 
       ErrorInfo: ClientError option
       GameBoard: Deferred<GameBoard>
+      SelectedSeason: SeasonBriefInfo option
       SelectedRankInfo: RecordBriefInfo option
       Plaground: PlaygroundState
       UploadingState: Deferred<unit> }
@@ -30,6 +31,9 @@ type Msg =
     | PlaygroundMsg of Playground.Msg
 
     | OnWindowHide
+
+    | GotoPreSeason
+    | GotoPosSeason
 
 
 [<RequireQualifiedAccess>]

@@ -45,7 +45,7 @@ type PlayerGrain
                     this.SafeState <- { this.SafeState with Password = password }
             }
 
-        member _.AddRecord (password, record, tetrisEventsStr) =
+        member _.AddRecord (password, seasonId, record, tetrisEventsStr) =
             task {
                 do! (this :> IPlayerGrain).InitCredential(password)
                 if this.SafeState.Password = password then
@@ -61,7 +61,7 @@ type PlayerGrain
                     fileStore.Upload(id.AsString, tetrisEventsPath id.AsInt32, stream) |> ignore
 
                     let gameBoard = grainFactory.GetGrain<IGameBoardGrain>(int64 Constants.GameZone1)
-                    do! gameBoard.AddRecord { record with Id = id.AsInt32 }
+                    do! gameBoard.AddRecord (seasonId, { record with Id = id.AsInt32 })
                     do! state.WriteStateAsync()
                     return Ok id.AsInt32
 

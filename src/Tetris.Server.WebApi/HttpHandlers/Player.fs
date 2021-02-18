@@ -9,7 +9,7 @@ open Tetris.Server.WebApi.Grain.Interfaces
 open Tetris.Server.WebApi.Dtos.Game
 
 
-let uploadRecord: HttpHandler =
+let uploadRecord seasonId: HttpHandler =
     fun nxt ctx ->
         task {
             let! payload = ctx.BindJsonAsync<NewRecord>()
@@ -25,7 +25,7 @@ let uploadRecord: HttpHandler =
                       Score = payload.Score
                       RecordDate = DateTime.Now
                       TimeCostInMs = payload.TimeCostInMs }
-                let! id = player.AddRecord(payload.PlayerPassword, newRecord, payload.GameEvents)
+                let! id = player.AddRecord(payload.PlayerPassword, seasonId, newRecord, payload.GameEvents)
                 match id with
                 | Ok id   -> return! Successful.CREATED id nxt ctx
                 | Error e -> return! RequestErrors.BAD_REQUEST e nxt ctx

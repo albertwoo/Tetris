@@ -21,7 +21,7 @@ let all: HttpHandler =
             POST    >=> routeCif "/game/ping/%s" GameBoard.updateOnline
             GET     >=> routeCi  "/game/board" >=> GameBoard.getGameBoardInfo
                                  
-            POST    >=> routeCi  "/player/record" >=> RobotChecker.checkHeader >=> Player.uploadRecord
+            POST    >=> routeCif  "/player/season/%i/record" (fun id -> RobotChecker.checkHeader >=> Player.uploadRecord id)
             GET     >=> routeCif "/player/%s/record/%i" Player.getRecord
             GET     >=> routeCif "/player/%s/record/%i/events" Player.getRecordEvents
         ])
