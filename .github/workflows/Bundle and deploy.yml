@@ -1,11 +1,11 @@
 name: Bundle and deploy to Tencent
 
 on:
-  push:
-    branches:
-      - master
-  # release:
-  #   types: [published]
+  # push:
+  #   branches:
+  #     - master
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -50,5 +50,4 @@ jobs:
           cp -r -f  ${{ secrets.REMOTE_TARGET }}/TetrisDeploy/* ${{ secrets.REMOTE_TARGET }}/Tetris
           echo Start website
           sudo systemctl start tetris.service
-          sudo systemctl staus tetris.service
     
