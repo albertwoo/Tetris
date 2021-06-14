@@ -1,8 +1,11 @@
 name: Bundle and deploy to Tencent
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - master
+  # release:
+  #   types: [published]
 
 jobs:
   build:
@@ -42,11 +45,11 @@ jobs:
         password: ${{ secrets.REMOTE_PWD }}
         script: |
           echo Stop website
-          sudo pkill -f 172.17.0.14:86
+          sudo pkill -f ${{ secrets.REMOTE_LOCALHOST }}:${{ secrets.REMOTE_PORT }}
           echo Copy files
           cp -r -f  ${{ secrets.REMOTE_TARGET }}/TetrisDeploy/* ${{ secrets.REMOTE_TARGET }}/Tetris
           echo Start website
           cd ${{ secrets.REMOTE_TARGET }}/Tetris
-          sudo nohup dotnet Tetris.Server.WebApi.dll --urls http://172.17.0.14:86 > Tetris.out 2>&1 &
+          sudo nohup dotnet Tetris.Server.WebApi.dll --urls http://${{ secrets.REMOTE_LOCALHOST }}:${{ secrets.REMOTE_PORT }} > Tetris.out 2>&1 &
         
     
